@@ -23,8 +23,8 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
-  const [selectedAddressId, setSelectedAddressId] = useState<string | 'new'>(
-    user?.addresses?.find(a => a.isDefault)?.type || (user?.addresses?.length ? user.addresses[0].type : 'new')
+  const [selectedAddressId, setSelectedAddressId] = useState<number | 'new'>(
+    user?.addresses?.find(a => a.isDefault)?.shipping_address_id || (user?.addresses?.length ? user.addresses[0].shipping_address_id! : 'new')
   );
   const [saveToAccount, setSaveToAccount] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,7 +80,7 @@ const CheckoutPage = () => {
       setFormData(prev => ({ ...prev, email: user.email, name: user.name, surname: user.surname || '' }));
       
       if (selectedAddressId !== 'new' && user.addresses) {
-        const addr = user.addresses.find(a => a.type === selectedAddressId);
+        const addr = user.addresses.find(a => a.shipping_address_id === selectedAddressId);
         if (addr) {
           setFormData({
             email: user.email,
@@ -229,7 +229,7 @@ const CheckoutPage = () => {
       return;
     }
 
-    const selectedAddress = user?.addresses?.find(a => a.type === selectedAddressId);
+    const selectedAddress = user?.addresses?.find(a => a.shipping_address_id === selectedAddressId);
     let shippingAddressId = selectedAddress?.shipping_address_id || null;
 
     if (isAuthenticated && user && selectedAddressId === 'new' && saveToAccount) {
@@ -396,18 +396,18 @@ const CheckoutPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
                     {user.addresses.map((addr) => (
                       <div 
-                        key={addr.shipping_address_id || addr.type}
+                        key={addr.shipping_address_id}
                         onClick={() => {
-                          setSelectedAddressId(addr.type);
+                          setSelectedAddressId(addr.shipping_address_id!);
                           setIsChangingAddress(false);
                         }}
                         className={`p-6 rounded-2xl border cursor-pointer transition-all ${
-                          selectedAddressId === addr.type ? 'bg-primary/5 border-primary shadow-lg' : 'bg-white/5 border-white/10 hover:border-white/30'
+                          selectedAddressId === addr.shipping_address_id ? 'bg-primary/5 border-primary shadow-lg' : 'bg-white/5 border-white/10 hover:border-white/30'
                         }`}
                       >
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-[10px] font-black uppercase tracking-widest">{addr.type}</span>
-                          {selectedAddressId === addr.type && <CheckCircle2 className="w-4 h-4 text-primary" />}
+                          {selectedAddressId === addr.shipping_address_id && <CheckCircle2 className="w-4 h-4 text-primary" />}
                         </div>
                         <p className="text-[11px] text-secondary/60">{addr.street}</p>
                         <p className="text-[11px] text-secondary/40 uppercase tracking-tighter mt-1">{addr.zip} {addr.city} ({addr.province})</p>
@@ -431,9 +431,9 @@ const CheckoutPage = () => {
                     <div className="space-y-1">
                       <div className="flex items-center gap-3 mb-2">
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 bg-primary/10 text-primary rounded-full">
-                          {selectedAddressId === 'new' ? 'Nueva Dirección' : user.addresses.find(a => a.type === selectedAddressId)?.type}
+                          {selectedAddressId === 'new' ? 'Nueva Dirección' : user.addresses.find(a => a.shipping_address_id === selectedAddressId)?.type}
                         </span>
-                        {user.addresses.find(a => a.type === selectedAddressId)?.isDefault && (
+                        {user.addresses.find(a => a.shipping_address_id === selectedAddressId)?.isDefault && (
                           <span className="text-[8px] font-black uppercase tracking-widest text-gray-500 italic">(Principal)</span>
                         )}
                       </div>
@@ -441,9 +441,9 @@ const CheckoutPage = () => {
                         <p className="text-sm font-medium text-gray-400">Introduce los datos abajo</p>
                       ) : (
                         <>
-                          <p className="text-base font-bold">{user.addresses.find(a => a.type === selectedAddressId)?.street}</p>
+                          <p className="text-base font-bold">{user.addresses.find(a => a.shipping_address_id === selectedAddressId)?.street}</p>
                           <p className="text-xs text-gray-500 font-medium">
-                            {user.addresses.find(a => a.type === selectedAddressId)?.zip} {user.addresses.find(a => a.type === selectedAddressId)?.city}, {user.addresses.find(a => a.type === selectedAddressId)?.province}
+                            {user.addresses.find(a => a.shipping_address_id === selectedAddressId)?.zip} {user.addresses.find(a => a.shipping_address_id === selectedAddressId)?.city}, {user.addresses.find(a => a.shipping_address_id === selectedAddressId)?.province}
                           </p>
                         </>
                       )}
