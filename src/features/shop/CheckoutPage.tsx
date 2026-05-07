@@ -28,7 +28,7 @@ const CheckoutPage = () => {
   );
   const [saveToAccount, setSaveToAccount] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'bizum'>('bizum');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'bizum'>('card');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [shippingOption, setShippingOption] = useState<'home' | 'local' | 'nacex_point'>('home');
   const [selectedPoint, setSelectedPoint] = useState<string>('');
