@@ -181,7 +181,8 @@ export const AdminDashboard: React.FC = () => {
         telefono: order.customer?.phone,
         orderId: order.order_id,
         isTest: order.payment_method === 'TEST_MODE',
-        payment_method: order.payment_method // Enviar también el método de pago original
+        isNacexShop: order.carrier?.includes('Nacex Point'), // Detectar si es envío a punto
+        payment_method: order.payment_method
       } : {};
 
       const res = await api.shipping.createNacexExpedition(orderId, orderDetails);

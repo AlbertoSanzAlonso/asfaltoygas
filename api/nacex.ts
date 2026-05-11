@@ -145,7 +145,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const nacexData = [
         `del_cli=${NACEX_AGENCY}`,
         `num_cli=${cleanCliente}`,
-        `tip_ser=08`,
+        `tip_ser=${body.isNacexShop ? '31' : '08'}`, // 31 para NacexShop, 08 para domicilio
         `tip_cob=O`,
         `ref_cli=${(orderId || 'ORD').split('-')[0]}`,
         `tip_env=1`,
