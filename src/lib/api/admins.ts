@@ -15,11 +15,11 @@ export const admins = {
     return data || null;
   },
 
-  getByUsername: async (username: string): Promise<Admin | null> => {
+  getByEmail: async (email: string): Promise<Admin | null> => {
     const { data, error } = await supabase
       .from('admins')
       .select('*')
-      .eq('username', username)
+      .eq('email', email)
       .maybeSingle();
 
     if (error && error.code !== 'PGRST116') throw error;

@@ -30,19 +30,15 @@ export const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({ isAdmin 
       let type: 'admin' | 'customer' = isAdmin ? 'admin' : 'customer';
 
       if (isAdmin) {
-        // Primero intentamos buscar por username o email en nuestra tabla personalizada
-        let admin = await api.admins.getByUsername(emailOrUser);
-        if (!admin) {
-          admin = await api.admins.getByEmail(emailOrUser);
-        }
+        // Buscamos directamente por email en la tabla personalizada
+        let admin = await api.admins.getByEmail(emailOrUser);
 
         if (admin && admin.email) {
           targetEmail = admin.email;
         } else if (emailOrUser.includes('@')) {
-          // Si no está en la tabla pero el input es un email, lo usamos directamente
           targetEmail = emailOrUser.trim().toLowerCase();
         } else {
-          throw new Error('Cuenta de administrador no encontrada. Por favor, introduce tu email completo.');
+          throw new Error('Por favor, introduce tu email completo de administrador.');
         }
       } else {
         const customer = await api.customers.getByEmail(emailOrUser);
