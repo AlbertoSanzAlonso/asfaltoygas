@@ -82,7 +82,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           city: p[3] || '',
           zip: p[4] || '',
           phone: p[5] || '',
-          hours: p[6] || ''
+          hours: p[6] || '',
+          lat: p[p.length - 2] || '',
+          lng: p[p.length - 1] || ''
         };
       });
 

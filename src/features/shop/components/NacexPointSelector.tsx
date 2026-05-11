@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, CheckCircle2, Search, Loader2 } from 'lucide-react';
+import { NacexMap } from './NacexMap';
 
 interface NacexPoint {
   id: string;
@@ -7,6 +8,8 @@ interface NacexPoint {
   address: string;
   city: string;
   zip: string;
+  lat?: string;
+  lng?: string;
 }
 
 interface NacexPointSelectorProps {
@@ -78,34 +81,44 @@ export const NacexPointSelector: React.FC<NacexPointSelectorProps> = ({ onSelect
           {points.map((point) => {
             const isSelected = selectedPoint?.includes(point.id);
             return (
-              <div
-                key={point.id}
-                onClick={() => onSelect(`${point.name} (${point.id})`)}
-                className={`group p-6 rounded-4xl border-2 cursor-pointer transition-all duration-300 flex items-center justify-between ${
-                  isSelected
-                    ? 'bg-primary/5 border-primary shadow-xl scale-[1.01]'
-                    : 'bg-secondary/5 border-transparent hover:border-primary/20 hover:bg-white hover:shadow-lg'
-                }`}
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-3">
-                    <p className={`text-[13px] font-black uppercase tracking-tight italic ${isSelected ? 'text-primary' : 'text-secondary'}`}>
-                      {point.name}
-                    </p>
+              <div key={point.id} className="space-y-4">
+                <div
+                  onClick={() => onSelect(`${point.name} (${point.id})`)}
+                  className={`group p-6 rounded-4xl border-2 cursor-pointer transition-all duration-300 flex items-center justify-between ${
+                    isSelected
+                      ? 'bg-primary/5 border-primary shadow-xl scale-[1.01]'
+                      : 'bg-secondary/5 border-transparent hover:border-primary/20 hover:bg-white hover:shadow-lg'
+                  }`}
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      <p className={`text-[13px] font-black uppercase tracking-tight italic ${isSelected ? 'text-primary' : 'text-secondary'}`}>
+                        {point.name}
+                      </p>
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+                      <p className="text-[10px] text-secondary/60 uppercase tracking-widest font-bold">
+                        {point.address}
+                      </p>
+                      <span className="text-[9px] text-primary/40 font-black uppercase tracking-[0.2em]">
+                        {point.city} • {point.zip}
+                      </span>
+                    </div>
                   </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
-                    <p className="text-[10px] text-secondary/60 uppercase tracking-widest font-bold">
-                      {point.address}
-                    </p>
-                    <span className="text-[9px] text-primary/40 font-black uppercase tracking-[0.2em]">
-                      {point.city} • {point.zip}
-                    </span>
+                  
+                  <div className={`shrink-0 ml-4 p-3 rounded-2xl transition-all duration-500 ${isSelected ? 'bg-primary text-white' : 'bg-white text-secondary/10 opacity-0 group-hover:opacity-100'}`}>
+                    {isSelected ? <CheckCircle2 className="w-5 h-5" /> : <MapPin className="w-4 h-4" />}
                   </div>
                 </div>
-                
-                <div className={`shrink-0 ml-4 p-3 rounded-2xl transition-all duration-500 ${isSelected ? 'bg-primary text-white' : 'bg-white text-secondary/10 opacity-0 group-hover:opacity-100'}`}>
-                  {isSelected ? <CheckCircle2 className="w-5 h-5" /> : <MapPin className="w-4 h-4" />}
-                </div>
+
+                {isSelected && point.lat && point.lng && (
+                  <NacexMap 
+                    lat={parseFloat(point.lat)} 
+                    lng={parseFloat(point.lng)} 
+                    name={point.name} 
+                    address={point.address} 
+                  />
+                )}
               </div>
             );
           })}
