@@ -138,8 +138,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log('Nacex Data (Key-Value):', nacexData);
 
-    // MODO PRUEBA: Si el ID del pedido empieza por TEST- o viene marcado como isTest
-    const isTestOrder = (orderId || '').toString().startsWith('TEST-') || body.isTest === true;
+    // MODO PRUEBA: Muy robusto para evitar errores reales en desarrollo
+    const isTestOrder = 
+      (orderId || '').toString().toUpperCase().startsWith('TEST') || 
+      body.isTest === true || 
+      body.isTest === 'true' ||
+      body.payment_method === 'TEST_MODE';
+
+    console.log(`>>> Procesando pedido ${orderId}. Modo Test: ${isTestOrder}`);
 
     if (!canUseRealAPI || isTestOrder) {
       console.log('>>> MODO SIMULACIÓN ACTIVADO');

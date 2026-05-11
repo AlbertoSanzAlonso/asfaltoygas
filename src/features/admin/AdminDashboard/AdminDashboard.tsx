@@ -180,7 +180,8 @@ export const AdminDashboard: React.FC = () => {
         cp: order.shipping_zip,
         telefono: order.customer?.phone,
         orderId: order.order_id,
-        isTest: order.payment_method === 'TEST_MODE' // Detectar si es un pedido de prueba
+        isTest: order.payment_method === 'TEST_MODE',
+        payment_method: order.payment_method // Enviar también el método de pago original
       } : {};
 
       const res = await api.shipping.createNacexExpedition(orderId, orderDetails);
