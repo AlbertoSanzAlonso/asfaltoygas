@@ -11,7 +11,6 @@ import type { Address } from '@/types';
 export const useCheckoutForm = () => {
   const { items, total: cartTotal, clearCart, setIsCartOpen, openModal } = useCartStore();
   const { user, isAuthenticated, updateUser } = useAuthStore();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const [selectedAddressId, setSelectedAddressId] = useState<number | 'new'>(

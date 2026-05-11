@@ -81,7 +81,7 @@ export const NacexPointSelector: React.FC<NacexPointSelectorProps> = ({ onSelect
               <div
                 key={point.id}
                 onClick={() => onSelect(`${point.name} (${point.id})`)}
-                className={`group p-6 rounded-[2rem] border-2 cursor-pointer transition-all duration-300 flex items-center justify-between ${
+                className={`group p-6 rounded-4xl border-2 cursor-pointer transition-all duration-300 flex items-center justify-between ${
                   isSelected
                     ? 'bg-primary/5 border-primary shadow-xl scale-[1.01]'
                     : 'bg-secondary/5 border-transparent hover:border-primary/20 hover:bg-white hover:shadow-lg'
