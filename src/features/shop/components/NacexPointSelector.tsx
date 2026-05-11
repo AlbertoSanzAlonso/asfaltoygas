@@ -15,7 +15,7 @@ interface NacexPoint {
 }
 
 interface NacexPointSelectorProps {
-  onSelect: (pointName: string) => void;
+  onSelect: (point: NacexPoint) => void;
   selectedPoint?: string;
   zipCode?: string;
 }
@@ -81,11 +81,11 @@ export const NacexPointSelector: React.FC<NacexPointSelectorProps> = ({ onSelect
       ) : (
         <div className="space-y-4">
           {points.map((point) => {
-            const isSelected = selectedPoint?.includes(point.id);
+            const isSelected = selectedPoint?.includes(point.id) || selectedPoint === point.name;
             return (
               <div key={point.id} className="space-y-4">
                 <div
-                  onClick={() => onSelect(`${point.name} (${point.id})`)}
+                  onClick={() => onSelect(point)}
                   className={`group p-6 rounded-4xl border-2 cursor-pointer transition-all duration-300 flex items-center justify-between ${
                     isSelected
                       ? 'bg-primary/5 border-primary shadow-xl scale-[1.01]'

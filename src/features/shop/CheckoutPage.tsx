@@ -86,7 +86,7 @@ const CheckoutPage = () => {
                 selectedOption={shippingOption} 
                 onSelect={setShippingOption} 
                 selectedPoint={selectedPoint}
-                onPointSelect={setSelectedPoint}
+                onPointSelect={setSelectedNacexPoint}
                 zipCode={formData.zip}
               />
 

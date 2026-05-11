@@ -9,7 +9,7 @@ interface ShippingMethodSelectorProps {
   selectedOption: ShippingOption;
   onSelect: (option: ShippingOption) => void;
   selectedPoint?: string;
-  onPointSelect?: (point: string) => void;
+  onPointSelect?: (point: any) => void;
   zipCode?: string;
 }
 

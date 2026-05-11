@@ -20,7 +20,7 @@ export const useCheckoutForm = () => {
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'bizum'>('card');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [shippingOption, setShippingOption] = useState<'home' | 'local' | 'nacex_point'>('home');
-  const [selectedPoint, setSelectedPoint] = useState<string>('');
+  const [selectedNacexPoint, setSelectedNacexPoint] = useState<any>(null);
   const [isChangingAddress, setIsChangingAddress] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -159,7 +159,17 @@ export const useCheckoutForm = () => {
         image_url: item.images?.[0] || ''
       })),
       payment_status: 'Paid',
-      carrier: shippingOption === 'nacex_point' ? `Nacex Point: ${selectedPoint}` : shippingOption
+      carrier: shippingOption === 'nacex_point' && selectedNacexPoint 
+        ? `Nacex Point: ${selectedNacexPoint.name} (${selectedNacexPoint.address})` 
+        : shippingOption,
+      // Guardamos metadatos adicionales si la base de datos tiene el campo JSONB
+      metadata: shippingOption === 'nacex_point' ? {
+        nacex_shop_id: selectedNacexPoint?.id,
+        nacex_shop_name: selectedNacexPoint?.name,
+        nacex_shop_address: selectedNacexPoint?.address,
+        nacex_shop_city: selectedNacexPoint?.city,
+        nacex_shop_zip: selectedNacexPoint?.zip
+      } : null
     };
 
     try {
@@ -193,7 +203,7 @@ export const useCheckoutForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    if (shippingOption === 'nacex_point' && !selectedPoint) {
+    if (shippingOption === 'nacex_point' && !selectedNacexPoint) {
       alert('Por favor, selecciona un Punto Nacex Shop para continuar.');
       setIsSubmitting(false);
       return;
@@ -237,7 +247,16 @@ export const useCheckoutForm = () => {
       total_amount: finalTotal,
       order_status: 'Pending',
       payment_method: paymentMethod === 'card' ? 'Redsys (Tarjeta)' : 'Redsys (Bizum)',
-      carrier: shippingOption === 'nacex_point' ? `Nacex Point: ${selectedPoint}` : shippingOption,
+      carrier: shippingOption === 'nacex_point' && selectedNacexPoint 
+        ? `Nacex Point: ${selectedNacexPoint.name} (${selectedNacexPoint.address})` 
+        : shippingOption,
+      metadata: shippingOption === 'nacex_point' ? {
+        nacex_shop_id: selectedNacexPoint?.id,
+        nacex_shop_name: selectedNacexPoint?.name,
+        nacex_shop_address: selectedNacexPoint?.address,
+        nacex_shop_city: selectedNacexPoint?.city,
+        nacex_shop_zip: selectedNacexPoint?.zip
+      } : null,
       shipping_address_id: shippingAddressId,
       shipping_city: formData.city,
       shipping_province: formData.province,
@@ -313,8 +332,9 @@ export const useCheckoutForm = () => {
     setIsChangingAddress,
     shippingOption,
     setShippingOption,
-    selectedPoint,
-    setSelectedPoint,
+    selectedPoint: selectedNacexPoint?.name || '',
+    selectedNacexPoint,
+    setSelectedNacexPoint,
     paymentMethod,
     setPaymentMethod,
     isSubmitting,
