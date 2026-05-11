@@ -81,25 +81,29 @@ export const NacexPointSelector: React.FC<NacexPointSelectorProps> = ({ onSelect
               <div
                 key={point.id}
                 onClick={() => onSelect(`${point.name} (${point.id})`)}
-                className={`group p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 flex items-center justify-between ${
+                className={`group p-6 rounded-[2rem] border-2 cursor-pointer transition-all duration-300 flex items-center justify-between ${
                   isSelected
-                    ? 'bg-primary/5 border-primary shadow-lg scale-[1.02]'
-                    : 'bg-secondary/5 border-transparent hover:border-primary/30 hover:bg-white hover:shadow-md'
+                    ? 'bg-primary/5 border-primary shadow-xl scale-[1.01]'
+                    : 'bg-secondary/5 border-transparent hover:border-primary/20 hover:bg-white hover:shadow-lg'
                 }`}
               >
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[8px] font-black bg-secondary text-white px-2 py-0.5 rounded-full uppercase tracking-tighter">ID: {point.id}</span>
-                    <p className={`text-[11px] font-black uppercase tracking-tight italic ${isSelected ? 'text-primary' : 'text-secondary'}`}>
+                  <div className="flex items-center gap-3">
+                    <p className={`text-[13px] font-black uppercase tracking-tight italic ${isSelected ? 'text-primary' : 'text-secondary'}`}>
                       {point.name}
                     </p>
                   </div>
-                  <p className="text-[10px] text-secondary/60 uppercase tracking-widest font-bold mt-2 flex items-center gap-1">
-                    {point.address} • <span className="text-primary/40">{point.city}</span>
-                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <p className="text-[10px] text-secondary/60 uppercase tracking-widest font-bold">
+                      {point.address}
+                    </p>
+                    <span className="text-[9px] text-primary/40 font-black uppercase tracking-[0.2em]">
+                      {point.city} • {point.zip}
+                    </span>
+                  </div>
                 </div>
                 
-                <div className={`shrink-0 ml-4 p-2 rounded-xl transition-all duration-500 ${isSelected ? 'bg-primary text-white rotate-0' : 'bg-white text-secondary/20 rotate-90 opacity-0 group-hover:opacity-100'}`}>
+                <div className={`shrink-0 ml-4 p-3 rounded-2xl transition-all duration-500 ${isSelected ? 'bg-primary text-white' : 'bg-white text-secondary/10 opacity-0 group-hover:opacity-100'}`}>
                   {isSelected ? <CheckCircle2 className="w-5 h-5" /> : <MapPin className="w-4 h-4" />}
                 </div>
               </div>

@@ -60,15 +60,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       // Método exacto encontrado en el WSDL para buscar puntos por CP
       const response = await fetch(`${NACEX_WS_URL}?method=getPuntoEntregaCP&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=${targetCP}`);
-      const rawData = await response.text();
       
-      // El formato de este método usa tildes (~) y saltos de línea
+      // Nacex usa ISO-8859-1, necesitamos decodificarlo correctamente
+      const buffer = await response.arrayBuffer();
+      const decoder = new TextDecoder('iso-8859-1');
+      const rawData = decoder.decode(buffer);
+      
       const lines = rawData.split('\n').filter(l => l.trim() && l.includes('~'));
       const points = lines.map(line => {
         const p = line.split('~');
+        
+        // Limpiar el nombre: quitar códigos tipo "0800-00 " del principio
+        let cleanName = (p[1] || 'Punto Nacex').replace(/^[0-9\-]+\s+/, '').trim();
+        // Quitar también repeticiones tipo "AGENCIA 0800"
+        cleanName = cleanName.replace(/AGENCIA\s+[0-9]+/gi, '').trim();
+
         return {
           id: p[0],
-          name: p[1] || 'Punto Nacex',
+          name: cleanName,
           address: p[2] || '',
           city: p[3] || '',
           zip: p[4] || '',
