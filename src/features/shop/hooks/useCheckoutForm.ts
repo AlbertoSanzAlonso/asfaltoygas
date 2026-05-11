@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCartStore } from "@/store/useCartStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -9,7 +8,7 @@ import { fetchRedsysParameters, REDSYS_URL_TEST, REDSYS_URL_PROD } from "@/lib/r
 import type { Address } from '@/types';
 
 export const useCheckoutForm = () => {
-  const { items, total: cartTotal, clearCart, setIsCartOpen, openModal } = useCartStore();
+  const { items, total: cartTotal, clearCart, openModal } = useCartStore();
   const { user, isAuthenticated, updateUser } = useAuthStore();
   const queryClient = useQueryClient();
 
