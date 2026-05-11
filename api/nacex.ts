@@ -1,11 +1,11 @@
 
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { NACEX_CONFIG } from '../src/constants/nacex';
 
 /**
- * Nacex API Handler (Proxy to avoid CORS and hide credentials)
+ * Nacex API Handler (Proxy para evitar CORS y ocultar credenciales)
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Configuración de cabeceras para CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -16,145 +16,97 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const { method, cp, tracking } = req.query;
 
-  // NACEX CREDENTIALS
-  const NACEX_USER = process.env.NACEX_USER || NACEX_CONFIG.usuario;
+  // CREDENCIALES (Prioridad a Variables de Entorno)
+  const NACEX_USER = process.env.NACEX_USER || 'INFOBENALUMOX@GMAIL.COM';
   const NACEX_PASS = process.env.NACEX_PASSWORD || '';
-  const NACEX_AGENCY = process.env.NACEX_AGENCIA || NACEX_CONFIG.agencia;
-  const NACEX_CLIENT = process.env.NACEX_CLIENTE || NACEX_CONFIG.cliente;
-  const NACEX_CP = process.env.NACEX_CP_RECOGIDA || NACEX_CONFIG.codigoPostalRecogida;
+  const NACEX_AGENCY = process.env.NACEX_AGENCIA || '2924';
+  const NACEX_CLIENT = process.env.NACEX_CLIENTE || '00472';
+  const NACEX_CP_RECOGIDA = process.env.NACEX_CP_RECOGIDA || '29631';
   
   const NACEX_WS_URL = 'https://pda.nacex.com/nacex_ws/ws'; 
 
-  // Helper to check if we should use real API
-  const canUseRealAPI = NACEX_PASS && NACEX_PASS !== 'tu_password';
+  const canUseRealAPI = NACEX_PASS && NACEX_PASS !== 'tu_password' && NACEX_PASS !== 'PON_AQUI_TU_CLAVE_MD5';
 
   // --- 1. TEST CONNECTION ---
   if (method === 'test_connection') {
-    if (!canUseRealAPI) {
-      return res.status(200).json({ 
-        success: true, 
-        message: 'Modo MOCK activo (sin contraseña real)',
-        mode: 'mock'
-      });
-    }
+    if (!canUseRealAPI) return res.status(200).json({ success: true, mode: 'mock' });
 
     try {
-      const response = await fetch(`${NACEX_WS_URL}?method=getAgencias&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=`);
+      const response = await fetch(`${NACEX_WS_URL}?method=getAgencia&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=28001`);
       const data = await response.text();
       if (response.ok && !data.includes('ERROR')) {
-        return res.status(200).json({ success: true, message: 'Conexión REAL establecida', mode: 'real' });
+        return res.status(200).json({ success: true, mode: 'real' });
       }
-      return res.status(401).json({ success: false, error: 'Credenciales inválidas en Nacex', detail: data });
+      return res.status(401).json({ success: false, error: 'Credenciales inválidas', detail: data });
     } catch (err) {
-      return res.status(500).json({ success: false, error: 'Error de red con Nacex' });
+      return res.status(500).json({ success: false, error: 'Error de red' });
     }
   }
 
   // --- 2. PUNTOS DE RECOGIDA (NacexShop) ---
   if (method === 'get_puntos_shop') {
-    // Si tuviéramos API real, llamaríamos aquí. Mientras tanto, devolvemos puntos reales de ejemplo.
-    const mockPoints = [
-      { id: 'S292401', name: 'Nacex Shop - Papelería Gema', address: 'Av. Constitución, 12', city: 'Benalmádena', zip: '29631', distance: '0.5km' },
-      { id: 'S292402', name: 'Nacex Shop - Estanco Nº3', address: 'Calle Las Flores, 5', city: 'Benalmádena', zip: '29630', distance: '1.2km' },
-      { id: 'S292403', name: 'Nacex Shop - Supermercado Local', address: 'Plaza de la Mezquita, s/n', city: 'Benalmádena', zip: '29631', distance: '0.8km' },
-    ];
-    return res.status(200).json(mockPoints);
+    const targetCP = cp || NACEX_CP_RECOGIDA;
+    
+    if (!canUseRealAPI) {
+      // Mock points if no API key
+      const mockPoints = [
+        { id: 'S292401', name: 'Nacex Shop - Papelería Gema', address: 'Av. Constitución, 12', city: 'Benalmádena', zip: '29631', distance: '0.5km' },
+        { id: 'S292402', name: 'Nacex Shop - Estanco Nº3', address: 'Calle Las Flores, 5', city: 'Benalmádena', zip: '29630', distance: '1.2km' },
+        { id: 'S292403', name: 'Nacex Shop - Supermercado Local', address: 'Plaza de la Mezquita, s/n', city: 'Benalmádena', zip: '29631', distance: '0.8km' },
+      ];
+      return res.status(200).json(mockPoints);
+    }
+
+    try {
+      // Llamada real a getPuntosEntrega de Nacex
+      const response = await fetch(`${NACEX_WS_URL}?method=getPuntosEntrega&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=cp=${targetCP}`);
+      const rawData = await response.text();
+      
+      // Parsear respuesta por tuberías
+      const lines = rawData.split('\n').filter(l => l.trim());
+      const points = lines.map(line => {
+        const p = line.split('|');
+        return {
+          id: p[0],
+          name: p[1],
+          address: p[2],
+          zip: p[3],
+          city: p[4],
+          distance: p[5] ? `${p[5]}km` : ''
+        };
+      });
+
+      return res.status(200).json(points);
+    } catch (err) {
+      return res.status(500).json({ error: 'Error cargando puntos Nacex' });
+    }
   }
 
   // --- 3. CREAR ENVÍO ---
   if (method === 'crear_envio') {
     if (!canUseRealAPI) {
-      return res.status(200).json({
-        success: true,
-        message: 'Envío simulado correctamente',
-        tracking: 'NX' + Math.floor(Math.random() * 1000000000),
-        label_url: '#',
-        mode: 'mock'
-      });
+      return res.status(200).json({ success: true, tracking: 'NX' + Date.now(), label_url: '#', mode: 'mock' });
     }
 
     try {
-      // Obtenemos datos del body para el envío real
       const orderData = req.body || {};
-      
-      /* 
-        Formato DATA para putExpedicion (simplificado):
-        del_cli|num_cli|nom_rec|dir_rec|pob_rec|cp_rec|tel_rec|nom_ent|dir_ent|pob_ent|cp_ent|tel_ent|tip_ser|tip_env|num_pac|pes_pac|val_dec|obs_1|obs_2|ref_cli|tip_cob|imp_cob
-      */
       const dataParams = [
-        NACEX_AGENCY,                        // del_cli
-        NACEX_CLIENT,                        // num_cli
-        '',                                  // nom_rec (vacio = usa datos cliente)
-        '',                                  // dir_rec
-        '',                                  // pob_rec
-        NACEX_CP,                            // cp_rec
-        '',                                  // tel_rec
-        orderData.nombre || 'Cliente Test',  // nom_ent
-        orderData.direccion || 'Calle Falsa 123', // dir_ent
-        orderData.poblacion || 'Madrid',     // pob_ent
-        orderData.cp || '28001',             // cp_ent
-        orderData.telefono || '600000000',   // tel_ent
-        orderData.servicio || '1',           // tip_ser (1=Nacex 10:00, 2=19:00, etc)
-        '2',                                 // tip_env (2=Paquete)
-        '1',                                 // num_pac
-        '1.0',                               // pes_pac
-        '0',                                 // val_dec
-        orderData.obs || '',                 // obs_1
-        '',                                  // obs_2
-        orderData.orderId || 'ORD-123',      // ref_cli
-        'P',                                 // tip_cob (P=Pagado)
-        '0'                                  // imp_cob
+        NACEX_AGENCY, NACEX_CLIENT, '', '', '', NACEX_CP_RECOGIDA, '',
+        orderData.nombre || 'Cliente', orderData.direccion || '', orderData.poblacion || '', 
+        orderData.cp || '', orderData.telefono || '', orderData.servicio || '1',
+        '2', '1', '1.0', '0', orderData.obs || '', '', orderData.orderId || 'ORD', 'P', '0'
       ].join('|');
 
       const response = await fetch(`${NACEX_WS_URL}?method=putExpedicion&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=${encodeURIComponent(dataParams)}`);
       const rawData = await response.text();
-      
-      // La respuesta de Nacex suele ser: "OK|12345678|URL_ETIQUETA" o "ERROR|Mensaje"
       const parts = rawData.split('|');
       
       if (parts[0] === 'OK') {
-        return res.status(200).json({
-          success: true,
-          tracking: parts[1],
-          label_url: parts[2] || '#',
-          mode: 'real'
-        });
-      } else {
-        return res.status(400).json({
-          success: false,
-          error: 'Error de Nacex API',
-          detail: rawData
-        });
+        return res.status(200).json({ success: true, tracking: parts[1], label_url: parts[2], mode: 'real' });
       }
+      return res.status(400).json({ success: false, error: rawData });
     } catch (err) {
-      return res.status(500).json({ success: false, error: 'Error interno procesando envío' });
-    }
-  }
-
-  // --- 4. ESTADO ENVÍO ---
-  if (method === 'estado_envio') {
-    if (!canUseRealAPI || !tracking) {
-      return res.status(200).json({
-        success: true,
-        tracking: tracking || 'NX_MOCK_123',
-        estado: 'SIMULADO',
-        detalle: 'Envío en proceso de pruebas'
-      });
-    }
-
-    try {
-      const response = await fetch(`${NACEX_WS_URL}?method=getEstado&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=${tracking}`);
-      const rawData = await response.text();
-      const parts = rawData.split('|');
-
-      return res.status(200).json({
-        success: true,
-        tracking: tracking,
-        estado: parts[0] || 'DESCONOCIDO',
-        detalle: parts[1] || rawData
-      });
-    } catch (err) {
-      return res.status(500).json({ success: false, error: 'Error consultando estado' });
+      return res.status(500).json({ success: false, error: 'Error interno' });
     }
   }
 
