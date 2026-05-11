@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCartStore } from "@/store/useCartStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/Button";
-import { User, LogIn, CheckCircle2, Plus } from 'lucide-react';
+import { User, LogIn } from 'lucide-react';
 import { CITIES_BY_PROVINCE } from "@/constants/locations";
 import { api } from "@/lib/api";
 import type { Address } from '@/types';
@@ -16,6 +16,8 @@ import { CheckoutSummary } from './components/CheckoutSummary';
 import { ShippingMethodSelector } from './components/ShippingMethodSelector';
 import { PaymentMethodSelector } from './components/PaymentMethodSelector';
 import { CheckoutAddressForm } from './components/CheckoutAddressForm';
+import { CheckoutAddressSelector } from './components/checkout/CheckoutAddressSelector';
+import { CheckoutSuccessModal } from './components/checkout/CheckoutSuccessModal';
 
 const CheckoutPage = () => {
   const { items, total: cartTotal, clearCart, setIsCartOpen, openModal } = useCartStore();
@@ -332,28 +334,7 @@ const CheckoutPage = () => {
   return (
     <div className="bg-accent min-h-screen pt-12 pb-32 text-secondary">
       {/* Success Modal */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-6 bg-secondary/80 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-md p-10 rounded-[2.5rem] shadow-2xl text-center space-y-8 animate-in zoom-in-95 duration-500">
-            <div className="mb-8 flex justify-center animate-bounce">
-              <img src="/assets/logo/LOGO MELOMEREZCO corona.svg" alt="Logo" className="w-24 h-24 object-contain" />
-            </div>
-            <div className="space-y-4">
-              <h2 className="text-3xl font-display font-black uppercase tracking-tighter italic">
-                ¡Pedido <span className="text-primary italic font-serif lowercase">confirmado</span>!
-              </h2>
-              <p className="text-sm text-secondary/60 font-medium leading-relaxed">
-                Tu pedido se ha procesado correctamente. Hemos enviado un correo con los detalles de tu compra.
-              </p>
-            </div>
-            <div className="pt-4">
-              <Button onClick={() => navigate('/cuenta/pedidos')} className="w-full bg-primary hover:bg-secondary text-white py-6 text-xs font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-primary/20">
-                Ver mis pedidos
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CheckoutSuccessModal show={showSuccessModal} onNavigate={navigate} />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <h1 className="text-5xl font-black tracking-tighter uppercase italic mb-16">Finalizar Pedido</h1>
@@ -380,78 +361,13 @@ const CheckoutPage = () => {
             )}
 
             {isAuthenticated && user?.addresses && user.addresses.length > 0 && (
-              <section className="mb-12">
-                <div className="flex justify-between items-end mb-6">
-                  <h3 className="text-xs font-black tracking-[0.4em] uppercase text-primary">Dirección de Envío</h3>
-                  <button 
-                    type="button"
-                    onClick={() => setIsChangingAddress(!isChangingAddress)}
-                    className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline underline-offset-4"
-                  >
-                    {isChangingAddress ? 'Cancelar' : 'Cambiar Dirección'}
-                  </button>
-                </div>
-
-                {isChangingAddress ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                    {user.addresses.map((addr) => (
-                      <div 
-                        key={addr.shipping_address_id}
-                        onClick={() => {
-                          setSelectedAddressId(addr.shipping_address_id!);
-                          setIsChangingAddress(false);
-                        }}
-                        className={`p-6 rounded-2xl border cursor-pointer transition-all ${
-                          selectedAddressId === addr.shipping_address_id ? 'bg-primary/5 border-primary shadow-lg' : 'bg-white/5 border-white/10 hover:border-white/30'
-                        }`}
-                      >
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-[10px] font-black uppercase tracking-widest">{addr.type}</span>
-                          {selectedAddressId === addr.shipping_address_id && <CheckCircle2 className="w-4 h-4 text-primary" />}
-                        </div>
-                        <p className="text-[11px] text-secondary/60">{addr.street}</p>
-                        <p className="text-[11px] text-secondary/40 uppercase tracking-tighter mt-1">{addr.zip} {addr.city} ({addr.province})</p>
-                      </div>
-                    ))}
-                    <div 
-                      onClick={() => {
-                        setSelectedAddressId('new');
-                        setIsChangingAddress(false);
-                      }} 
-                      className={`p-6 rounded-2xl border border-dashed cursor-pointer transition-all flex items-center justify-center gap-3 ${
-                        selectedAddressId === 'new' ? 'bg-primary/5 border-primary text-primary' : 'bg-transparent border-white/10 text-gray-500 hover:border-white/30'
-                      }`}
-                    >
-                      <Plus className="w-4 h-4" /> 
-                      <span className="text-[10px] font-black uppercase tracking-widest">Nueva Dirección</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-8 bg-white/5 border border-white/10 rounded-[2rem] flex items-center justify-between group">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 bg-primary/10 text-primary rounded-full">
-                          {selectedAddressId === 'new' ? 'Nueva Dirección' : user.addresses.find(a => a.shipping_address_id === selectedAddressId)?.type}
-                        </span>
-                        {user.addresses.find(a => a.shipping_address_id === selectedAddressId)?.isDefault && (
-                          <span className="text-[8px] font-black uppercase tracking-widest text-gray-500 italic">(Principal)</span>
-                        )}
-                      </div>
-                      {selectedAddressId === 'new' ? (
-                        <p className="text-sm font-medium text-gray-400">Introduce los datos abajo</p>
-                      ) : (
-                        <>
-                          <p className="text-base font-bold">{user.addresses.find(a => a.shipping_address_id === selectedAddressId)?.street}</p>
-                          <p className="text-xs text-gray-500 font-medium">
-                            {user.addresses.find(a => a.shipping_address_id === selectedAddressId)?.zip} {user.addresses.find(a => a.shipping_address_id === selectedAddressId)?.city}, {user.addresses.find(a => a.shipping_address_id === selectedAddressId)?.province}
-                          </p>
-                        </>
-                      )}
-                    </div>
-                    <CheckCircle2 className="w-6 h-6 text-primary opacity-50" />
-                  </div>
-                )}
-              </section>
+              <CheckoutAddressSelector 
+                addresses={user.addresses}
+                selectedAddressId={selectedAddressId}
+                onSelect={setSelectedAddressId}
+                isChanging={isChangingAddress}
+                setIsChanging={setIsChangingAddress}
+              />
             )}
 
             <form onSubmit={handleSubmit} className="space-y-12">

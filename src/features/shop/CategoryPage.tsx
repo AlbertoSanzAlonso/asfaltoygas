@@ -15,7 +15,6 @@ const CategoryPage: React.FC = () => {
   const subQuery = searchParams.get('sub')?.toLowerCase();
   
   // Ref to track if we have already performed the initial restoration
-  const isInitialMount = React.useRef(true);
   const wasRestored = React.useRef(false);
 
   // Initialize state from URL and SessionStorage
