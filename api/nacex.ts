@@ -117,35 +117,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     // Limpiar numero de cliente (quitar espacios o comillas si las hay)
     const cleanCliente = NACEX_CLIENT.trim().replace(/\D/g, '');
+    
+    // Fecha de hoy en formato DD/MM/AAAA
+    const today = new Date();
+    const formattedDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
-    // Estructura exacta según posiciones del error de Nacex
+    // Estructura exacta según el ÚLTIMO error de Nacex (Posiciones críticas)
     const nacexData = [
-      '',               // 1: Recogida
-      NACEX_AGENCY,     // 2: Agencia Origen
-      cleanCliente,     // 3: Cliente Origen (Pos 3)
+      NACEX_AGENCY,     // 1: del_cli (Pos 1)
+      cleanCliente,     // 2: num_cli (Pos 2)
+      formattedDate,    // 3: fec (Fecha DD/MM/AAAA) (Pos 3)
       (orderId || 'ORD').split('-')[0], // 4: Referencia (Pos 4)
-      '29',             // 5: Servicio (Pos 5)
-      '1',              // 6: Bultos (Pos 6)
-      'O',              // 7: Forma de pago (Pos 7)
-      '0',              // 8: Reembolso
-      '0',              // 9: Valor asegurado
-      '',               // 10: Nombre Remitente
-      '',               // 11: Dirección Remitente
-      '',               // 12: CP Remitente
-      '',               // 13: Población Remitente
-      '',               // 14: Teléfono Remitente
-      '',               // 15: País Remitente
-      '',               // 16: Provincia Remitente
-      customerName || 'Cliente', // 17: Nombre Entrega (Destinatario)
-      '',               // 18: Atención (Persona contacto)
-      address || '',    // 19: Dirección Entrega (Pos 19)
-      zip || '',        // 20: CP Entrega
-      city || '',       // 21: Población Entrega
-      province || '',   // 22: Provincia Entrega
-      phone || '000000000', // 23: Teléfono Entrega (OBLIGATORIO)
-      'ES',             // 24: País Entrega
-      '',               // 25: Email
-      '',               // 26: Observaciones
+      '08',             // 5: tip_ser (Pos 5) - Cambiado de 29 a 08 (Estándar) según error
+      'O',              // 6: tip_cob (Pos 6)
+      '',               // 7: tip_env
+      '',               // 8: ree (Reembolso)
+      '',               // 9: val (Valor)
+      '1',              // 10: bul (Bultos) (Pos 10)
+      '1.0',            // 11: kil (Kilos) (Pos 11)
+      '',               // 12: vol
+      '',               // 13: dec
+      '',               // 14: obs
+      customerName || 'Cliente', // 15: nom_ent
+      '',               // 16: per_ent
+      '',               // 17: nif_ent
+      '',               // 18: tel_ent
+      address || '',    // 19: dir_ent (Pos 19)
+      'ES',             // 20: pais_ent (Pos 20)
+      zip || '',        // 21: cp_ent (Pos 21)
+      city || '',       // 22: pob_ent (Pos 22)
+      province || '',   // 23: pro_ent
+      phone || '000000000', // 24: tel_ent_2
+      '',               // 25: email_ent
     ].join('|');
 
     console.log('Nacex Data Payload:', nacexData);
