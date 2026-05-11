@@ -115,43 +115,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const body = req.body || {};
     const { orderId, customerName, address, city, zip, province, phone } = body;
     
-    // Limpiar numero de cliente (quitar espacios o comillas si las hay)
+    // Limpiar numero de cliente
     const cleanCliente = NACEX_CLIENT.trim().replace(/\D/g, '');
     
-    // Fecha de hoy en formato DD/MM/AAAA
-    const today = new Date();
-    const formattedDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
-
-    // Estructura exacta según el feedback de errores
+    // Formato clave=valor según el manual (MUCHO MÁS ROBUSTO)
     const nacexData = [
-      NACEX_AGENCY,     // 1: del_cli
-      cleanCliente,     // 2: num_cli
-      formattedDate,    // 3: fec
-      (orderId || 'ORD').split('-')[0], // 4: ref
-      '08',             // 5: tip_ser
-      'O',              // 6: tip_cob
-      '1',              // 7: tip_env (Pos 7 - Probar con 1 si estaba vacío)
-      '0',              // 8: ree
-      '0',              // 9: val
-      '1',              // 10: bul (Pos 10)
-      '1.0',            // 11: kil (Pos 11)
-      '',               // 12: vol
-      '',               // 13: dec
-      '',               // 14: obs
-      customerName || 'Cliente', // 15: nom_ent
-      '',               // 16: per_ent
-      '',               // 17: nif_ent
-      phone || '000000000', // 18: tel_ent (Pos 18 - ¡CRÍTICO!)
-      address || '',    // 19: dir_ent (Pos 19)
-      'ES',             // 20: pais_ent (Pos 20)
-      zip || '',        // 21: cp_ent (Pos 21)
-      city || '',       // 22: pob_ent (Pos 22)
-      province || '',   // 23: pro_ent
-      '',               // 24: (Vacío)
-      '',               // 25: email_ent
+      `del_cli=${NACEX_AGENCY}`,
+      `num_cli=${cleanCliente}`,
+      `tip_ser=08`,             // Estándar (o 29 si estuviera habilitado)
+      `tip_cob=O`,              // Origen
+      `ref_cli=${(orderId || 'ORD').split('-')[0]}`,
+      `tip_env=1`,              // Tipo envío (1=Paquete, 2=Documento...)
+      `bul=1`,                  // Bultos
+      `kil=1.0`,                // Kilos
+      `nom_ent=${customerName || 'Cliente'}`,
+      `dir_ent=${address || ''}`,
+      `pais_ent=ES`,
+      `cp_ent=${zip || ''}`,
+      `pob_ent=${city || ''}`,
+      `tel_ent=${phone || '000000000'}`,
     ].join('|');
 
-    console.log('Nacex Data Payload:', nacexData);
+    console.log('Nacex Data (Key-Value):', nacexData);
 
     // MODO PRUEBA: Si el ID del pedido empieza por TEST- o viene marcado como isTest
     const isTestOrder = (orderId || '').toString().startsWith('TEST-') || body.isTest === true;
