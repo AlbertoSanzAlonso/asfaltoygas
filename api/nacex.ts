@@ -58,8 +58,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     try {
-      // Probamos con getAgencias (plural)
-      const response = await fetch(`${NACEX_WS_URL}?method=getAgencias&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=${targetCP}`);
+      // Método exacto encontrado en el WSDL para buscar puntos por CP
+      const response = await fetch(`${NACEX_WS_URL}?method=getPuntoEntregaCP&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=${targetCP}`);
       const rawData = await response.text();
       
       // Parsear respuesta por tuberías
