@@ -62,17 +62,18 @@ export const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({ isAdmin 
       
       setSentTo(targetEmail);
       setIsSuccess(true);
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'No se pudo procesar la solicitud.';
-      let friendlyMessage = errorMsg;
+    } catch (error: any) {
+      console.error('>>> [DEBUG AUTH] Error completo:', error);
       
-      if (errorMsg.includes('security purposes') || errorMsg.includes('rate limit exceeded')) {
+      let friendlyMessage = error.message || 'No se pudo procesar la solicitud.';
+      
+      if (friendlyMessage.includes('security purposes') || friendlyMessage.includes('rate limit exceeded')) {
         friendlyMessage = 'Has superado el límite de intentos. Por seguridad, debes esperar unos minutos antes de pedir otro enlace. ¡Un poquito de paciencia! ☕';
       }
 
       useCartStore.getState().openModal({
-        title: 'Atención',
-        message: friendlyMessage,
+        title: 'Error de Autenticación',
+        message: `Detalle del servidor: ${friendlyMessage}`,
         type: 'info'
       });
     } finally {
