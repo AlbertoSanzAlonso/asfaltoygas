@@ -134,8 +134,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log('Nacex Data Payload:', nacexData);
 
-    if (!canUseRealAPI) {
-      return res.status(200).json({ success: true, tracking: 'NX' + Date.now(), label_url: '#', mode: 'mock' });
+    // MODO PRUEBA: Si el ID del pedido empieza por TEST- o viene marcado como isTest
+    const isTestOrder = (orderId || '').toString().startsWith('TEST-') || body.isTest === true;
+
+    if (!canUseRealAPI || isTestOrder) {
+      console.log('>>> MODO SIMULACIÓN ACTIVADO (Pedido de prueba o API no configurada)');
+      return res.status(200).json({ 
+        success: true, 
+        tracking: 'TEST-NX' + Date.now(), 
+        label_url: 'https://pda.nacex.com/nacex_ws/img/etiqueta_ejemplo.png', 
+        mode: 'mock' 
+      });
     }
 
     try {

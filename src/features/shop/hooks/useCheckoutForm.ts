@@ -138,7 +138,7 @@ export const useCheckoutForm = () => {
       subtotal: cartTotal,
       total_amount: finalTotal,
       order_status: 'Paid',
-      payment_method: 'Test (Sin pago)',
+      payment_method: 'TEST_MODE', // Marcador para la API de Nacex
       shipping_city: formData.city,
       shipping_province: formData.province,
       shipping_zip: formData.zip,
