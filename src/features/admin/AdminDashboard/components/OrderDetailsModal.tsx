@@ -62,11 +62,33 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                 )}
                 
                 {order.carrier?.toLowerCase().includes('nacex') && (
-                  <div className="mt-4 p-4 bg-primary/5 rounded-2xl border border-primary/20 shadow-sm shadow-primary/5">
-                    <p className="text-[9px] text-primary font-black uppercase tracking-widest mb-1">Punto NACEX.Shop Seleccionado:</p>
-                    <p className="text-xs text-(--text-main) font-black italic uppercase leading-tight">
-                      {order.carrier.includes(':') ? order.carrier.split(':').slice(1).join(':').trim() : order.carrier}
-                    </p>
+                  <div className="mt-6 p-4 bg-primary/5 rounded-2xl border border-primary/20">
+                    <h4 className="text-[10px] text-primary font-black uppercase tracking-widest mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                      Logística Nacex.Shop
+                    </h4>
+                    <div className="space-y-2 border-t border-primary/10 pt-3">
+                      <div className="grid grid-cols-[80px_1fr] gap-2 items-start">
+                        <span className="text-[9px] text-gray-400 font-bold uppercase">Punto:</span>
+                        <span className="text-[10px] font-black uppercase leading-tight">
+                          {order.carrier.includes(':') ? order.carrier.split(':')[1].split('(')[0].trim() : order.carrier}
+                        </span>
+                      </div>
+                      {order.carrier.includes('(') && (
+                        <div className="grid grid-cols-[80px_1fr] gap-2 items-start">
+                          <span className="text-[9px] text-gray-400 font-bold uppercase">Dirección:</span>
+                          <span className="text-[10px] font-medium leading-tight">
+                            {order.carrier.split('(')[1]?.replace(')', '').trim()}
+                          </span>
+                        </div>
+                      )}
+                      <div className="grid grid-cols-[80px_1fr] gap-2 items-center">
+                        <span className="text-[9px] text-gray-400 font-bold uppercase">Estado:</span>
+                        <span className="text-[9px] bg-green-500/20 text-green-600 px-2 py-0.5 rounded-full font-black uppercase w-fit">
+                          Pendiente de Etiqueta
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
