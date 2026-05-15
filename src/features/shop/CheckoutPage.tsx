@@ -29,8 +29,8 @@ const CheckoutPage = () => {
     setIsChangingAddress,
     shippingOption,
     setShippingOption,
-    selectedPoint,
-    setSelectedPoint,
+    selectedNacexPoint,
+    setSelectedNacexPoint,
     paymentMethod,
     setPaymentMethod,
     isSubmitting,
@@ -85,7 +85,7 @@ const CheckoutPage = () => {
               <ShippingMethodSelector 
                 selectedOption={shippingOption} 
                 onSelect={setShippingOption} 
-                selectedPoint={selectedPoint}
+                selectedPoint={selectedNacexPoint}
                 onPointSelect={setSelectedNacexPoint}
                 zipCode={formData.zip}
               />
