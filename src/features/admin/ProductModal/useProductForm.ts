@@ -23,12 +23,14 @@ export const useProductForm = (product: Product | null | undefined, onSave: (pro
     is_new: false,
     is_published: false,
     variants: [{ id: 'v1', size: '', color: DEFAULT_COLOR, stock: 0 }],
-    colors: []
+    colors: [],
+    labels: [],
   });
 
   const [categoriesList, setCategoriesList] = useState<Category[]>([]);
   const [subcategoriesList, setSubcategoriesList] = useState<Subcategory[]>([]);
   const [availableColors, setAvailableColors] = useState<any[]>([]);
+  const [availableLabels, setAvailableLabels] = useState<any[]>([]);
 
   const [isUploading, setIsUploading] = useState(false);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
@@ -58,6 +60,7 @@ export const useProductForm = (product: Product | null | undefined, onSave: (pro
         setAvailableColors(ensureNeutroInCatalog(colors));
       })
       .catch(console.error);
+    api.labels.getAll().then(setAvailableLabels).catch(() => setAvailableLabels([]));
   }, []);
 
   useEffect(() => {
@@ -242,7 +245,12 @@ export const useProductForm = (product: Product | null | undefined, onSave: (pro
       return;
     }
 
-    onSave({ ...formData, variants: toSave, colors });
+    onSave({
+      ...formData,
+      variants: toSave,
+      colors,
+      labels: formData.labels || [],
+    });
   };
 
   return {
@@ -252,6 +260,8 @@ export const useProductForm = (product: Product | null | undefined, onSave: (pro
     subcategoriesList,
     availableColors,
     setAvailableColors,
+    availableLabels,
+    setAvailableLabels,
     isUploading,
     cropSrc,
     setCropSrc,

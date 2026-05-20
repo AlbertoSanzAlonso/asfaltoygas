@@ -24,6 +24,12 @@ export interface Color {
   hex: string;
 }
 
+export interface Label {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 export interface Product {
   product_id: string;
   name: string;
@@ -42,6 +48,7 @@ export interface Product {
   is_published?: boolean;
   stock: number;
   colors?: Color[];
+  labels?: Label[];
 }
 
 

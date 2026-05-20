@@ -19,7 +19,16 @@ export const colors = {
       .select()
       .single();
 
+    if (error?.code === '23505') {
+      const { data: existing } = await supabase
+        .from('colors')
+        .select('*')
+        .ilike('name', color.name)
+        .maybeSingle();
+      if (existing) return existing;
+    }
+
     if (error) throw error;
     return data;
-  }
+  },
 };

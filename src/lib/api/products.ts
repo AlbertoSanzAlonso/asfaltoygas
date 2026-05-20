@@ -3,6 +3,45 @@ import { supabase } from '../supabase';
 import type { Product } from '@/types';
 import { normalizeColor } from '../productVariants';
 
+const PRODUCT_SELECT_BASE =
+  '*, product_variants(*), product_images(*), categories(name), subcategories(name), product_colors(colors(*))';
+
+const PRODUCT_SELECT_WITH_LABELS = `${PRODUCT_SELECT_BASE}, product_labels(labels(*))`;
+
+const PRODUCT_SELECT_FILTER_BY_LABEL = `${PRODUCT_SELECT_BASE}, product_labels!inner(labels(*))`;
+
+function isMissingRelation(
+  error: { code?: string; message?: string } | null,
+  relation: string
+): boolean {
+  if (!error) return false;
+  const text = `${error.message || ''} ${(error as { details?: string }).details || ''}`.toLowerCase();
+  return (
+    error.code === 'PGRST205' ||
+    error.code === '42P01' ||
+    text.includes(relation.toLowerCase()) ||
+    text.includes('does not exist')
+  );
+}
+
+async function syncProductLabels(
+  productId: string,
+  labels?: { id: number }[]
+): Promise<void> {
+  if (!labels) return;
+  try {
+    await supabase.from('product_labels').delete().eq('product_id', productId);
+    if (labels.length > 0) {
+      const { error } = await supabase.from('product_labels').insert(
+        labels.map((l) => ({ product_id: productId, label_id: l.id }))
+      );
+      if (error) throw error;
+    }
+  } catch (err) {
+    console.warn('[product_labels] No se pudieron guardar etiquetas:', err);
+  }
+}
+
 // Helper para normalizar los datos de Supabase al tipo Product de nuestra app
 const normalise = (p: any): Product => ({
   ...p,
@@ -29,37 +68,66 @@ const normalise = (p: any): Product => ({
   })(),
   // Mapear colores de la tabla intermedia muchos a muchos
   colors: p.product_colors?.map((pc: any) => pc.colors).filter(Boolean) || [],
+  labels: p.product_labels?.map((pl: any) => pl.labels).filter(Boolean) || [],
   // Mapear categorías si vienen de un join
   category: p.categories?.name || p.category,
   subcategory: p.subcategories?.name || p.subcategory,
 });
 
 export const products = {
-  getAll: async (category?: string, subcategory?: string, page = 1, pageSize = 20, publishedOnly?: boolean, search?: string, isNewOnly?: boolean): Promise<{ products: Product[], total: number }> => {
+  getAll: async (
+    category?: string,
+    subcategory?: string,
+    page = 1,
+    pageSize = 20,
+    publishedOnly?: boolean,
+    search?: string,
+    isNewOnly?: boolean,
+    labelId?: number
+  ): Promise<{ products: Product[], total: number }> => {
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
-    let query = supabase
-      .from('products')
-      .select('*, product_variants(*), product_images(*), categories(name), subcategories(name), product_colors(colors(*))', { count: 'exact' });
+    const selects = labelId
+      ? [PRODUCT_SELECT_FILTER_BY_LABEL, PRODUCT_SELECT_BASE]
+      : [PRODUCT_SELECT_WITH_LABELS, PRODUCT_SELECT_BASE];
 
-    if (category) query = query.eq('category_id', category);
-    if (subcategory) query = query.eq('subcategory_id', subcategory);
-    if (search) query = query.ilike('name', `%${search}%`);
-    if (publishedOnly !== undefined) query = query.eq('is_published', publishedOnly);
-    if (isNewOnly !== undefined) query = query.eq('is_new', isNewOnly);
+    let lastError: typeof selects extends never[] ? never : object | null = null;
 
-    const { data, count, error } = await query
-      .order('created_at', { ascending: false })
-      .order('product_id', { ascending: true })
-      .range(from, to);
+    for (const select of selects) {
+      let query = supabase.from('products').select(select, { count: 'exact' });
 
-    if (error) throw error;
+      if (category) query = query.eq('category_id', category);
+      if (subcategory) query = query.eq('subcategory_id', subcategory);
+      if (search) query = query.ilike('name', `%${search}%`);
+      if (publishedOnly !== undefined) query = query.eq('is_published', publishedOnly);
+      if (isNewOnly !== undefined) query = query.eq('is_new', isNewOnly);
+      if (labelId && select.includes('product_labels')) {
+        query = query.eq('product_labels.label_id', labelId);
+      }
 
-    return {
-      products: (data || []).map(normalise),
-      total: count || 0
-    };
+      const { data, count, error } = await query
+        .order('created_at', { ascending: false })
+        .order('product_id', { ascending: true })
+        .range(from, to);
+
+      if (!error) {
+        return {
+          products: (data || []).map(normalise),
+          total: count || 0,
+        };
+      }
+
+      lastError = error;
+      if (!isMissingRelation(error, 'product_labels')) break;
+    }
+
+    if (labelId && isMissingRelation(lastError as { code?: string; message?: string }, 'product_labels')) {
+      console.warn('[labels] Filtro por etiqueta ignorado: ejecuta supabase/migrations/labels.sql');
+      return { products: [], total: 0 };
+    }
+
+    throw lastError;
   },
 
   getSiblings: async (productId: string, categoryId?: string, subcategoryId?: string): Promise<{ nextId: string | null, prevId: string | null }> => {
@@ -88,73 +156,103 @@ export const products = {
   },
 
   getById: async (product_id: string): Promise<Product> => {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*, product_variants(*), product_images(*), categories(name), subcategories(name), product_colors(colors(*))')
-      .eq('product_id', product_id)
-      .maybeSingle();
+    for (const select of [PRODUCT_SELECT_WITH_LABELS, PRODUCT_SELECT_BASE]) {
+      const { data, error } = await supabase
+        .from('products')
+        .select(select)
+        .eq('product_id', product_id)
+        .maybeSingle();
 
-    if (error) throw error;
-    return normalise(data);
+      if (!error) return normalise(data);
+      if (!isMissingRelation(error, 'product_labels')) throw error;
+    }
+    throw new Error('Producto no encontrado');
   },
 
   getNewArrivals: async (publishedOnly = true): Promise<Product[]> => {
-    let query = supabase
-      .from('products')
-      .select('*, product_variants(*), product_images(*), categories(name), subcategories(name), product_colors(colors(*))')
-      .eq('is_new', true);
+    for (const select of [PRODUCT_SELECT_WITH_LABELS, PRODUCT_SELECT_BASE]) {
+      let query = supabase.from('products').select(select).eq('is_new', true);
+      if (publishedOnly !== undefined) query = query.eq('is_published', publishedOnly);
 
-    if (publishedOnly !== undefined) query = query.eq('is_published', publishedOnly);
-
-    const { data, error } = await query.order('created_at', { ascending: false });
-    if (error) throw error;
-    return (data || []).map(normalise);
+      const { data, error } = await query.order('created_at', { ascending: false });
+      if (!error) return (data || []).map(normalise);
+      if (!isMissingRelation(error, 'product_labels')) throw error;
+    }
+    return [];
   },
 
   syncEmbedding: async (productId: string, name: string, description: string, categoryId?: string): Promise<void> => {
     try {
-      // Obtener el nombre de la categoría para un mejor embedding
+      const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+      if (!apiKey) return;
+
       let categoryName = '';
       if (categoryId) {
-        const { data: cat } = await supabase.from('categories').select('name').eq('id', categoryId).maybeSingle();
+        const { data: cat } = await supabase
+          .from('categories')
+          .select('name')
+          .eq('id', categoryId)
+          .maybeSingle();
         categoryName = cat?.name || '';
       }
 
-      const content = `Producto: ${name}. Categoría: ${categoryName}. Descripción: ${description}`;
-      
+      const content = `Producto: ${name}. Categoría: ${categoryName}. Descripción: ${description || ''}`;
+
       const response = await fetch('https://api.openai.com/v1/embeddings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
+          Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: "text-embedding-3-small",
-          input: content
-        })
+          model: 'text-embedding-3-small',
+          input: content,
+        }),
       });
 
-      if (!response.ok) throw new Error('OpenAI Embedding Error');
-      const { data: [{ embedding }] } = await response.json();
+      if (!response.ok) {
+        console.warn('[embedding] OpenAI:', response.status, await response.text());
+        return;
+      }
 
-      // Upsert: si existe lo actualiza, si no lo crea
-      const { error } = await supabase
+      const json = await response.json();
+      const embedding = json?.data?.[0]?.embedding;
+      if (!embedding) {
+        console.warn('[embedding] Respuesta OpenAI sin vector');
+        return;
+      }
+
+      const { error: deleteErr } = await supabase
         .from('product_embeddings')
-        .upsert({
-          product_id: productId,
-          content: content,
-          embedding: embedding
-        }, { onConflict: 'product_id' });
+        .delete()
+        .eq('product_id', productId);
 
-      if (error) throw error;
+      if (deleteErr && !isMissingRelation(deleteErr, 'product_embeddings')) {
+        console.warn('[embedding] delete:', deleteErr.message);
+      }
+
+      const { error: insertErr } = await supabase.from('product_embeddings').insert({
+        product_id: productId,
+        content,
+        embedding,
+      });
+
+      if (insertErr) {
+        console.warn(
+          '[embedding] No se guardó en Supabase (el producto sí se guardó):',
+          insertErr.message
+        );
+        return;
+      }
+
       console.log(`Embedding synced for ${name}`);
     } catch (err) {
-      console.error('Error syncing embedding:', err);
+      console.warn('[embedding] Error no crítico:', err);
     }
   },
 
   create: async (productData: Omit<Product, 'product_id'>): Promise<Product> => {
-    const { variants, images, colors, ...pData } = productData as any;
+    const { variants, images, colors, labels, ...pData } = productData as any;
     
     // 1. Create product
     const { data: product, error } = await supabase
@@ -196,14 +294,16 @@ export const products = {
       await supabase.from('product_colors').insert(colorRecords);
     }
 
-    // 5. Sync Embedding (Background)
+    await syncProductLabels(product.product_id, labels);
+
+    // 6. Sync Embedding (Background)
     products.syncEmbedding(product.product_id, product.name, product.description, product.category_id);
 
     return products.getById(product.product_id);
   },
 
   update: async (product_id: string, updates: Partial<Product>): Promise<Product> => {
-    const { variants, images, colors, ...pUpdates } = updates as any;
+    const { variants, images, colors, labels, ...pUpdates } = updates as any;
 
     // 1. Update product table
     const validColumns = [
@@ -263,7 +363,9 @@ export const products = {
       }
     }
 
-    // 5. Sync Embedding (Background) - Solo si cambió nombre, descripción o categoría
+    await syncProductLabels(product_id, labels);
+
+    // 6. Sync Embedding (Background) - Solo si cambió nombre, descripción o categoría
     if (updates.name || updates.description || updates.category_id) {
       products.syncEmbedding(product.product_id, product.name, product.description, product.category_id);
     }

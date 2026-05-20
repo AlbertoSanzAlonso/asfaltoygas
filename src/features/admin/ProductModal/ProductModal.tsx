@@ -14,6 +14,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose, on
     subcategoriesList,
     availableColors,
     setAvailableColors,
+    availableLabels,
+    setAvailableLabels,
     isUploading,
     cropSrc,
     setCropSrc,
@@ -61,6 +63,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose, on
               subcategoriesList={subcategoriesList}
               availableColors={availableColors}
               setAvailableColors={setAvailableColors}
+              availableLabels={availableLabels}
+              setAvailableLabels={setAvailableLabels}
               isUploading={isUploading}
               fileInputRef={fileInputRef}
               handleFileChange={handleFileChange}
