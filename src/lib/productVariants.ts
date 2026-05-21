@@ -137,10 +137,18 @@ export function formatVariantLabel(
   return color?.trim() ? `Talla ${size} · ${color}` : `Talla ${size}`;
 }
 
+/** Color visible en pedidos/factura (null = mostrar "-"). */
+export function formatOrderItemColorLabel(color?: string | null): string | null {
+  if (!color?.trim() || color === 'Único') return null;
+  const c = color.trim();
+  if (LEGACY_DEFAULT_COLORS.has(c.toLowerCase())) return null;
+  return c;
+}
+
 export function formatOrderItemDetails(size?: string, color?: string | null): string {
   if (!size) return '';
-  const c = color?.trim();
-  const colorPart = c && !LEGACY_DEFAULT_COLORS.has(c.toLowerCase()) ? ` • ${c}` : '';
+  const colorLabel = formatOrderItemColorLabel(color);
+  const colorPart = colorLabel ? ` • ${colorLabel}` : '';
   return `Talla: ${size}${colorPart}`;
 }
 

@@ -10,6 +10,7 @@ import {
   getOrderItemOriginalUnit,
   orderHasDiscount,
 } from '@/lib/orderPricing';
+import { formatOrderItemColorLabel } from '@/lib/productVariants';
 
 export const generateInvoicePDF = async (order: Order, user: { name?: string; surname?: string } | null): Promise<jsPDF> => {
   const doc = new jsPDF({
@@ -69,33 +70,29 @@ export const generateInvoicePDF = async (order: Order, user: { name?: string; su
   doc.text(`${order.shipping_zip || ''} ${order.shipping_city || ''}`, 20, startY + 62);
   doc.text(`${order.shipping_province || ''}`, 20, startY + 67);
   
-  const tableData = items.map((item) => {
-    const size = item.size || '-';
-    const color = item.color;
-    const sizeLabel = color && color !== 'Único' ? `${size} · ${color}` : size;
-
-    return [
-      item.name || `Producto #${item.product_id}`,
-      sizeLabel,
-      String(item.quantity),
-      `${getOrderItemOriginalUnit(item).toFixed(2)}€`,
-      `${getOrderItemLineFinal(item).toFixed(2)}€`,
-    ];
-  });
+  const tableData = items.map((item) => [
+    item.name || `Producto #${item.product_id}`,
+    item.size || '-',
+    formatOrderItemColorLabel(item.color) ?? '-',
+    String(item.quantity),
+    `${getOrderItemOriginalUnit(item).toFixed(2)}€`,
+    `${getOrderItemLineFinal(item).toFixed(2)}€`,
+  ]);
   
   autoTable(doc, {
     startY: startY + 80,
-    head: [['Artículo', 'Talla', 'Cant.', 'P. unit.', 'Total']],
+    head: [['Artículo', 'Talla', 'Color', 'Cant.', 'P. unit.', 'Total']],
     body: tableData,
     theme: 'grid',
     headStyles: { fillColor: [255, 79, 112], textColor: [255, 255, 255], fontStyle: 'bold' },
     styles: { fontSize: 9, cellPadding: 5 },
     columnStyles: {
       0: { cellWidth: 'auto' },
-      1: { cellWidth: 22, halign: 'center' },
+      1: { cellWidth: 18, halign: 'center' },
       2: { cellWidth: 22, halign: 'center' },
-      3: { cellWidth: 28, halign: 'right' },
-      4: { cellWidth: 28, halign: 'right' },
+      3: { cellWidth: 22, halign: 'center' },
+      4: { cellWidth: 24, halign: 'right' },
+      5: { cellWidth: 24, halign: 'right' },
     },
   });
   

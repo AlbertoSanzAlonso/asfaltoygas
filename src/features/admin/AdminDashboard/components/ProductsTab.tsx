@@ -84,6 +84,12 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
     }
   };
 
+  const handleRowClick = (e: React.MouseEvent, product: Product) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('button, input, a, label')) return;
+    onEdit(product);
+  };
+
   const getPageRange = () => {
     const range: number[] = [];
     const start = Math.max(1, productPage - 1);
@@ -214,29 +220,21 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
               {products?.map((product) => (
                 <tr 
                   key={product.product_id} 
-                  onClick={() => onToggleSelect(product.product_id)}
+                  onClick={(e) => handleRowClick(e, product)}
                   className={`hover:bg-primary/5 transition-colors group cursor-pointer ${selectedIds.includes(product.product_id) ? 'bg-primary/5' : ''}`}
                 >
-                  <td className="px-8 py-6">
+                  <td className="px-8 py-6" onClick={(e) => e.stopPropagation()}>
                     <input 
                       type="checkbox" 
                       className="accent-primary w-4 h-4 rounded cursor-pointer"
                       checked={selectedIds.includes(product.product_id)}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        onToggleSelect(product.product_id);
-                      }}
-                      onClick={(e) => e.stopPropagation()}
+                      onChange={() => onToggleSelect(product.product_id)}
                     />
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
                       <div 
-                        className="w-12 h-16 bg-black overflow-hidden border border-(--border-main) rounded-xl shadow-sm cursor-pointer hover:scale-105 transition-transform"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onEdit(product);
-                        }}
+                        className="w-12 h-16 bg-black overflow-hidden border border-(--border-main) rounded-xl shadow-sm group-hover:scale-105 transition-transform"
                       >
                         <img src={product.images?.[0] || PRODUCT_PLACEHOLDER} alt="" className="w-full h-full object-cover transition-all" />
                       </div>

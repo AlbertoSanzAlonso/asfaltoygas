@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/ScrollArea';
 import type { Order, Customer } from '@/types';
 import { OrderLinePricing } from '@/components/orders/OrderLinePricing';
+import { OrderItemVariantInfo } from '@/components/orders/OrderItemVariantInfo';
 import { OrderTotalsSummary } from '@/components/orders/OrderTotalsSummary';
 
 interface OrderDetailsModalProps {
@@ -77,13 +78,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                       </div>
                       <div>
                         <p className="text-xs font-black uppercase tracking-tight">{item.name || `Producto #${item.product_id}`}</p>
-                        {item.size && (
-                          <p className="text-[9px] font-bold text-primary uppercase tracking-widest mt-0.5">
-                            {item.color && item.color !== 'Único'
-                              ? `Talla: ${item.size} · ${item.color}`
-                              : `Talla: ${item.size}`}
-                          </p>
-                        )}
+                        <OrderItemVariantInfo size={item.size} color={item.color} />
                       </div>
                     </div>
                     <OrderLinePricing item={item} showUnitDetail />

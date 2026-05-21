@@ -2,8 +2,8 @@ import React from 'react';
 import { X, Truck } from 'lucide-react';
 import { Button } from "@/components/ui/Button";
 import type { Order } from "@/types";
-import { formatOrderItemDetails } from '@/lib/productVariants';
 import { OrderLinePricing } from '@/components/orders/OrderLinePricing';
+import { OrderItemVariantInfo } from '@/components/orders/OrderItemVariantInfo';
 import { OrderTotalsSummary } from '@/components/orders/OrderTotalsSummary';
 import { ScrollArea } from '@/components/ui/ScrollArea';
 
@@ -120,9 +120,11 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-black uppercase italic text-(--text-main)">{item.name}</p>
-                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">
-                      {formatOrderItemDetails(item.size, item.color) || 'Sin talla'} • Cantidad: {item.quantity}
-                    </p>
+                    <OrderItemVariantInfo
+                      size={item.size}
+                      color={item.color}
+                      quantity={item.quantity}
+                    />
                   </div>
                   <OrderLinePricing item={item} showUnitDetail />
                 </div>
