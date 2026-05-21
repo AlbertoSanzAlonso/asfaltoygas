@@ -93,7 +93,7 @@ export const generateInvoicePDF = async (order: Order, user: { name?: string; su
     columnStyles: {
       0: { cellWidth: 'auto' },
       1: { cellWidth: 22, halign: 'center' },
-      2: { cellWidth: 16, halign: 'center' },
+      2: { cellWidth: 22, halign: 'center' },
       3: { cellWidth: 28, halign: 'right' },
       4: { cellWidth: 28, halign: 'right' },
     },
