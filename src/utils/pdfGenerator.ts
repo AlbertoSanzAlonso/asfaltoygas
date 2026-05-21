@@ -104,31 +104,32 @@ export const generateInvoicePDF = async (order: Order, user: { name?: string; su
   const discountAmount = getOrderDiscountAmount(order);
   const totalsX = 190;
   const totalsMaxWidth = 75;
-  const lineHeight = 5;
+  const lineGap = 6;
 
   const drawTotalsLine = (text: string, y: number, opts?: { bold?: boolean; size?: number }) => {
-    doc.setFontSize(opts?.size ?? 10);
+    const fontSize = opts?.size ?? 10;
+    doc.setFontSize(fontSize);
     doc.setFont('helvetica', opts?.bold ? 'bold' : 'normal');
     doc.setTextColor(opts?.bold ? 0 : 100);
     const lines = doc.splitTextToSize(text, totalsMaxWidth);
     lines.forEach((line: string, i: number) => {
-      doc.text(line, totalsX, y + i * lineHeight, { align: 'right' });
+      doc.text(line, totalsX, y + i * lineGap, { align: 'right' });
     });
-    return y + lines.length * lineHeight;
+    return y + lines.length * lineGap;
   };
 
   let y = drawTotalsLine(`Subtotal: ${subtotal.toFixed(2)}€`, finalY);
 
   if (hasDiscount) {
-    y = drawTotalsLine(`Descuento: −${discountAmount.toFixed(2)}€`, y + 1);
-    if (order.discount_code) {
-      y = drawTotalsLine(`Código: ${order.discount_code}`, y, { size: 9 });
-    }
+    const discountLabel = order.discount_code
+      ? `Descuento (${order.discount_code}): -${discountAmount.toFixed(2)}€`
+      : `Descuento: -${discountAmount.toFixed(2)}€`;
+    y = drawTotalsLine(discountLabel, y);
   }
 
-  y = drawTotalsLine(`Gastos de envío: ${order.shipping_cost?.toFixed(2) || '0.00'}€`, y + 1);
-  y = drawTotalsLine(`Impuestos (IVA incl.): ${order.tax_amount?.toFixed(2) || '0.00'}€`, y + 1);
-  drawTotalsLine(`TOTAL: ${order.total_amount.toFixed(2)}€`, y + 4, { bold: true, size: 14 });
+  y = drawTotalsLine(`Gastos de envío: ${(order.shipping_cost ?? 0).toFixed(2)}€`, y);
+  y = drawTotalsLine('IVA incluido', y);
+  drawTotalsLine(`TOTAL: ${order.total_amount.toFixed(2)}€`, y + lineGap, { bold: true, size: 14 });
   
   doc.setFontSize(9);
   doc.setFont('helvetica', 'italic');
