@@ -8,6 +8,7 @@ import {
   buildOrderTotalsEmailHtml,
 } from '../../src/lib/orderEmailHtml';
 import type { Order, OrderItem } from '../../src/types';
+import { sendAdminNewOrderEmail } from '../../src/lib/emails/adminNewOrderNotification';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -168,6 +169,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           subject: `Confirmación de pedido #${orderId} - Modas Me lo Merezco`,
           html
         });
+      }
+
+      // 5. Aviso a la tienda para generar etiqueta Nacex
+      try {
+        const orderItems: OrderItem[] =
+          items && items.length > 0
+            ? items
+            : Array.isArray(order.items)
+              ? order.items
+              : [];
+        await sendAdminNewOrderEmail(order as Order, orderItems);
+      } catch (adminMailErr) {
+        console.error('Error enviando aviso de pedido al admin:', adminMailErr);
       }
 
       return res.status(200).json({ success: true });

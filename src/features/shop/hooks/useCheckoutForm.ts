@@ -246,6 +246,16 @@ export const useCheckoutForm = () => {
       } catch (mailError) {
         console.error('Failed to send confirmation email:', mailError);
       }
+
+      try {
+        await fetch('/api/notify-admin-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: createdOrder.order_id }),
+        });
+      } catch (adminNotifyErr) {
+        console.error('Failed to notify admin of new order:', adminNotifyErr);
+      }
       
       for (const item of items) {
         if (item.selectedVariant.variant_id) {
