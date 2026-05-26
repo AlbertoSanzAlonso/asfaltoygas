@@ -2,11 +2,30 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 
 /** Versión del handler (comprobar en Network → respuesta JSON tras redeploy). */
-const NACEX_API_VERSION = '2026-05-recogida-v2';
+const NACEX_API_VERSION = '2026-05-recogida-v3';
 
 /** Evita romper el formato pipe-separated de Nacex. */
 function nacexField(value: string): string {
   return value.replace(/\|/g, ' ').trim();
+}
+
+/** putExpedicion devuelve OK|... (antiguo) o código numérico|albarán|... (actual). */
+function parsePutExpedicionResponse(raw: string): {
+  tracking: string;
+  albaran?: string;
+  labelUrl?: string;
+} | null {
+  const text = raw.trim();
+  if (!text || text.toUpperCase().startsWith('ERROR')) return null;
+
+  const parts = text.split('|').map((p) => p.trim());
+  if (parts[0] === 'OK' && parts[1]) {
+    return { tracking: parts[1], labelUrl: parts[2] };
+  }
+  if (/^\d+$/.test(parts[0] ?? '')) {
+    return { tracking: parts[0], albaran: parts[1] };
+  }
+  return null;
 }
 
 /** Codifica cada valor como la librería PHP oficial (clave=urlencode(valor)). */
@@ -289,17 +308,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         `${NACEX_WS_URL}?method=putExpedicion&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=${nacexDataEncoded}`,
       );
       const rawData = await decodeNacexResponse(response);
-      const parts = rawData.split('|');
+      const created = parsePutExpedicionResponse(rawData);
 
-      if (parts[0] === 'OK') {
+      if (created) {
+        let label_url = created.labelUrl || '';
+
+        if (!label_url) {
+          try {
+            const labelData = encodeNacexData([`codExp=${created.tracking}`, 'modelo=IMAGEN']);
+            const labelRes = await fetch(
+              `${NACEX_WS_URL}?method=getEtiqueta&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=${labelData}`,
+            );
+            const labelRaw = (await decodeNacexResponse(labelRes)).trim();
+            if (labelRaw && !labelRaw.toUpperCase().startsWith('ERROR')) {
+              label_url = `data:image/png;base64,${labelRaw.replace(/\s+/g, '')}`;
+            }
+          } catch (labelErr) {
+            console.warn('No se pudo obtener etiqueta Nacex:', labelErr);
+          }
+        }
+
         return res.status(200).json({
           success: true,
-          tracking: parts[1],
-          label_url: parts[2],
+          tracking: created.tracking,
+          albaran: created.albaran,
+          label_url,
           mode: 'real',
           apiVersion: NACEX_API_VERSION,
         });
       }
+
       return res.status(400).json({
         success: false,
         error: formatNacexError(rawData),
