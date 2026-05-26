@@ -187,24 +187,36 @@ export const AdminDashboard: React.FC = () => {
       } : {};
 
       const res = await api.shipping.createNacexExpedition(orderId, orderDetails);
-      
-      // ACTUALIZACIÓN DEL TICKET/PEDIDO EN BASE DE DATOS
-      const updatedOrder = await api.orders.update(orderId, {
+
+      // La API /api/nacex guarda el tracking con service role; refrescamos también en cliente
+      let updatedOrder: typeof order | undefined;
+      try {
+        updatedOrder = await api.orders.update(orderId, {
+          tracking_number: res.trackingNumber,
+          carrier: 'NACEX',
+          order_status: 'Shipped',
+          shipped_date: new Date().toISOString(),
+        });
+      } catch (updateErr) {
+        console.warn('Update cliente de pedido falló (tracking ya guardado en servidor):', updateErr);
+      }
+
+      const orderWithTracking = {
+        ...(updatedOrder || order)!,
         tracking_number: res.trackingNumber,
         carrier: 'NACEX',
-        order_status: 'Shipped',
-        shipped_date: new Date().toISOString()
-      });
+        order_status: 'Shipped' as const,
+        shipped_date: new Date().toISOString(),
+      };
 
-      // Actualizar estados locales para que la UI se actualice inmediatamente
-      setSelectedOrder(updatedOrder);
+      setSelectedOrder(orderWithTracking);
       setTrackingInfo({ number: res.trackingNumber, carrier: 'NACEX' });
 
       // Enviar notificación por email al cliente de forma automática
       if (order?.customer?.email) {
         try {
           await api.mail.sendStatusUpdate(
-            { ...updatedOrder, customer: order.customer },
+            { ...orderWithTracking, customer: order.customer },
             order.customer.email,
             'Shipped'
           );

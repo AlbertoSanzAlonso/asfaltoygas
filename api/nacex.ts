@@ -1,5 +1,6 @@
 
 import { VercelRequest, VercelResponse } from '@vercel/node';
+import { createClient } from '@supabase/supabase-js';
 
 /** Versión del handler (comprobar en Network → respuesta JSON tras redeploy). */
 const NACEX_API_VERSION = '2026-05-recogida-v4';
@@ -100,6 +101,32 @@ function formatNacexError(raw: string): string {
 
 function nacexLabelPath(codExp: string): string {
   return `/api/nacex?method=get_etiqueta&codExp=${encodeURIComponent(codExp)}`;
+}
+
+/** Guarda tracking en Supabase con service role (el admin en cliente suele fallar por RLS). */
+async function saveOrderTracking(orderId: string, tracking: string): Promise<boolean> {
+  const supabaseUrl = process.env.VITE_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceKey || !orderId) return false;
+
+  const supabase = createClient(supabaseUrl, serviceKey);
+  const { data, error } = await supabase
+    .from('orders')
+    .update({
+      tracking_number: tracking,
+      carrier: 'NACEX',
+      order_status: 'Shipped',
+      shipped_date: new Date().toISOString(),
+    })
+    .eq('order_id', orderId)
+    .select('order_id, tracking_number')
+    .maybeSingle();
+
+  if (error) {
+    console.error('[nacex] No se pudo guardar tracking en orders:', error.message);
+    return false;
+  }
+  return Boolean(data?.tracking_number);
 }
 
 /** Descarga etiqueta PNG desde Nacex (respuesta en base64). */
@@ -359,11 +386,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             ? created.labelUrl
             : nacexLabelPath(created.tracking);
 
+        const orderIdToSave = String(body.orderId || orderId || '').trim();
+        const orderSaved = orderIdToSave
+          ? await saveOrderTracking(orderIdToSave, created.tracking)
+          : false;
+
         return res.status(200).json({
           success: true,
           tracking: created.tracking,
           albaran: created.albaran,
           label_url,
+          orderSaved,
           mode: 'real',
           apiVersion: NACEX_API_VERSION,
         });
