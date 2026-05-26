@@ -40,7 +40,7 @@ export const AddToCartModal: React.FC = () => {
               <h3 className="text-xl font-black uppercase tracking-tight italic mb-2 text-secondary">
                 {modalConfig.title}
               </h3>
-              <p className="text-secondary/60 text-sm mb-8 font-light leading-relaxed">
+              <p className="text-secondary/60 text-sm mb-8 font-light leading-relaxed whitespace-pre-line text-left">
                 {modalConfig.message}
               </p>
 

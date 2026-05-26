@@ -1,6 +1,57 @@
 
 import { VercelRequest, VercelResponse } from '@vercel/node';
 
+/** Nacex responde en ISO-8859-1; response.text() asume UTF-8 y rompe tildes (Parmetros). */
+async function decodeNacexResponse(response: Response): Promise<string> {
+  const buffer = await response.arrayBuffer();
+  return new TextDecoder('iso-8859-1').decode(buffer);
+}
+
+/** Convierte "ERROR|mensaje|5412" en texto legible para el admin. */
+function formatNacexError(raw: string): string {
+  const text = raw.trim();
+  if (!text) return 'No se pudo crear el envío en Nacex.';
+
+  const parts = text.split('|').map((p) => p.trim());
+  const isError = parts[0]?.toUpperCase() === 'ERROR';
+  const code =
+    isError && parts.length > 2 && /^\d+$/.test(parts[parts.length - 1] ?? '')
+      ? parts[parts.length - 1]
+      : '';
+  const mainMessage =
+    (isError ? (code ? parts.slice(1, -1) : parts.slice(1)).join('|') : text) ||
+    'Error al comunicar con Nacex.';
+
+  const hints: string[] = [];
+  if (/num_cli/i.test(mainMessage)) {
+    hints.push('Número de cliente: revisa NACEX_CLIENTE en Vercel (máximo 5 dígitos).');
+  }
+  if (/cp_ent/i.test(mainMessage)) {
+    hints.push('Código postal: el pedido debe tener un CP de envío válido.');
+  }
+  if (/dir_ent/i.test(mainMessage)) {
+    hints.push('Dirección: comprueba calle y número en el pedido.');
+  }
+  if (/tel_ent/i.test(mainMessage)) {
+    hints.push('Teléfono: añade un número de contacto del cliente.');
+  }
+  if (/nom_ent/i.test(mainMessage)) {
+    hints.push('Nombre: revisa nombre y apellidos del destinatario.');
+  }
+  if (/del_cli/i.test(mainMessage)) {
+    hints.push('Delegación: revisa NACEX_AGENCIA en la configuración.');
+  }
+
+  let message = mainMessage.trim();
+  if (hints.length > 0) {
+    message += '\n\n' + [...new Set(hints)].map((h) => `→ ${h}`).join('\n');
+  }
+  if (code) {
+    message += `\n\n(Ref. Nacex: ${code})`;
+  }
+  return message;
+}
+
 /**
  * Nacex API Handler (Proxy para evitar CORS y ocultar credenciales)
  */
@@ -33,11 +84,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     try {
       const response = await fetch(`${NACEX_WS_URL}?method=getAgencia&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=28001`);
-      const data = await response.text();
+      const data = await decodeNacexResponse(response);
       if (response.ok && !data.includes('ERROR')) {
         return res.status(200).json({ success: true, mode: 'real' });
       }
-      return res.status(401).json({ success: false, error: 'Credenciales inválidas', detail: data });
+      return res.status(401).json({ success: false, error: 'Credenciales inválidas', detail: formatNacexError(data) });
     } catch (err) {
       return res.status(500).json({ success: false, error: 'Error de red' });
     }
@@ -49,11 +100,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     try {
       const response = await fetch(`${NACEX_WS_URL}?method=getAgencia&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=28001`);
-      const data = await response.text();
+      const data = await decodeNacexResponse(response);
       if (response.ok && !data.includes('ERROR')) {
         return res.status(200).json({ success: true, mode: 'real' });
       }
-      return res.status(401).json({ success: false, error: 'Credenciales inválidas', detail: data });
+      return res.status(401).json({ success: false, error: 'Credenciales inválidas', detail: formatNacexError(data) });
     } catch (err) {
       return res.status(500).json({ success: false, error: 'Error de red' });
     }
@@ -77,10 +128,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Método exacto encontrado en el WSDL para buscar puntos por CP
       const response = await fetch(`${NACEX_WS_URL}?method=getPuntoEntregaCP&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=${targetCP}`);
 
-      // Nacex usa ISO-8859-1, necesitamos decodificarlo correctamente
-      const buffer = await response.arrayBuffer();
-      const decoder = new TextDecoder('iso-8859-1');
-      const rawData = decoder.decode(buffer);
+      const rawData = await decodeNacexResponse(response);
 
       const lines = rawData.split('\n').filter(l => l.trim() && l.includes('~'));
       const points = lines.map(line => {
@@ -113,10 +161,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // --- 3. CREAR ENVÍO ---
   if (method === 'create_expedition' || method === 'crear_envio') {
     const body = req.body || {};
-    const { orderId, customerName, address, city, zip, province, phone } = body;
+    const { orderId, province } = body;
 
-    // Limpiar numero de cliente (Nacex a veces falla con ceros a la izquierda)
-    const cleanCliente = NACEX_CLIENT.trim().replace(/\D/g, '').replace(/^0+/, '');
+    // Admin envía nombre/cp/...; aceptar también nombres en inglés
+    const customerName = (body.customerName || body.nombre || 'Cliente').toString().trim();
+    const address = (body.address || body.direccion || '').toString().trim();
+    const city = (body.city || body.poblacion || '').toString().trim();
+    const zip = String(body.zip ?? body.cp ?? '').trim();
+    const phone = String(body.phone || body.telefono || '000000000').trim();
+
+    // Nacex: num_cli = máximo 5 dígitos (conservar ceros a la izquierda si caben)
+    const cleanCliente = NACEX_CLIENT.trim().replace(/\D/g, '').slice(0, 5);
     
     // MODO PRUEBA: Detección ultra-robusta
     const paymentMethod = (body.payment_method || '').toString().toUpperCase();
@@ -140,6 +195,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
+    if (!cleanCliente) {
+      return res.status(400).json({
+        success: false,
+        error: 'NACEX_CLIENTE no configurado o inválido (máx. 5 dígitos). Revisa las variables de entorno.',
+      });
+    }
+
+    if (!zip || zip.length > 15) {
+      return res.status(400).json({
+        success: false,
+        error: 'Código postal de entrega inválido. El pedido debe tener shipping_zip / cp (1-15 caracteres).',
+      });
+    }
+
     try {
       // Solo construimos los datos reales si NO es modo test
       const nacexData = [
@@ -151,24 +220,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         `tip_env=1`,
         `bul=1`,
         `kil=1.0`,
-        `nom_ent=${customerName || 'Cliente'}`,
-        `dir_ent=${address || ''}`,
+        `nom_ent=${customerName}`,
+        `dir_ent=${address}`,
         `pais_ent=ES`,
-        `cp_ent=${zip || ''}`,
-        `pob_ent=${city || ''}`,
-        `tel_ent=${phone || '000000000'}`,
+        `cp_ent=${zip}`,
+        `pob_ent=${city}`,
+        `tel_ent=${phone}`,
       ].join('|');
 
       console.log('Nacex Data Payload:', nacexData);
 
       const response = await fetch(`${NACEX_WS_URL}?method=putExpedicion&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=${encodeURIComponent(nacexData)}`);
-      const rawData = await response.text();
+      const rawData = await decodeNacexResponse(response);
       const parts = rawData.split('|');
 
       if (parts[0] === 'OK') {
         return res.status(200).json({ success: true, tracking: parts[1], label_url: parts[2], mode: 'real' });
       }
-      return res.status(400).json({ success: false, error: rawData });
+      return res.status(400).json({ success: false, error: formatNacexError(rawData) });
     } catch (err) {
       return res.status(500).json({ success: false, error: 'Error interno' });
     }
