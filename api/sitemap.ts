@@ -1,11 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
+import { getCanonicalSiteUrl } from './_siteUrl';
 
-const SITE_URL = (
-  process.env.SITE_URL ||
-  process.env.VITE_SITE_URL ||
-  'https://www.modasmelomerezco.es'
-).replace(/\/$/, '');
+const SITE_URL = getCanonicalSiteUrl();
 
 type SitemapEntry = {
   loc: string;
