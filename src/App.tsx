@@ -36,7 +36,6 @@ const CustomerLayout = safeLazy(() => import("@/features/customer/CustomerLayout
 const CustomerDashboard = safeLazy(() => import("@/features/customer/CustomerDashboard").then(m => ({ default: m.CustomerDashboard })));
 const OrderHistory = safeLazy(() => import("@/features/customer/OrderHistory").then(m => ({ default: m.OrderHistory })));
 const InvoiceList = safeLazy(() => import("@/features/customer/InvoiceList").then(m => ({ default: m.InvoiceList })));
-const PaymentMethods = safeLazy(() => import("@/features/customer/PaymentMethods").then(m => ({ default: m.PaymentMethods })));
 const ProfilePage = safeLazy(() => import("@/features/customer/ProfilePage").then(m => ({ default: m.ProfilePage })));
 const FavoritesPage = safeLazy(() => import("@/features/customer/FavoritesPage").then(m => ({ default: m.FavoritesPage })));
 const AdminLoginPage = safeLazy(() => import("@/features/admin/AdminLoginPage").then(m => ({ default: m.AdminLoginPage })));
@@ -153,7 +152,7 @@ function App() {
                     <Route index element={<CustomerDashboard />} />
                     <Route path="pedidos" element={<OrderHistory />} />
                     <Route path="facturas" element={<InvoiceList />} />
-                    <Route path="pagos" element={<PaymentMethods />} />
+                    <Route path="pagos" element={<Navigate to="/cuenta" replace />} />
                     <Route path="perfil" element={<ProfilePage />} />
                     <Route path="favoritos" element={<FavoritesPage />} />
                   </Routes>

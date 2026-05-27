@@ -2,7 +2,6 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Package, 
-  CreditCard, 
   User, 
   LogOut, 
   ChevronRight,
@@ -36,7 +35,6 @@ export const CustomerLayout: React.FC<CustomerLayoutProps> = ({ children }) => {
     { id: 'overview', label: 'Resumen', icon: ShoppingBag, path: '/cuenta' },
     { id: 'favorites', label: 'Favoritos', icon: Heart, path: '/cuenta/favoritos' },
     { id: 'orders', label: 'Mis Pedidos', icon: Package, path: '/cuenta/pedidos' },
-    { id: 'payment', label: 'Métodos de Pago', icon: CreditCard, path: '/cuenta/pagos' },
     { id: 'profile', label: 'Perfil', icon: User, path: '/cuenta/perfil' },
   ];
 
