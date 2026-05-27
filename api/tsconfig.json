@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "skipLibCheck": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "ignoreDeprecations": "6.0"
+  },
+  "include": [
+    "./**/*.ts",
+    "../src/types/**/*.ts",
+    "../src/lib/orderContact.ts",
+    "../src/lib/orderEmailHtml.ts",
+    "../src/lib/orderPricing.ts",
+    "../src/lib/emails/**/*.ts"
+  ]
+}

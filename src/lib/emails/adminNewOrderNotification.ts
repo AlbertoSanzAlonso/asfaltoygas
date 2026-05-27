@@ -1,11 +1,11 @@
 import nodemailer from 'nodemailer';
-import type { Order, OrderItem } from '@/types';
-import { getOrderContact } from '@/lib/orderContact';
+import type { Order, OrderItem } from '../../types/index.js';
+import { getOrderContact } from '../orderContact.js';
 import {
   buildOrderItemsEmailRows,
   buildOrderItemsEmailTableHead,
   buildOrderTotalsEmailHtml,
-} from '@/lib/orderEmailHtml';
+} from '../orderEmailHtml.js';
 
 const LOGO_URL =
   'https://aoyafhjpgmxcygqnklvl.supabase.co/storage/v1/object/public/assets/logo/LOGO%20MELOMEREZCO%20completo%20color.png';

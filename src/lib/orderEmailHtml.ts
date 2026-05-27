@@ -1,4 +1,4 @@
-import type { Order, OrderItem } from '@/types';
+import type { Order, OrderItem } from '../types/index.js';
 import {
   getOrderDiscountAmount,
   getOrderItemLineDiscount,
@@ -7,7 +7,7 @@ import {
   getOrderItemOriginalUnit,
   orderHasDiscount,
   orderItemHasDiscount,
-} from './orderPricing';
+} from './orderPricing.js';
 
 function formatItemSize(item: OrderItem): string {
   if (!item.size) return '';

@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
-import type { Order, OrderItem } from '../src/types';
-import { sendAdminNewOrderEmail } from '../src/lib/emails/adminNewOrderNotification';
+import type { Order, OrderItem } from '../src/types/index.js';
+import { sendAdminNewOrderEmail } from '../src/lib/emails/adminNewOrderNotification.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');

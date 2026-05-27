@@ -1,4 +1,4 @@
-import type { Order, OrderItem } from '@/types';
+import type { Order, OrderItem } from '../types/index.js';
 
 export function orderItemHasDiscount(item: OrderItem): boolean {
   return getOrderItemLineDiscount(item) > 0.001;

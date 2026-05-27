@@ -6,9 +6,9 @@ import {
   buildOrderItemsEmailRows,
   buildOrderItemsEmailTableHead,
   buildOrderTotalsEmailHtml,
-} from '../../src/lib/orderEmailHtml';
-import type { Order, OrderItem } from '../../src/types';
-import { sendAdminNewOrderEmail } from '../../src/lib/emails/adminNewOrderNotification';
+} from '../../src/lib/orderEmailHtml.js';
+import type { Order, OrderItem } from '../../src/types/index.js';
+import { sendAdminNewOrderEmail } from '../../src/lib/emails/adminNewOrderNotification.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {

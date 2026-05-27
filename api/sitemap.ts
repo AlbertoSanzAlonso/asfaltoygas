@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
-import { getCanonicalSiteUrl } from './_siteUrl';
+import { getCanonicalSiteUrl } from './_siteUrl.js';
 
 const SITE_URL = getCanonicalSiteUrl();
 
