@@ -13,6 +13,7 @@ import { OrderDetailsModal } from "@/features/admin/AdminDashboard/components/Or
 import { useAdminData } from './useAdminData';
 import { api } from "@/lib/api";
 import { getOrderContact } from '@/lib/orderContact';
+import { canFulfillOrder } from '@/lib/orderPayment';
 import { useCartStore } from "@/store/useCartStore";
 import type { Product, Order } from "@/types";
 
@@ -172,9 +173,19 @@ export const AdminDashboard: React.FC = () => {
   };
 
   const handleGenerateLabel = async (orderId: string) => {
+    const order = orders?.find(o => o.order_id === orderId);
+    if (order && !canFulfillOrder(order)) {
+      openModal({
+        title: 'Pago pendiente',
+        message:
+          'Este pedido aún no está pagado. El envío y la etiqueta Nacex solo están disponibles cuando Redsys confirme el pago.',
+        type: 'warning',
+      });
+      return;
+    }
+
     try {
       // Buscamos los detalles del pedido para pasarlos a la API de Nacex
-      const order = orders?.find(o => o.order_id === orderId);
       const contact = order ? getOrderContact(order) : null;
       const orderDetails = order ? {
         nombre: contact?.name || 'Cliente',

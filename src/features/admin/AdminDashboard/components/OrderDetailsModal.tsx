@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import type { Order } from "@/types";
 import { api } from '@/lib/api';
 import { getOrderContact } from '@/lib/orderContact';
+import { canFulfillOrder } from '@/lib/orderPayment';
 import { OrderLinePricing } from '@/components/orders/OrderLinePricing';
 import { OrderItemVariantInfo } from '@/components/orders/OrderItemVariantInfo';
 import { OrderTotalsSummary } from '@/components/orders/OrderTotalsSummary';
@@ -174,7 +175,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                     <FileImage className="w-4 h-4 mr-2" />
                     VER ETIQUETA NACEX
                   </Button>
-                ) : (
+                ) : canFulfillOrder(order) ? (
                   <Button
                     className="flex-1 py-4 text-[10px] font-black tracking-widest italic"
                     onClick={() => onGenerateLabel(order.order_id)}
@@ -182,6 +183,10 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                     <Truck className="w-4 h-4 mr-2" />
                     GENERAR ETIQUETA NACEX
                   </Button>
+                ) : (
+                  <p className="flex-1 text-center text-[10px] font-black uppercase tracking-widest text-yellow-600 py-4">
+                    Envío disponible cuando el pago esté confirmado en Redsys
+                  </p>
                 )}
               </div>
             </div>

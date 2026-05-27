@@ -1,6 +1,7 @@
 
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
+import { canFulfillOrder } from '../src/lib/orderPayment.js';
 
 /** Versión del handler (comprobar en Network → respuesta JSON tras redeploy). */
 const NACEX_API_VERSION = '2026-05-recogida-v4';
@@ -312,6 +313,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         label_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', 
         mode: 'mock' 
       });
+    }
+
+    const orderIdStr = String(orderId || '').trim();
+    if (orderIdStr) {
+      const supabaseUrl = process.env.VITE_SUPABASE_URL;
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (supabaseUrl && serviceKey) {
+        const supabase = createClient(supabaseUrl, serviceKey);
+        const { data: orderRow, error: orderLookupError } = await supabase
+          .from('orders')
+          .select('order_status, payment_status')
+          .eq('order_id', orderIdStr)
+          .maybeSingle();
+
+        if (orderLookupError || !orderRow) {
+          return res.status(404).json({
+            success: false,
+            error: 'Pedido no encontrado.',
+          });
+        }
+
+        if (!canFulfillOrder(orderRow)) {
+          return res.status(403).json({
+            success: false,
+            error:
+              'El pedido no está pagado. No se puede crear el envío hasta que Redsys confirme el pago.',
+          });
+        }
+      }
     }
 
     if (!cleanCliente) {

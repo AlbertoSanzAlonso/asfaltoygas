@@ -6,6 +6,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useCartStore } from "@/store/useCartStore";
 import type { Order } from '@/types';
 import { api } from "@/lib/api";
+import { isOrderPaid } from '@/lib/orderPayment';
 
 // Sub-components
 import { OrderListTable } from './components/OrderListTable';
@@ -22,33 +23,54 @@ export const OrderHistory: React.FC = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('payment') === 'success') {
-      clearCart();
-      openModal({
-        title: '¡Pago completado!',
-        message: 'Tu pedido se ha procesado correctamente. Recibirás un email de confirmación en breve.',
-        type: 'success',
-        actionLabel: 'Ver mis pedidos',
-        onAction: async () => {
-          closeModal();
-        }
-      });
-      
-      const sendInitialEmail = async () => {
+    if (params.get('payment') !== 'success') return;
+
+    clearCart();
+    window.history.replaceState({}, '', window.location.pathname);
+
+    const confirmPaymentReturn = async () => {
+      const customerKey = user?.customer_id || user?.email || '';
+      if (!customerKey) return;
+
+      const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      for (let attempt = 0; attempt < 6; attempt++) {
         try {
-          const latestOrders = await api.orders.getByCustomer(user?.customer_id || user?.email || '');
+          const latestOrders = await api.orders.getByCustomer(customerKey);
           const latest = latestOrders[0];
-          if (latest && (new Date().getTime() - new Date(latest.order_date).getTime() < 60000)) {
-            await api.mail.sendOrderConfirmation(latest, user?.email || '');
+          const isRecent =
+            latest &&
+            Date.now() - new Date(latest.order_date).getTime() < 15 * 60 * 1000;
+
+          if (latest && isRecent && isOrderPaid(latest)) {
+            openModal({
+              title: '¡Pago completado!',
+              message:
+                'Tu pedido está confirmado. Recibirás un email con los detalles en breve.',
+              type: 'success',
+              actionLabel: 'Entendido',
+              onAction: () => closeModal(),
+            });
+            return;
           }
         } catch (e) {
-          console.error('Auto-email on return failed', e);
+          console.error('Error comprobando estado del pago:', e);
         }
-      };
-      sendInitialEmail();
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-  }, [clearCart, openModal, user]);
+        await sleep(attempt < 2 ? 1500 : 2500);
+      }
+
+      openModal({
+        title: 'Pago en proceso',
+        message:
+          'Hemos recibido tu vuelta desde la pasarela. Si el pago se ha completado, el pedido aparecerá como pagado en unos instantes y te enviaremos la confirmación por email.',
+        type: 'info',
+        actionLabel: 'Entendido',
+        onAction: () => closeModal(),
+      });
+    };
+
+    void confirmPaymentReturn();
+  }, [clearCart, openModal, closeModal, user]);
 
   const { data: orders, isLoading, error } = useQuery({
     queryKey: ['orders', user?.email || user?.customer_id, currentPage],

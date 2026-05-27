@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/Button";
 import type { Order } from "@/types";
 import { api } from '@/lib/api';
+import { canFulfillOrder } from '@/lib/orderPayment';
 
 interface OrdersTabProps {
   orders?: Order[];
@@ -71,7 +72,7 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
                       >
                         VER ETIQUETA
                       </Button>
-                    ) : (
+                    ) : canFulfillOrder(order) ? (
                       <Button
                         size="sm"
                         variant="outline"
@@ -83,6 +84,10 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
                       >
                         GENERAR NACEX
                       </Button>
+                    ) : (
+                      <span className="text-[9px] font-black uppercase tracking-widest text-yellow-600 px-2">
+                        Pago pendiente
+                      </span>
                     )}
                   </td>
                 </tr>

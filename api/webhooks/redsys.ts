@@ -1,14 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import CryptoJS from 'crypto-js';
 import { createClient } from '@supabase/supabase-js';
-import nodemailer from 'nodemailer';
-import {
-  buildOrderItemsEmailRows,
-  buildOrderItemsEmailTableHead,
-  buildOrderTotalsEmailHtml,
-} from '../../src/lib/orderEmailHtml.js';
 import type { Order, OrderItem } from '../../src/types/index.js';
-import { sendAdminNewOrderEmail } from '../../src/lib/emails/adminNewOrderNotification.js';
+import { sendOrderPaidEmails } from '../../src/lib/emails/adminNewOrderNotification.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -100,88 +94,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
 
-      // 4. Send Confirmation Email
-      if (order && order.customer_email) {
-        const orderId = order.order_id.split('-')[0].toUpperCase();
-        const logoUrl = 'https://aoyafhjpgmxcygqnklvl.supabase.co/storage/v1/object/public/assets/logo/LOGO%20MELOMEREZCO%20completo%20color.png';
-        
-        const orderItems: OrderItem[] =
-          items?.length > 0
-            ? items
-            : Array.isArray(order.items)
-              ? order.items
-              : [];
-        const itemsHtml = orderItems.length > 0 ? buildOrderItemsEmailRows(orderItems) : '';
-        const tableHead = buildOrderItemsEmailTableHead(orderItems);
-        const totalsHtml = buildOrderTotalsEmailHtml({ ...order, items: orderItems } as Order);
+      // 4. Emails cliente + admin (en paralelo, mismo momento)
+      const orderItems: OrderItem[] =
+        items && items.length > 0
+          ? items
+          : Array.isArray(order.items)
+            ? order.items
+            : [];
 
-        const html = `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; border-radius: 10px;">
-            <div style="text-align: center; margin-bottom: 10px;">
-              <img src="${logoUrl}" alt="Modas Me lo Merezco" style="width: 200px; height: auto;">
-            </div>
-            <h1 style="color: #000; text-transform: uppercase; font-style: italic; border-bottom: 2px solid #000; padding-bottom: 20px; text-align: center;">
-              Pedido <span style="color: #ff3366;">#${orderId}</span> Confirmado
-            </h1>
-            <p style="text-align: center;">¡Hola!</p>
-            <p style="text-align: center;">Gracias por tu compra en <strong>Modas Me lo Merezco</strong>. Tu pedido ya ha sido pagado y está siendo preparado.</p>
-            
-            <div style="margin: 30px 0;">
-              <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px; text-transform: uppercase; font-size: 12px; color: #888;">Detalles de tu compra</h3>
-              <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                  ${tableHead}
-                </thead>
-                <tbody>
-                  ${itemsHtml}
-                </tbody>
-              </table>
-              
-              <div style="margin-top: 20px; text-align: right; font-weight: bold;">
-                ${totalsHtml}
-              </div>
-            </div>
-
-            <div style="background: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0; font-size: 13px;">
-              <h4 style="margin-top: 0; text-transform: uppercase; font-size: 11px; color: #888;">Dirección de Envío</h4>
-              <p style="margin: 5px 0;">${order.shipping_street}</p>
-              <p style="margin: 5px 0;">${order.shipping_zip} ${order.shipping_city}, ${order.shipping_province}</p>
-            </div>
-
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
-            <p style="font-size: 11px; color: #999; text-align: center;">Si tienes alguna pregunta, simplemente responde a este email. Gracias por confiar en nosotros.</p>
-          </div>
-        `;
-
-        const transporter = nodemailer.createTransport({
-          host: 'smtp.gmail.com',
-          port: 465,
-          secure: true,
-          auth: {
-            user: process.env.GMAIL_USER,
-            pass: process.env.GMAIL_APP_PASSWORD,
-          },
-        });
-
-        await transporter.sendMail({
-          from: '"Modas Me lo Merezco" <info@modasmelomerezco.es>',
-          to: order.customer_email,
-          subject: `Confirmación de pedido #${orderId} - Modas Me lo Merezco`,
-          html
-        });
-      }
-
-      // 5. Aviso a la tienda para generar etiqueta Nacex
-      try {
-        const orderItems: OrderItem[] =
-          items && items.length > 0
-            ? items
-            : Array.isArray(order.items)
-              ? order.items
-              : [];
-        await sendAdminNewOrderEmail(order as Order, orderItems);
-      } catch (adminMailErr) {
-        console.error('Error enviando aviso de pedido al admin:', adminMailErr);
+      const emailResults = await sendOrderPaidEmails(order as Order, orderItems);
+      if (!emailResults.admin) {
+        console.error('[redsys-webhook] No se pudo enviar el aviso al admin.');
       }
 
       return res.status(200).json({ success: true });
