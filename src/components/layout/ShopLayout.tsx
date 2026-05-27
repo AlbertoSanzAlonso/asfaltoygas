@@ -1,6 +1,7 @@
 import { type FC, type ReactNode, useEffect } from 'react';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
+import { RouteSeo } from '@/components/seo/RouteSeo';
 
 interface ShopLayoutProps {
   children: ReactNode;
@@ -22,7 +23,8 @@ export const ShopLayout: FC<ShopLayoutProps> = ({ children, setIsCartOpen, isMen
   }, [isMenuOpen]);
   return (
     <div className="min-h-screen bg-accent text-secondary selection:bg-primary selection:text-white flex flex-col overflow-x-hidden">
-      <Navbar 
+      <RouteSeo />
+      <Navbar
         setIsCartOpen={setIsCartOpen} 
         isMenuOpen={isMenuOpen} 
         setIsMenuOpen={setIsMenuOpen} 

@@ -8,7 +8,11 @@
       "destination": "/api/:path*"
     },
     {
-      "source": "/((?!assets/|favicon.ico|icons.svg|logo.png|_next/).*)",
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/((?!assets/|favicon.ico|icons.svg|logo.png|og-image.png|robots.txt|sitemap.xml|_next/).*)",
       "destination": "/index.html"
     }
   ],

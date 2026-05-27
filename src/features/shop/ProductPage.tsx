@@ -16,6 +16,8 @@ import {
   findVariant,
   hasColorVariants,
 } from '@/lib/productVariants';
+import { SeoHelmet } from '@/components/seo/SeoHelmet';
+import { absoluteUrl, truncateDescription } from '@/lib/seo/constants';
 
 const ProductPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -169,9 +171,40 @@ const ProductPage = () => {
   const availableSizes = getUniqueSizes(product.variants);
   const catalogColors = product.colors || [];
   const requiresColor = hasColorVariants(product.variants);
+  const productDescription = truncateDescription(
+    product.description ||
+      `${product.name}. Precio ${product.price.toFixed(2)} €. Compra online en Modas Me lo Merezco.`,
+  );
 
   return (
     <div className="bg-accent min-h-screen pt-12 pb-32 text-secondary">
+      <SeoHelmet
+        title={product.name}
+        description={productDescription}
+        path={`/producto/${product.product_id}`}
+        image={displayImages[0]}
+        type="product"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: product.name,
+          description: productDescription,
+          image: displayImages[0]?.startsWith('http')
+            ? displayImages[0]
+            : absoluteUrl(displayImages[0]),
+          brand: {
+            '@type': 'Brand',
+            name: 'Modas Me lo Merezco',
+          },
+          offers: {
+            '@type': 'Offer',
+            priceCurrency: 'EUR',
+            price: product.price,
+            availability: 'https://schema.org/InStock',
+            url: absoluteUrl(`/producto/${product.product_id}`),
+          },
+        }}
+      />
       <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
         {/* Breadcrumbs */}
         <nav className="flex items-center justify-between mb-12">

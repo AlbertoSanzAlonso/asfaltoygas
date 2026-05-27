@@ -165,6 +165,11 @@ export const useCheckoutForm = () => {
   };
 
   const handleCityChange = (newCity: string) => {
+    if (newCity === 'otra') {
+      setFormData({ ...formData, city: '' });
+      return;
+    }
+
     let detectedProv = formData.province;
     if (!detectedProv) {
       for (const [prov, cities] of Object.entries(CITIES_BY_PROVINCE)) {

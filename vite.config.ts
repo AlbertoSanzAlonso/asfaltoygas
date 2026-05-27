@@ -141,7 +141,21 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    plugins: [react(), vercelDevPlugin()],
+    plugins: [
+      react(),
+      vercelDevPlugin(),
+      {
+        name: 'inject-google-site-verification',
+        transformIndexHtml(html: string) {
+          const token = env.VITE_GOOGLE_SITE_VERIFICATION?.trim()
+          if (!token || html.includes('google-site-verification')) return html
+          return html.replace(
+            '<head>',
+            `<head>\n    <meta name="google-site-verification" content="${token}" />`,
+          )
+        },
+      },
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),

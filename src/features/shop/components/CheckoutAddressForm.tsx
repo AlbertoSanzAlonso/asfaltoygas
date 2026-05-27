@@ -42,12 +42,18 @@ export const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
   requireGuestContact = false,
   zipMunicipalities = [],
 }) => {
-  const citySuggestions =
-    zipMunicipalities.length > 0
-      ? zipMunicipalities
-      : formData.province && CITIES_BY_PROVINCE[formData.province]
-        ? CITIES_BY_PROVINCE[formData.province]
-        : [];
+  const provinceCities =
+    formData.province && CITIES_BY_PROVINCE[formData.province]
+      ? CITIES_BY_PROVINCE[formData.province]
+      : [];
+
+  /** CP con varias localidades o lista por provincia: select nativo (el datalist no abre bien al pulsar la flecha). */
+  const useCitySelect =
+    zipMunicipalities.length > 1 ||
+    (zipMunicipalities.length === 0 && provinceCities.length > 0);
+
+  const citySelectOptions =
+    zipMunicipalities.length > 0 ? zipMunicipalities : provinceCities;
 
   return (
     <section>
@@ -119,24 +125,40 @@ export const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         </div>
 
         <div className="relative space-y-1">
-          <input
-            type="text"
-            list="checkout-cities"
-            placeholder="CIUDAD / LOCALIDAD"
-            required
-            autoComplete="address-level2"
-            className="w-full bg-gray-50 border border-gray-200 px-6 py-4 text-sm font-bold focus:border-primary outline-none text-secondary"
-            value={formData.city}
-            onChange={(e) => onCityChange(e.target.value)}
-          />
-          <datalist id="checkout-cities">
-            {citySuggestions.map((city) => (
-              <option key={city} value={city} />
-            ))}
-          </datalist>
+          {useCitySelect ? (
+            <select
+              required
+              autoComplete="address-level2"
+              className="w-full bg-gray-50 border border-gray-200 px-6 py-4 text-sm font-bold focus:border-primary outline-none text-secondary appearance-none"
+              value={formData.city}
+              onChange={(e) => onCityChange(e.target.value)}
+            >
+              <option value="" disabled>
+                {zipMunicipalities.length > 1 ? 'LOCALIDAD' : 'CIUDAD'}
+              </option>
+              {citySelectOptions.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+              {zipMunicipalities.length === 0 && (
+                <option value="otra">OTRA...</option>
+              )}
+            </select>
+          ) : (
+            <input
+              type="text"
+              placeholder="CIUDAD / LOCALIDAD"
+              required
+              autoComplete="address-level2"
+              className="w-full bg-gray-50 border border-gray-200 px-6 py-4 text-sm font-bold focus:border-primary outline-none text-secondary"
+              value={formData.city}
+              onChange={(e) => onCityChange(e.target.value)}
+            />
+          )}
           {zipMunicipalities.length > 1 && (
             <p className="text-[10px] text-secondary/60 font-bold uppercase tracking-wide px-1">
-              Este código postal tiene varias localidades: escribe o elige la correcta.
+              Este código postal tiene varias localidades: elige la correcta en el desplegable.
             </p>
           )}
         </div>

@@ -8,6 +8,8 @@ import { api } from "@/lib/api";
 import { ProductCard } from "@/components/shop/ProductCard";
 import type { Product, Subcategory, Label } from '@/types';
 import { useScrollRestoration } from "@/lib/useScrollRestoration";
+import { SeoHelmet } from '@/components/seo/SeoHelmet';
+import { truncateDescription } from '@/lib/seo/constants';
 
 const CategoryPage: React.FC = () => {
   const { category } = useParams<{ category: string }>();
@@ -168,8 +170,18 @@ const CategoryPage: React.FC = () => {
   // Helper to determine if we should show the empty state
   const showEmptyState = !isLoading && !isFetching && productsData && allProducts.length === 0;
 
+  const categoryTitle = categoryData?.name || category || 'Categoría';
+  const categoryDescription = truncateDescription(
+    `Descubre ${categoryTitle.toLowerCase()} en Modas Me lo Merezco. Moda para mujer con envío gratuito desde 50 €.`,
+  );
+
   return (
     <div className="bg-accent min-h-screen pt-12 pb-32 text-secondary">
+      <SeoHelmet
+        title={categoryTitle}
+        description={categoryDescription}
+        path={`/categoria/${category}`}
+      />
       <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
         <header className="mb-20 text-center">
           <h1 className="text-[10vw] font-black tracking-tighter uppercase italic mb-6 leading-none">

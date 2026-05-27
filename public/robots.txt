@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /cuenta/
+Disallow: /checkout
+Disallow: /login
+Disallow: /registro
+Disallow: /recuperar-password
+Disallow: /reset-password
+Disallow: /confirmar-suscripcion
+Disallow: /desuscribir
+
+Sitemap: https://www.modasmelomerezco.es/sitemap.xml
