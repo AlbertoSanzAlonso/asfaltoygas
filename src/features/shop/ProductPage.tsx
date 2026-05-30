@@ -17,7 +17,12 @@ import {
   hasColorVariants,
 } from '@/lib/productVariants';
 import { SeoHelmet } from '@/components/seo/SeoHelmet';
-import { absoluteUrl, truncateDescription } from '@/lib/seo/constants';
+import {
+  absoluteUrl,
+  truncateDescription,
+  OFFER_SHIPPING_DETAILS,
+  MERCHANT_RETURN_POLICY,
+} from '@/lib/seo/constants';
 
 const ProductPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -202,6 +207,8 @@ const ProductPage = () => {
             price: product.price,
             availability: 'https://schema.org/InStock',
             url: absoluteUrl(`/producto/${product.product_id}`),
+            shippingDetails: OFFER_SHIPPING_DETAILS,
+            hasMerchantReturnPolicy: MERCHANT_RETURN_POLICY,
           },
         }}
       />

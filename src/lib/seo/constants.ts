@@ -23,3 +23,48 @@ export function truncateDescription(text: string, maxLength = 155): string {
   if (cleaned.length <= maxLength) return cleaned;
   return `${cleaned.slice(0, maxLength - 1).trim()}…`;
 }
+
+/**
+ * Detalles de envío para los datos estructurados de Offer (merchant listings).
+ * Refleja la política real: 5,50 € por pedido, solo península, entrega en 24-48 h laborables.
+ */
+export const OFFER_SHIPPING_DETAILS = {
+  '@type': 'OfferShippingDetails',
+  shippingRate: {
+    '@type': 'MonetaryAmount',
+    value: 5.5,
+    currency: 'EUR',
+  },
+  shippingDestination: {
+    '@type': 'DefinedRegion',
+    addressCountry: 'ES',
+  },
+  deliveryTime: {
+    '@type': 'ShippingDeliveryTime',
+    handlingTime: {
+      '@type': 'QuantitativeValue',
+      minValue: 0,
+      maxValue: 1,
+      unitCode: 'DAY',
+    },
+    transitTime: {
+      '@type': 'QuantitativeValue',
+      minValue: 1,
+      maxValue: 2,
+      unitCode: 'DAY',
+    },
+  },
+} as const;
+
+/**
+ * Política de devoluciones para los datos estructurados de Offer (merchant listings).
+ * Refleja la política real: 14 días naturales, gastos de devolución a cargo del cliente.
+ */
+export const MERCHANT_RETURN_POLICY = {
+  '@type': 'MerchantReturnPolicy',
+  applicableCountry: 'ES',
+  returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+  merchantReturnDays: 14,
+  returnMethod: 'https://schema.org/ReturnByMail',
+  returnFees: 'https://schema.org/ReturnShippingFees',
+} as const;
