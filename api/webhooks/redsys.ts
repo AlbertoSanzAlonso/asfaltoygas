@@ -3,6 +3,7 @@ import CryptoJS from 'crypto-js';
 import { createClient } from '@supabase/supabase-js';
 import type { Order, OrderItem } from '../../src/types/index.js';
 import { sendOrderPaidEmails } from '../../src/lib/emails/adminNewOrderNotification.js';
+import { isOrderPaid } from '../../src/lib/orderPayment.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -59,16 +60,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const orderUuid = merchantParams.Ds_MerchantData; // Here is our real ID
       
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
-      
-      // Update Order Status
+
+      // Idempotencia: solo marcar pagado si sigue Pending (reintentos de Redsys).
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .update({ order_status: 'Paid', payment_status: 'Paid' })
         .eq('order_id', orderUuid)
+        .eq('order_status', 'Pending')
         .select()
-        .single();
+        .maybeSingle();
 
       if (orderError) throw orderError;
+
+      if (!order) {
+        const { data: existing } = await supabase
+          .from('orders')
+          .select('order_id, order_status, payment_status')
+          .eq('order_id', orderUuid)
+          .maybeSingle();
+
+        if (existing && isOrderPaid(existing)) {
+          console.log('[redsys-webhook] Pedido ya procesado:', orderUuid);
+          return res.status(200).json({ success: true, alreadyProcessed: true });
+        }
+
+        if (!existing) {
+          console.error('[redsys-webhook] Pedido no encontrado:', orderUuid);
+          return res.status(404).json({ message: 'Order not found' });
+        }
+
+        console.warn('[redsys-webhook] Pedido en estado no procesable:', orderUuid, existing);
+        return res.status(200).json({ success: true, skipped: true });
+      }
 
       // 3. Decrement Stock
       // We need the order items. They are in the 'order_items' table usually, 
