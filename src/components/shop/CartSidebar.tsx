@@ -152,7 +152,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => 
                   <Button className="w-full py-5 text-base font-black italic tracking-widest bg-primary hover:bg-primary-dark text-white shadow-xl shadow-primary/20" size="lg">Finalizar Compra</Button>
                 </Link>
                 <p className="text-[10px] text-secondary/40 text-center mt-6 uppercase tracking-widest">
-                  Envío gratuito en pedidos superiores a 60€
+                  Envío gratuito en pedidos superiores a 50€
                 </p>
               </div>
             )}
