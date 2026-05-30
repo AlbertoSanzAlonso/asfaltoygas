@@ -27,8 +27,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, o
 
   return (
     <div className={`flex h-screen ${theme === 'dark' ? 'dark' : ''} bg-(--bg-main) text-(--text-main) overflow-hidden relative transition-colors duration-300`}>
-      {/* Mobile Header */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-(--border-main) bg-(--bg-main) fixed top-0 left-0 w-full z-50">
+      {/* Cabecera con menú: visible por debajo de 1350px (móvil + tablet) */}
+      <div className="flex min-[1350px]:hidden items-center justify-between p-4 border-b border-(--border-main) bg-(--bg-main) fixed top-0 left-0 w-full z-50">
         <Link to="/" className="flex items-center">
           <img 
             src={theme === 'dark' ? "/assets/logo/LOGO MELOMEREZCO completo blanco.png" : "/assets/logo/LOGO MELOMEREZCO completo transparente.png"} 
@@ -44,8 +44,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, o
         </div>
       </div>
 
-      {/* Sidebar */}
-      <aside className={`fixed md:static inset-y-0 left-0 w-72 border-r border-(--border-main) flex flex-col bg-(--bg-main) z-40 transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+      {/* Sidebar: fija y oculta por defecto hasta 1350px; visible en desktop ancho */}
+      <aside className={`fixed min-[1350px]:static inset-y-0 left-0 w-72 border-r border-(--border-main) flex flex-col bg-(--bg-main) z-40 transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full min-[1350px]:translate-x-0'}`}>
         <div className="p-10 grow overflow-y-auto">
           <div className="flex flex-col mb-16 items-center">
             <Link to="/" className="flex items-center">
@@ -109,9 +109,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, o
       </aside>
 
       {/* Content */}
-      <main className="flex-1 overflow-y-auto bg-(--bg-main) pt-24 md:pt-0 w-full relative transition-colors duration-300">
-        <header className="h-auto md:h-24 py-6 md:py-0 border-b border-(--border-main) flex flex-col-reverse md:flex-row items-center justify-between px-6 md:px-16 bg-(--bg-main) gap-4 md:gap-0 transition-colors duration-300">
-          <div className="hidden md:flex items-center gap-6 ml-auto">
+      <main className="flex-1 overflow-y-auto bg-(--bg-main) pt-24 min-[1350px]:pt-0 w-full relative transition-colors duration-300">
+        <header className="h-auto min-[1350px]:h-24 py-6 min-[1350px]:py-0 border-b border-(--border-main) flex flex-col-reverse min-[1350px]:flex-row items-center justify-between px-6 min-[1350px]:px-16 bg-(--bg-main) gap-4 min-[1350px]:gap-0 transition-colors duration-300">
+          <div className="hidden min-[1350px]:flex items-center gap-6 ml-auto">
             <ThemeToggle />
           </div>
         </header>
