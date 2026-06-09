@@ -79,9 +79,25 @@ const HOME_JSON_LD = {
   image: DEFAULT_OG_IMAGE,
   description: DEFAULT_DESCRIPTION,
   priceRange: '€€',
+  telephone: '+34 685 011 494',
+  email: 'info@modasmelomerezco.es',
+  sameAs: [
+    'https://www.instagram.com/modasmelomerezco',
+    'https://www.tiktok.com/@modasmelomerezco',
+    'https://www.facebook.com/profile.php?id=61555721379464',
+  ],
   address: {
     '@type': 'PostalAddress',
+    streetAddress: 'Calle Aragón, 2, Local 2',
+    addressLocality: 'Benalmádena',
+    addressRegion: 'Málaga',
+    postalCode: '29631',
     addressCountry: 'ES',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 36.5961,
+    longitude: -4.5708,
   },
 };
 

@@ -28,7 +28,7 @@ export const FeaturedSection: React.FC = () => {
                 <motion.img
                   src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop"
                   className="w-full h-full object-cover scale-105"
-                  alt="Feature"
+                  alt="Mujer con estilo en tienda de moda Modas Me lo Merezco"
                 />
               </div>
               <div className="absolute -bottom-10 -left-10 bg-primary p-12 hidden md:block shadow-2xl">
@@ -41,7 +41,7 @@ export const FeaturedSection: React.FC = () => {
 
       <section className="py-32 md:py-60 relative overflow-hidden flex items-center justify-center bg-primary">
         <div className="absolute inset-0 opacity-20 mix-blend-overlay">
-          <img src="https://images.unsplash.com/photo-1539109132382-381bb3f1c2b3?q=80&w=1000&auto=format&fit=crop" className="w-full h-full object-cover" alt="Background" />
+          <img src="https://images.unsplash.com/photo-1539109132382-381bb3f1c2b3?q=80&w=1000&auto=format&fit=crop" className="w-full h-full object-cover" alt="Fondo de moda femenina elegante" />
         </div>
         <div className="relative z-10 text-center max-w-5xl px-6">
           <h2 className="text-3xl md:text-4xl lg:text-6xl font-serif italic mb-12 leading-tight text-white max-w-4xl mx-auto">
