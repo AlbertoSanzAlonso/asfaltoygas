@@ -2,7 +2,7 @@ import { getSeoMetaForPath } from './api/_seoMeta.js';
 import { injectSeoIntoHtml } from './api/_injectSeoHtml.js';
 
 const CRAWLER_UA =
-  /googlebot|google-inspectiontool|bingbot|applebot|facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|pinterest|yandex|baiduspider/i;
+  /googlebot|google-inspectiontool|bingbot|applebot|facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|pinterest|yandex|baiduspider|ahrefsbot|semrushbot|mj12bot|dotbot|rogerbot|screaming\s*frog|sitebulb/i;
 
 const INDEXABLE_PREFIXES = [
   '/producto/',

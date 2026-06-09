@@ -31,7 +31,7 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
         <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
           <div className="flex justify-between items-center h-20">
             <div className="flex lg:hidden flex-1">
-              <button onClick={() => setIsMenuOpen(true)} className="p-2 -ml-2 text-secondary hover:text-primary transition-colors">
+              <button onClick={() => setIsMenuOpen(true)} aria-label="Abrir menú de navegación" className="p-2 -ml-2 text-secondary hover:text-primary transition-colors">
                 <Menu className="w-6 h-6" />
               </button>
             </div>
@@ -47,11 +47,11 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
               </Link>
             </div>
             <div className="flex items-center justify-end gap-4 md:gap-8 flex-1">
-              <button className="hidden md:flex items-center gap-3 text-[10px] font-bold tracking-[0.3em] uppercase text-secondary hover:text-primary transition-colors">
+              <button aria-label="Buscar productos" className="hidden md:flex items-center gap-3 text-[10px] font-bold tracking-[0.3em] uppercase text-secondary hover:text-primary transition-colors">
                 <Search className="w-5 h-5" />
               </button>
               
-              <Link to="/cuenta/favoritos" className="group relative flex items-center gap-3 text-secondary">
+              <Link to="/cuenta/favoritos" aria-label="Mis favoritos" className="group relative flex items-center gap-3 text-secondary">
                 <Heart className="w-5 h-5 group-hover:text-primary transition-colors" />
                 {favoriteCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[8px] font-black rounded-full flex items-center justify-center animate-in zoom-in duration-300">
@@ -60,7 +60,7 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
                 )}
               </Link>
 
-              <Link to="/cuenta" className="group flex items-center gap-3 text-secondary">
+              <Link to="/cuenta" aria-label="Mi cuenta" className="group flex items-center gap-3 text-secondary">
                 <div className={`relative ${isAuthenticated ? 'text-primary' : 'text-secondary'} transition-colors`}>
                   <UserIcon className="w-5 h-5 group-hover:text-primary transition-colors" />
                   {isAuthenticated && (
@@ -74,7 +74,7 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
                 )}
               </Link>
 
-              <div onClick={() => setIsCartOpen(true)} className="relative cursor-pointer group flex items-center gap-3 text-secondary">
+              <div onClick={() => setIsCartOpen(true)} aria-label="Abrir cesta de compra" className="relative cursor-pointer group flex items-center gap-3 text-secondary">
                 <ShoppingBag className="w-5 h-5 group-hover:text-primary transition-colors" />
                 {totalItems > 0 && (
                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[8px] font-black rounded-full flex items-center justify-center lg:hidden animate-in zoom-in duration-300">

@@ -237,28 +237,73 @@ const ProductPage = () => {
         path={`/producto/${product.product_id}`}
         image={displayImages[0]}
         type="product"
-        jsonLd={{
-          '@context': 'https://schema.org',
-          '@type': 'Product',
-          name: product.name,
-          description: productDescription,
-          image: displayImages[0]?.startsWith('http')
-            ? displayImages[0]
-            : absoluteUrl(displayImages[0]),
-          brand: {
-            '@type': 'Brand',
-            name: 'Modas Me lo Merezco',
+        jsonLd={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Inicio',
+                item: absoluteUrl('/'),
+              },
+              {
+                '@type': 'ListItem',
+                position: 2,
+                name: product.category || 'Sin Categoría',
+                item: absoluteUrl(`/categoria/${product.category?.toLowerCase() || 'todas'}`),
+              },
+              ...(product.subcategory
+                ? [
+                    {
+                      '@type': 'ListItem',
+                      position: 3,
+                      name: product.subcategory,
+                      item: absoluteUrl(
+                        `/categoria/${product.category?.toLowerCase() || 'todas'}?sub=${product.subcategory_id}`,
+                      ),
+                    },
+                    {
+                      '@type': 'ListItem',
+                      position: 4,
+                      name: product.name,
+                      item: absoluteUrl(`/producto/${product.product_id}`),
+                    },
+                  ]
+                : [
+                    {
+                      '@type': 'ListItem',
+                      position: 3,
+                      name: product.name,
+                      item: absoluteUrl(`/producto/${product.product_id}`),
+                    },
+                  ]),
+            ],
           },
-          offers: {
-            '@type': 'Offer',
-            priceCurrency: 'EUR',
-            price: product.price,
-            availability: availabilitySchema,
-            url: absoluteUrl(`/producto/${product.product_id}`),
-            shippingDetails: OFFER_SHIPPING_DETAILS,
-            hasMerchantReturnPolicy: MERCHANT_RETURN_POLICY,
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: product.name,
+            description: productDescription,
+            image: displayImages[0]?.startsWith('http')
+              ? displayImages[0]
+              : absoluteUrl(displayImages[0]),
+            brand: {
+              '@type': 'Brand',
+              name: 'Modas Me lo Merezco',
+            },
+            offers: {
+              '@type': 'Offer',
+              priceCurrency: 'EUR',
+              price: product.price,
+              availability: availabilitySchema,
+              url: absoluteUrl(`/producto/${product.product_id}`),
+              shippingDetails: OFFER_SHIPPING_DETAILS,
+              hasMerchantReturnPolicy: MERCHANT_RETURN_POLICY,
+            },
           },
-        }}
+        ]}
       />
       <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
         {/* Breadcrumbs */}

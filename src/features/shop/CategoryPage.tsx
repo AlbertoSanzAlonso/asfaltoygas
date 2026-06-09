@@ -9,7 +9,7 @@ import { ProductCard } from "@/components/shop/ProductCard";
 import type { Product, Subcategory, Label } from '@/types';
 import { useScrollRestoration } from "@/lib/useScrollRestoration";
 import { SeoHelmet } from '@/components/seo/SeoHelmet';
-import { truncateDescription } from '@/lib/seo/constants';
+import { absoluteUrl, truncateDescription } from '@/lib/seo/constants';
 
 const CategoryPage: React.FC = () => {
   const { category } = useParams<{ category: string }>();
@@ -181,6 +181,24 @@ const CategoryPage: React.FC = () => {
         title={categoryTitle}
         description={categoryDescription}
         path={`/categoria/${category}`}
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'Inicio',
+              item: absoluteUrl('/'),
+            },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: categoryTitle,
+              item: absoluteUrl(`/categoria/${category}`),
+            },
+          ],
+        }}
       />
       <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
         <header className="mb-20 text-center">
