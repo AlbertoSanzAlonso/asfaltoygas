@@ -3,6 +3,7 @@ import { SeoHelmet } from './SeoHelmet';
 import {
   DEFAULT_DESCRIPTION,
   DEFAULT_OG_IMAGE,
+  SITE_LOGO,
   SITE_NAME,
   SITE_URL,
 } from '@/lib/seo/constants';
@@ -73,6 +74,7 @@ const HOME_JSON_LD = {
   '@type': 'ClothingStore',
   name: SITE_NAME,
   url: SITE_URL,
+  logo: SITE_LOGO,
   image: DEFAULT_OG_IMAGE,
   description: DEFAULT_DESCRIPTION,
   priceRange: '€€',

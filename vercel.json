@@ -12,7 +12,7 @@
       "destination": "/api/sitemap"
     },
     {
-      "source": "/((?!assets/|favicon.ico|icons.svg|logo.png|og-image.png|robots.txt|sitemap.xml|_next/).*)",
+      "source": "/((?!assets/|favicon|apple-touch-icon|icons.svg|logo.png|og-image.png|robots.txt|sitemap.xml|_next/).*)",
       "destination": "/index.html"
     }
   ],

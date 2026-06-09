@@ -1,5 +1,6 @@
 export const SITE_URL = 'https://www.modasmelomerezco.es';
 export const SITE_NAME = 'Modas Me lo Merezco';
+export const SITE_LOGO = `${SITE_URL}/logo.png`;
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 export const GOOGLE_SITE_VERIFICATION =
   import.meta.env.VITE_GOOGLE_SITE_VERIFICATION?.trim() || '';
