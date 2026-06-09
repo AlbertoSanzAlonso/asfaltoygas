@@ -67,6 +67,7 @@ const NOINDEX_PATHS = [
   '/checkout',
   '/confirmar-suscripcion',
   '/desuscribir',
+  '/favoritos',
 ];
 
 const HOME_JSON_LD = {

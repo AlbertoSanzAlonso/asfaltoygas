@@ -4,6 +4,7 @@ Allow: /
 Disallow: /admin/
 Disallow: /cuenta/
 Disallow: /checkout
+Disallow: /favoritos
 Disallow: /login
 Disallow: /registro
 Disallow: /recuperar-password

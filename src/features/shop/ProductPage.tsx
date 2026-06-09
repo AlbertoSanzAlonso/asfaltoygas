@@ -203,7 +203,19 @@ const ProductPage = () => {
       </motion.div>
     </div>
   );
-  if (!product || product.is_published === false) return <div className="h-screen flex items-center justify-center">Producto no encontrado</div>;
+  if (!product || product.is_published === false) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center">
+        <SeoHelmet
+          title="Producto no encontrado"
+          description="El producto que buscas no está disponible en Modas Me lo Merezco."
+          path={`/producto/${id}`}
+          noindex
+        />
+        <p>Producto no encontrado</p>
+      </div>
+    );
+  }
 
   const displayImages = product.images.length > 0 ? product.images : [PRODUCT_PLACEHOLDER];
   const availableSizes = getUniqueSizes(product.variants);
