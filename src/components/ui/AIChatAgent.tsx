@@ -135,7 +135,7 @@ export const AIChatAgent = () => {
                 return `${label}: ${v.stock}uds`;
               }).join(', ') || 'Sin info de stock';
               const novelty = p.is_new ? '✨ NOVEDAD ✨' : '';
-              return `Artículo: ${p.name} ${novelty}. Precio: ${p.price}€. URL: ${window.location.origin}/producto/${p.product_id}. Tallas/Stock: ${stockInfo}. Descripción: ${p.description}`;
+              return `Artículo: ${p.name} ${novelty}. Precio: ${p.price}€. URL: /producto/${p.product_id}. Tallas/Stock: ${stockInfo}. Descripción: ${p.description}`;
             }).join('\n---\n')
           : 'No hay artículos específicos en el catálogo que coincidan.';
       } catch {
@@ -166,19 +166,20 @@ ${productsInfo}
 REGLAS CRÍTICAS DE RESPUESTA:
 1. SOLO recomienda artículos que estén en el "INVENTARIO REAL" arriba indicado. NUNCA inventes un producto que no aparezca en la lista.
 2. Si la clienta pide una categoría (ej: Pantalón) y no hay ninguno en el inventario real, NO inventes ni recomiendes otra cosa de distinta categoría. Di amablemente que no tienes stock de eso ahora mismo y ofrece mirar las "Novedades" o contactar por WhatsApp.
-3. Los enlaces a producto DEBEN ser copiados EXACTAMENTE del inventario real. No modifiques ni inventes URLs.
+3. Los enlaces a producto DEBEN ser copiados EXACTAMENTE del inventario real. No modifiques ni inventes URLs. Usa siempre la forma relativa (/producto/...) NUNCA con dominio completo.
 4. Sé persuasiva pero muy concisa.
 5. Si un producto es "NOVEDAD", menciónalo con entusiasmo.
-6. NUNCA digas "Excelente elección" ni frases similares si la clienta solo preguntó o pidió recomendaciones. Responde de forma natural como una dependienta de boutique. Si la clienta aún no ha elegido nada, no finjas que ya lo hizo.`
+6. NUNCA digas "Excelente elección" ni frases similares si la clienta solo preguntó o pidió recomendaciones. Responde de forma natural como una dependienta de boutique. Si la clienta aún no ha elegido nada, no finjas que ya lo hizo.
+7. NO compartas la URL completa del sitio web (https://www.modasmelomerezco.es) porque la usuaria ya está en él. Si quieres dirigir a una sección, usa solo el enlace relativo (ej: /#novedades).`
         : `
-NOTA: En este momento no tengo acceso al catálogo de productos en tiempo real. NO inventes productos ni generes URLs de producto bajo ninguna circunstancia. Ayuda a la clienta con información general de la tienda (envíos, devoluciones, tallas, horarios) y sugiérele estas secciones reales de la web:
+NOTA: En este momento no tengo acceso al catálogo de productos en tiempo real. NO inventes productos ni generes URLs de producto bajo ninguna circunstancia. Ayuda a la clienta con información general de la tienda (envíos, devoluciones, tallas, horarios) y sugiérele estas secciones reales de la web usando enlaces relativos:
 
-- Ropa: ${window.location.origin}/categoria/ropa
-- Complementos: ${window.location.origin}/categoria/complementos
-- Bolsos: ${window.location.origin}/categoria/bolsos
-- Novedades: ${window.location.origin}/#novedades
+- Ropa: /categoria/ropa
+- Complementos: /categoria/complementos
+- Bolsos: /categoria/bolsos
+- Novedades: /#novedades
 
-Para dudas de stock, que contacte por WhatsApp (685 011 494). NUNCA escribas enlaces que no estén en esta lista.`;
+Para dudas de stock, que contacte por WhatsApp (685 011 494). NUNCA escribas enlaces que no estén en esta lista. NUNCA incluyas el dominio completo (https://...) en los enlaces, usa siempre la forma relativa como se muestra arriba.`;
 
       const systemPrompt = baseInfo + inventoryBlock;
 
