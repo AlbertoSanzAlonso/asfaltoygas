@@ -264,9 +264,6 @@ export const products = {
 
   syncEmbedding: async (productId: string, name: string, description: string, categoryId?: string): Promise<void> => {
     try {
-      const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-      if (!apiKey) return;
-
       let categoryName = '';
       if (categoryId) {
         const { data: cat } = await supabase
@@ -279,16 +276,10 @@ export const products = {
 
       const content = `Producto: ${name}. Categoría: ${categoryName}. Descripción: ${description || ''}`;
 
-      const response = await fetch('https://api.openai.com/v1/embeddings', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'text-embedding-3-small',
-          input: content,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'embed', input: content }),
       });
 
       if (!response.ok) {
