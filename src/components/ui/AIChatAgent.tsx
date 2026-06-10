@@ -3,20 +3,14 @@ import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from "@/lib/supabase";
 // Eliminamos Xenova/Transformers para usar OpenAI directamente (más preciso)
-const getQueryEmbedding = async (text: string) => {
-  const response = await fetch('https://api.openai.com/v1/embeddings', {
+const getQueryEmbedding = async (text: string): Promise<number[]> => {
+  const response = await fetch('/api/chat', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: "text-embedding-3-small",
-      input: text
-    })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'embed', input: text }),
   });
 
-  if (!response.ok) throw new Error('OpenAI Embedding Error');
+  if (!response.ok) throw new Error('Embedding Error');
   const data = await response.json();
   return data.data[0].embedding;
 };
@@ -165,22 +159,17 @@ REGLAS CRÍTICAS DE RESPUESTA:
 5. Si un producto es "NOVEDAD", menciónalo con entusiasmo.
 `;
 
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
+          action: 'chat',
+          systemPrompt,
           messages: [
-            { role: 'system', content: systemPrompt },
             ...conversationHistory,
-            { role: 'user', content: userMsg }
+            { role: 'user', content: userMsg },
           ],
-          temperature: 0.6,
-          max_tokens: 600
-        })
+        }),
       });
 
       if (!response.ok) throw new Error('Groq API Error');
