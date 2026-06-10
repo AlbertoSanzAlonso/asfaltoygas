@@ -18,6 +18,6 @@ scratch/
 .env.preview
 .env.production
 
-# Cursor local (skills, MCP, config) — no subir al repo
-.cursor/
-AGENTS.md
+# Cursor skills (proyecto) — compartir con el equipo
+# Los skills son documentación viva del proyecto
+# .cursor/mcp.json se mantiene bajo versionado (sin tokens)

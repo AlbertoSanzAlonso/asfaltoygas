@@ -47,7 +47,7 @@ export const Footer: FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-20 mb-24">
             <div className="col-span-1 flex flex-col items-center lg:items-start text-center lg:text-left">
               <Link to="/" className="group block mb-10 w-full">
-                <img src="/assets/logo/logo-completo-blanco.svg" alt="Logo" className="h-56 w-auto object-contain opacity-100 transition-opacity mx-auto md:mx-0" />
+                <img src="/assets/logo/logo-completo-blanco.svg" alt="Modas Me lo Merezco" className="h-56 w-auto object-contain opacity-100 transition-opacity mx-auto md:mx-0" />
               </Link>
               <p className="text-white/80 text-sm leading-relaxed max-w-xs font-medium">Estilo y calidad para tu día a día. Porque vestir bien es recordarte quién eres.</p>
             </div>

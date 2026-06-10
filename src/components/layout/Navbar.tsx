@@ -43,7 +43,7 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
             </div>
             <div className="shrink-0">
               <Link to="/" className="group flex flex-col items-center leading-none">
-                <img src="/assets/logo/logo-corona.png" alt="Logo" className="h-14 w-auto object-contain transition-transform group-hover:scale-110" />
+                <img src="/assets/logo/logo-corona.png" alt="Modas Me lo Merezco" className="h-14 w-auto object-contain transition-transform group-hover:scale-110" />
               </Link>
             </div>
             <div className="flex items-center justify-end gap-4 md:gap-8 flex-1">
@@ -107,7 +107,7 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
               className="fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-white z-70 lg:hidden shadow-2xl flex flex-col"
             >
               <div className="p-8 flex justify-between items-center border-b border-secondary/5">
-                <img src="/assets/logo/logo-corona.png" alt="Logo" className="h-12 w-auto brightness-0" />
+                <img src="/assets/logo/logo-corona.png" alt="Modas Me lo Merezco" className="h-12 w-auto brightness-0" />
                 <button 
                   onClick={() => setIsMenuOpen(false)} 
                   className="p-3 bg-accent rounded-full text-secondary hover:text-primary hover:bg-primary/10 transition-all active:scale-95"

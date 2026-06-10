@@ -11,5 +11,9 @@ Disallow: /recuperar-password
 Disallow: /reset-password
 Disallow: /confirmar-suscripcion
 Disallow: /desuscribir
+Disallow: /wp-includes/
+Disallow: /wp-content/
+Disallow: /wp-admin/
+Disallow: /ropa-2/
 
 Sitemap: https://www.modasmelomerezco.es/sitemap.xml

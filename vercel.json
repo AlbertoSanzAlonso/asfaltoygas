@@ -2,6 +2,33 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "redirects": [
+    {
+      "source": "http://www.modasmelomerezco.es/(.*)",
+      "destination": "https://www.modasmelomerezco.es/$1",
+      "permanent": true
+    },
+    {
+      "source": "http://modasmelomerezco.es/(.*)",
+      "destination": "https://www.modasmelomerezco.es/$1",
+      "permanent": true
+    },
+    {
+      "source": "https://modasmelomerezco.es/(.*)",
+      "destination": "https://www.modasmelomerezco.es/$1",
+      "permanent": true
+    },
+    {
+      "source": "/wp-includes/:path*",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/ropa-2/:path*",
+      "destination": "/categoria/ropa",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/:path*",
