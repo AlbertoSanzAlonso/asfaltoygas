@@ -168,7 +168,14 @@ REGLAS CRÍTICAS DE RESPUESTA:
 4. Sé persuasiva pero muy concisa.
 5. Si un producto es "NOVEDAD", menciónalo con entusiasmo.`
         : `
-NOTA: En este momento no tengo acceso al catálogo de productos en tiempo real. NO inventes productos ni generes URLs de producto bajo ninguna circunstancia. Ayuda a la clienta con información general de la tienda (envíos, devoluciones, tallas, horarios) y anímala a visitar las secciones de Ropa y Complementos en la web (${window.location.origin}/categoria/ropa), o a contactar por WhatsApp. NUNCA escribas enlaces que no existan.`;
+NOTA: En este momento no tengo acceso al catálogo de productos en tiempo real. NO inventes productos ni generes URLs de producto bajo ninguna circunstancia. Ayuda a la clienta con información general de la tienda (envíos, devoluciones, tallas, horarios) y sugiérele estas secciones reales de la web:
+
+- Ropa: ${window.location.origin}/categoria/ropa
+- Complementos: ${window.location.origin}/categoria/complementos
+- Bolsos: ${window.location.origin}/categoria/bolsos
+- Novedades: ${window.location.origin}/#novedades
+
+Para dudas de stock, que contacte por WhatsApp (685 011 494). NUNCA escribas enlaces que no estén en esta lista.`;
 
       const systemPrompt = baseInfo + inventoryBlock;
 
