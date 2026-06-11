@@ -18,8 +18,8 @@ export const generateInvoicePDF = async (order: Order, user: { name?: string; su
   });
   
   try {
-    const coronaUrl = 'https://aoyafhjpgmxcygqnklvl.supabase.co/storage/v1/object/public/assets/logo/logo-corona.png';
-    const lettersUrl = 'https://aoyafhjpgmxcygqnklvl.supabase.co/storage/v1/object/public/assets/logo/LOGO%20MELOMEREZCO%20solo%20letras.png';
+    const coronaUrl = '/assets/logo/logo-asfaltoygas-icon.svg';
+    const lettersUrl = '/assets/logo/logo-asfaltoygas-blanco.svg';
     
     const loadImg = (url: string): Promise<HTMLImageElement | null> => new Promise((resolve) => {
       const img = new Image();
@@ -131,7 +131,7 @@ export const generateInvoicePDF = async (order: Order, user: { name?: string; su
   doc.setFontSize(9);
   doc.setFont('helvetica', 'italic');
   doc.setTextColor(150);
-  doc.text('Gracias por confiar en Modas Me lo Merezco.', 105, 275, { align: 'center' });
+  doc.text('Gracias por confiar en Asfalto y Gas.', 105, 275, { align: 'center' });
   doc.text('Vístete para ti.', 105, 282, { align: 'center' });
   
   return doc;

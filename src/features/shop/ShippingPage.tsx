@@ -53,7 +53,7 @@ const ShippingPage: FC = () => {
                 Sin coste de envío recogiendo tu pedido en nuestra tienda física.
               </p>
               <div className="pt-4 space-y-1">
-                <p className="text-secondary font-medium text-sm uppercase tracking-wider">Modas Me lo Merezco</p>
+                <p className="text-secondary font-medium text-sm uppercase tracking-wider">Asfalto y Gas</p>
                 <p className="text-secondary/60 text-xs">C/ Aragón, 2, L2 – Benalmádena</p>
               </div>
             </section>
@@ -82,7 +82,7 @@ const ShippingPage: FC = () => {
 
           <footer className="pt-12 text-center">
             <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-secondary/40">
-              © 2026 Modas Me lo Merezco - Información de Envíos
+              © 2026 Asfalto y Gas - Información de Envíos
             </p>
           </footer>
         </div>

@@ -20,7 +20,7 @@ const AvisoLegalPage: FC = () => {
               <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">Titular</span>
-                  <p className="text-secondary font-medium">MODAS MELOMEREZCO, S.L.</p>
+                  <p className="text-secondary font-medium">ASFALTO Y GAS, S.L.</p>
                 </div>
                 <div className="space-y-2">
                   <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">NIF</span>
@@ -28,11 +28,11 @@ const AvisoLegalPage: FC = () => {
                 </div>
                 <div className="space-y-2">
                   <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">Correo electrónico</span>
-                  <a href="mailto:info@modasmelomerezco.es" className="text-secondary font-medium hover:text-primary transition-colors">info@modasmelomerezco.es</a>
+                  <a href="mailto:info@asfaltoygas.es" className="text-secondary font-medium hover:text-primary transition-colors">info@asfaltoygas.es</a>
                 </div>
                 <div className="space-y-2">
                   <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">Sitio web</span>
-                  <a href="https://www.modasmelomerezco.es" className="text-secondary font-medium hover:text-primary transition-colors">www.modasmelomerezco.es</a>
+                  <a href="https://www.asfaltoygas.es" className="text-secondary font-medium hover:text-primary transition-colors">www.asfaltoygas.es</a>
                 </div>
               </div>
             </section>
@@ -40,7 +40,7 @@ const AvisoLegalPage: FC = () => {
             <section className="space-y-6">
               <h2 className="text-xl font-bold tracking-widest uppercase text-secondary">1. Objeto</h2>
               <p className="text-secondary/80 leading-relaxed">
-                El presente Aviso Legal regula el acceso y uso del sitio web <a href="https://www.modasmelomerezco.es" className="text-primary hover:underline">https://www.modasmelomerezco.es</a>, cuyo titular es MODAS MELOMEREZCO, S.L.
+                El presente Aviso Legal regula el acceso y uso del sitio web <a href="https://www.asfaltoygas.es" className="text-primary hover:underline">https://www.asfaltoygas.es</a>, cuyo titular es ASFALTO Y GAS, S.L.
               </p>
               <p className="text-secondary/80 leading-relaxed">
                 La navegación por el sitio web atribuye la condición de usuario e implica la aceptación plena y sin reservas de todas las disposiciones incluidas en este Aviso Legal.
@@ -50,7 +50,7 @@ const AvisoLegalPage: FC = () => {
             <section className="space-y-6">
               <h2 className="text-xl font-bold tracking-widest uppercase text-secondary">2. Propiedad intelectual e industrial</h2>
               <p className="text-secondary/80 leading-relaxed">
-                Todos los contenidos del sitio web (textos, imágenes, diseños, logotipos, estructura, código fuente, etc.) son titularidad de MODAS MELOMEREZCO, S.L. o dispone de los derechos necesarios para su uso.
+                Todos los contenidos del sitio web (textos, imágenes, diseños, logotipos, estructura, código fuente, etc.) son titularidad de ASFALTO Y GAS, S.L. o dispone de los derechos necesarios para su uso.
               </p>
               <p className="text-secondary/80 leading-relaxed font-medium">
                 Queda prohibida su reproducción, distribución o comunicación pública sin autorización expresa.
@@ -60,7 +60,7 @@ const AvisoLegalPage: FC = () => {
             <section className="space-y-6">
               <h2 className="text-xl font-bold tracking-widest uppercase text-secondary">3. Responsabilidad</h2>
               <p className="text-secondary/80 leading-relaxed">
-                MODAS MELOMEREZCO, S.L. no se hace responsable de los daños derivados del uso indebido del sitio web ni de posibles errores técnicos o interrupciones del servicio.
+                ASFALTO Y GAS, S.L. no se hace responsable de los daños derivados del uso indebido del sitio web ni de posibles errores técnicos o interrupciones del servicio.
               </p>
             </section>
 

@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import { getCanonicalSiteUrl } from './_siteUrl.js';
+import { isSupabaseConfigured } from './_supabaseConfig.js';
 
 const SITE_URL = getCanonicalSiteUrl();
 
@@ -13,9 +14,9 @@ type SitemapEntry = {
 
 const STATIC_PAGES: SitemapEntry[] = [
   { loc: '/', changefreq: 'daily', priority: '1.0', lastmod: '2026-06-10' },
-  { loc: '/categoria/ropa', changefreq: 'daily', priority: '0.9', lastmod: '2026-06-10' },
-  { loc: '/categoria/complementos', changefreq: 'daily', priority: '0.9', lastmod: '2026-06-10' },
-  { loc: '/categoria/bolsos', changefreq: 'daily', priority: '0.9', lastmod: '2026-06-10' },
+  { loc: '/categoria/cascos', changefreq: 'daily', priority: '0.9', lastmod: '2026-06-11' },
+  { loc: '/categoria/equipacion', changefreq: 'daily', priority: '0.9', lastmod: '2026-06-11' },
+  { loc: '/categoria/accesorios', changefreq: 'daily', priority: '0.9', lastmod: '2026-06-11' },
   { loc: '/conocenos', changefreq: 'monthly', priority: '0.6', lastmod: '2026-06-10' },
   { loc: '/envios', changefreq: 'monthly', priority: '0.5', lastmod: '2026-06-10' },
   { loc: '/devoluciones', changefreq: 'monthly', priority: '0.5', lastmod: '2026-06-10' },
@@ -60,12 +61,11 @@ function toLastmod(value?: string | null): string | undefined {
 }
 
 export default async function handler(_req: VercelRequest, res: VercelResponse) {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
   const entries: SitemapEntry[] = [...STATIC_PAGES];
 
-  if (supabaseUrl && serviceKey) {
+  if (isSupabaseConfigured()) {
+    const supabaseUrl = process.env.VITE_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     try {
       const supabase = createClient(supabaseUrl, serviceKey);
       const { data: products } = await supabase

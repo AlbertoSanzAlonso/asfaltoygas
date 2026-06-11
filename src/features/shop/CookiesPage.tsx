@@ -21,7 +21,7 @@ const CookiesPage: FC = () => {
               <h2 className="text-xl font-bold tracking-widest uppercase text-secondary">Uso de cookies</h2>
             </div>
             <p className="text-secondary/80 leading-relaxed text-lg">
-              En <span className="text-secondary font-medium">www.modasmelomerezco.es</span> utilizamos cookies para mejorar tu experiencia de navegación y garantizar el correcto funcionamiento de nuestra tienda online.
+              En <span className="text-secondary font-medium">www.asfaltoygas.es</span> utilizamos cookies para mejorar tu experiencia de navegación y garantizar el correcto funcionamiento de nuestra tienda online.
             </p>
           </section>
 

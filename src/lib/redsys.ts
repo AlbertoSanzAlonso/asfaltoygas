@@ -42,7 +42,7 @@ export const generateRedsysParameters = (
     DS_MERCHANT_MERCHANTURL: options.urlNotification,
     DS_MERCHANT_URLOK: options.urlOk,
     DS_MERCHANT_URLKO: options.urlKo,
-    DS_MERCHANT_PRODUCTDESCRIPTION: options.productDescription || 'Compra en Modas Me lo Merezco',
+    DS_MERCHANT_PRODUCTDESCRIPTION: options.productDescription || 'Compra en Asfalto y Gas',
     ...(options.paymentMethod === 'bizum' ? { DS_MERCHANT_PAYMETHODS: 'z' } : {}),
     ...(options.paymentMethod === 'card' ? { DS_MERCHANT_PAYMETHODS: 'c' } : {})
   };

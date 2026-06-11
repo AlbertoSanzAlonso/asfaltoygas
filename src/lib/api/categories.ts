@@ -1,9 +1,12 @@
 
 import { supabase } from '../supabase';
+import { isSupabaseConfigured } from '../supabaseConfig';
 import type { Category, Subcategory } from '@/types';
 
 export const categories = {
   getAll: async (): Promise<Category[]> => {
+    if (!isSupabaseConfigured()) return [];
+
     const { data, error } = await supabase
       .from('categories')
       .select('*')
@@ -14,6 +17,8 @@ export const categories = {
   },
 
   getByName: async (name: string): Promise<Category | undefined> => {
+    if (!isSupabaseConfigured()) return undefined;
+
     const { data, error } = await supabase
       .from('categories')
       .select('*')
@@ -25,6 +30,8 @@ export const categories = {
   },
 
   getSubcategories: async (categoryId?: number): Promise<Subcategory[]> => {
+    if (!isSupabaseConfigured()) return [];
+
     let query = supabase
       .from('subcategories')
       .select('*')

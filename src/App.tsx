@@ -79,7 +79,7 @@ const Skeleton: FC = () => (
       }}
       className="relative"
     >
-      <img src="/assets/logo/logo-corona.png" alt="Cargando..." className="w-16 h-16 object-contain" />
+      <img src="/assets/logo/logo-asfaltoygas-icon.svg" alt="Cargando..." className="w-16 h-16 object-contain" />
       <motion.div 
         animate={{ scale: [1, 2, 1], opacity: [0, 0.3, 0] }}
         transition={{ duration: 1.5, repeat: Infinity, times: [0, 0.5, 1] }}

@@ -1,13 +1,14 @@
-export const SITE_URL = 'https://www.modasmelomerezco.es';
-export const SITE_NAME = 'Modas Me lo Merezco';
+import { BRAND } from '@/lib/brand';
+
+export const SITE_URL = BRAND.url;
+export const SITE_NAME = BRAND.name;
 export const SITE_LOGO = `${SITE_URL}/logo.png`;
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 export const GOOGLE_SITE_VERIFICATION =
   import.meta.env.VITE_GOOGLE_SITE_VERIFICATION?.trim() || '';
 
-export const DEFAULT_TITLE = `${SITE_NAME} | Tienda online de moda para mujer`;
-export const DEFAULT_DESCRIPTION =
-  'Tienda online de moda para mujer. Ropa, vestidos, bolsos y complementos de tendencia. Descubre colecciones exclusivas en Modas Me lo Merezco.';
+export const DEFAULT_TITLE = `${SITE_NAME} | ${BRAND.tagline}`;
+export const DEFAULT_DESCRIPTION = BRAND.description;
 
 export function buildTitle(pageTitle?: string): string {
   if (!pageTitle) return DEFAULT_TITLE;

@@ -1,18 +1,22 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { isSupabaseConfigured } from './supabaseConfig';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+let client: SupabaseClient | null = null;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase credentials missing in .env. Please configure them in your local .env file.');
+function getClient(): SupabaseClient {
+  if (!client) {
+    const url = import.meta.env.VITE_SUPABASE_URL?.trim() || 'https://placeholder-project.supabase.co';
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() || 'placeholder-key';
+    client = createClient(url, key);
+  }
+  return client;
 }
 
-// Fallback dummy credentials to prevent instant crash of Vite at startup
-const fallbackUrl = 'https://placeholder-project.supabase.co';
-const fallbackKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE1OTg4ODMwMDAsImV4cCI6MTkwNDQ0NzAwMH0.placeholder';
+/** Cliente Supabase; las consultas deben comprobar `isSupabaseConfigured()` antes. */
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    return Reflect.get(getClient(), prop);
+  },
+});
 
-export const supabase = createClient(
-  supabaseUrl || fallbackUrl,
-  supabaseAnonKey || fallbackKey
-);
-
+export { isSupabaseConfigured };

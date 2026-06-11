@@ -51,7 +51,7 @@ const SubscriptionConfirmation: React.FC = () => {
             </div>
             <div className="space-y-2">
               <h2 className="text-3xl font-black uppercase italic tracking-tighter">¡Suscripción Activa!</h2>
-              <p className="text-gray-500 text-sm font-bold uppercase tracking-widest">Ya formas parte de Modas Me lo Merezco</p>
+              <p className="text-gray-500 text-sm font-bold uppercase tracking-widest">Ya formas parte de Asfalto y Gas</p>
             </div>
             <p className="text-gray-400 text-xs leading-relaxed">
               A partir de ahora recibirás nuestras novedades y promociones exclusivas directamente en tu email.

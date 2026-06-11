@@ -1,4 +1,4 @@
-# Agentes — Modas Me lo Merezco
+# Agentes — Asfalto y Gas
 
 ## Skills del proyecto
 
@@ -11,6 +11,6 @@
 
 - Inventario: una fila en `product_variants` = talla + color + stock; color por defecto **Neutro**.
 - No commitear archivos `.env` con credenciales.
-- SEO: el `alt` de imágenes de logo en links no debe ser `"Logo"` (Google lo toma como sitelink). Usar `"Modas Me lo Merezco"`.
-- SEO: la canonical siempre es `https://www.modasmelomerezco.es` (con www), sin query params.
-- SEO: `public/logo.png` debe ser ≥500x500px (usado en datos estructurados `ClothingStore`).
+- SEO: el `alt` de imágenes de logo en links no debe ser `"Logo"` (Google lo toma como sitelink). Usar `"Asfalto y Gas"`.
+- SEO: la canonical siempre es `https://www.asfaltoygas.es` (con www), sin query params.
+- SEO: `public/logo.png` debe ser ≥500x500px (usado en datos estructurados `Store`).

@@ -37,7 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const info = await transporter.sendMail({
-      from: `"Modas Me lo Merezco" <${process.env.GMAIL_USER}>`,
+      from: `"Asfalto y Gas" <${process.env.GMAIL_USER}>`,
       to,
       subject,
       text,

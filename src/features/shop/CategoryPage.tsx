@@ -172,7 +172,7 @@ const CategoryPage: React.FC = () => {
 
   const categoryTitle = categoryData?.name || category || 'Categoría';
   const categoryDescription = truncateDescription(
-    `Descubre ${categoryTitle.toLowerCase()} en Modas Me lo Merezco. Moda para mujer con envío gratuito desde 50 €.`,
+    `Descubre ${categoryTitle.toLowerCase()} en Asfalto y Gas. Cascos y equipación motera con envío gratuito desde 50 €.`,
   );
 
   return (
@@ -370,7 +370,7 @@ const CategoryPage: React.FC = () => {
                 }}
                 className="relative"
               >
-                <img src="/assets/logo/logo-corona.png" alt="Cargando..." className="w-12 h-12 object-contain" />
+                <img src="/assets/logo/logo-asfaltoygas-icon.svg" alt="Cargando..." className="w-12 h-12 object-contain" />
               </motion.div>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">

@@ -100,7 +100,7 @@ const ReturnsPage: FC = () => {
 
           <footer className="pt-12 text-center">
             <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-secondary/40">
-              © 2026 Modas Me lo Merezco - Devoluciones y Cambios
+              © 2026 Asfalto y Gas - Devoluciones y Cambios
             </p>
           </footer>
         </div>

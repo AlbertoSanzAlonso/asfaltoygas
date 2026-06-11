@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { PRODUCT_PLACEHOLDER } from '@/lib/constants';
+import { isBlockedImageUrl } from '@/lib/supabaseConfig';
 
 interface ProductImageProps {
   src?: string;
@@ -29,11 +30,11 @@ export const ProductImage: React.FC<ProductImageProps> = ({
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
-  
-  const isPlaceholder = !src || src === PRODUCT_PLACEHOLDER || error;
-  const imageSrc = error ? PRODUCT_PLACEHOLDER : (src || PRODUCT_PLACEHOLDER);
 
-  // Handle cached images
+  const blocked = isBlockedImageUrl(src);
+  const isPlaceholder = !src || blocked || src === PRODUCT_PLACEHOLDER || error;
+  const imageSrc = isPlaceholder ? PRODUCT_PLACEHOLDER : src!;
+
   useEffect(() => {
     if (imgRef.current?.complete) {
       setLoaded(true);
@@ -47,12 +48,11 @@ export const ProductImage: React.FC<ProductImageProps> = ({
   };
 
   return (
-    <div className={`relative overflow-hidden ${aspectRatio} ${isPlaceholder ? 'bg-primary' : 'bg-white'} ${containerClassName}`}>
-      {/* Loading State: Centered pulsing logo */}
+    <div className={`relative overflow-hidden ${aspectRatio} ${isPlaceholder ? 'bg-secondary/5' : 'bg-white'} ${containerClassName}`}>
       {!loaded && !isPlaceholder && (
         <div className="absolute inset-0 flex items-center justify-center bg-secondary/5">
           <motion.img 
-            src="/assets/logo/logo-corona.png" 
+            src={PRODUCT_PLACEHOLDER}
             alt="Cargando..." 
             className="w-12 h-12 object-contain opacity-20"
             animate={{ 
@@ -78,7 +78,6 @@ export const ProductImage: React.FC<ProductImageProps> = ({
         height={height}
         onLoad={handleLoad}
         onError={() => {
-          console.error(`Error loading image: ${imageSrc}`);
           setError(true);
           setLoaded(true);
           onLoad?.();
@@ -100,17 +99,6 @@ export const ProductImage: React.FC<ProductImageProps> = ({
             : 'object-cover group-hover:scale-105'
         } ${className}`}
       />
-
-      {/* Watermark: Only for real loaded images */}
-      {loaded && !isPlaceholder && (
-        <div className="absolute bottom-4 right-4 w-1/5 max-w-[100px] pointer-events-none opacity-60 select-none z-10">
-          <img 
-            src="/assets/logo/LOGO MELOMEREZCO corona blanco.png" 
-            alt="" 
-            className="w-full h-auto drop-shadow-lg" 
-          />
-        </div>
-      )}
     </div>
   );
 };

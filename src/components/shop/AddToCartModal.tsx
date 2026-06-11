@@ -31,7 +31,7 @@ export const AddToCartModal: React.FC = () => {
             <div className="p-8 text-center">
               <div className="mb-8 flex justify-center">
                 <img 
-                  src="/assets/logo/LOGO MELOMEREZCO corona.svg" 
+                  src="/assets/logo/logo-asfaltoygas-icon.svg" 
                   alt="Logo" 
                   className="w-24 h-24 object-contain"
                 />

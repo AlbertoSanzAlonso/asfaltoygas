@@ -46,7 +46,7 @@ export const mailApi = {
 
   sendOrderConfirmation: async (order: any, customerEmail: string) => {
     const orderId = order.order_id.split('-')[0].toUpperCase();
-    const logoUrl = 'https://aoyafhjpgmxcygqnklvl.supabase.co/storage/v1/object/public/assets/logo/LOGO%20MELOMEREZCO%20completo%20color.png';
+    const logoUrl = '/assets/logo/logo-asfaltoygas-blanco.svg';
     const { user } = useAuthStore.getState();
     
     // Generate PDF Invoice
@@ -62,13 +62,13 @@ export const mailApi = {
     const html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; border-radius: 10px;">
         <div style="text-align: center; margin-bottom: 10px;">
-          <img src="${logoUrl}" alt="Modas Me lo Merezco" style="width: 200px; height: auto;">
+          <img src="${logoUrl}" alt="Asfalto y Gas" style="width: 200px; height: auto;">
         </div>
         <h1 style="color: #000; text-transform: uppercase; font-style: italic; border-bottom: 2px solid #000; padding-bottom: 20px; text-align: center;">
           Pedido <span style="color: #ff3366;">#${orderId}</span> en marcha
         </h1>
         <p style="text-align: center;">¡Hola <strong>${order.customer?.name || user?.name || 'cliente'}</strong>!</p>
-        <p style="text-align: center;">Gracias por tu compra en <strong>Modas Me lo Merezco</strong>. Tu pedido ya está siendo preparado.</p>
+        <p style="text-align: center;">Gracias por tu compra en <strong>Asfalto y Gas</strong>. Tu pedido ya está siendo preparado.</p>
         
         <div style="margin: 30px 0;">
           <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px; text-transform: uppercase; font-size: 12px; color: #888;">Detalles de tu compra</h3>
@@ -100,7 +100,7 @@ export const mailApi = {
 
     const payload = {
       to: customerEmail,
-      subject: `Confirmación de pedido #${orderId} - Modas Me lo Merezco`,
+      subject: `Confirmación de pedido #${orderId} - Asfalto y Gas`,
       html,
       attachments: [
         {
@@ -115,14 +115,14 @@ export const mailApi = {
   },
 
   sendPasswordRecovery: async (email: string, resetLink: string) => {
-    const logoUrl = 'https://aoyafhjpgmxcygqnklvl.supabase.co/storage/v1/object/public/assets/logo/LOGO%20MELOMEREZCO%20completo%20color.png';
+    const logoUrl = '/assets/logo/logo-asfaltoygas-blanco.svg';
     const html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; border-radius: 10px;">
         <div style="text-align: center; margin-bottom: 10px;">
-          <img src="${logoUrl}" alt="Modas Me lo Merezco" style="width: 180px; height: auto;">
+          <img src="${logoUrl}" alt="Asfalto y Gas" style="width: 180px; height: auto;">
         </div>
         <h2 style="color: #000; text-transform: uppercase; font-style: italic; text-align: center;">Recuperación de Contraseña</h2>
-        <p style="text-align: center;">Has solicitado restablecer tu contraseña en <strong>Modas Me lo Merezco</strong>.</p>
+        <p style="text-align: center;">Has solicitado restablecer tu contraseña en <strong>Asfalto y Gas</strong>.</p>
         <div style="margin: 30px 0; text-align: center;">
           <a href="${resetLink}" style="background: #000; color: #fff; padding: 15px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
             Restablecer contraseña
@@ -135,14 +135,14 @@ export const mailApi = {
 
     return mailApi.send({
       to: email,
-      subject: 'Recuperación de contraseña - Modas Me lo Merezco',
+      subject: 'Recuperación de contraseña - Asfalto y Gas',
       html
     });
   },
 
   sendStatusUpdate: async (order: any, customerEmail: string, newStatus: string) => {
     const orderId = order.order_id.split('-')[0].toUpperCase();
-    const logoUrl = 'https://aoyafhjpgmxcygqnklvl.supabase.co/storage/v1/object/public/assets/logo/LOGO%20MELOMEREZCO%20completo%20color.png';
+    const logoUrl = '/assets/logo/logo-asfaltoygas-blanco.svg';
     const statusMap: Record<string, string> = {
       'Paid': 'Pagado',
       'Shipped': 'Enviado',
@@ -161,7 +161,7 @@ export const mailApi = {
     const html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; border-radius: 10px;">
         <div style="text-align: center; margin-bottom: 10px;">
-          <img src="${logoUrl}" alt="Modas Me lo Merezco" style="width: 180px; height: auto;">
+          <img src="${logoUrl}" alt="Asfalto y Gas" style="width: 180px; height: auto;">
         </div>
         <h2 style="color: #000; text-transform: uppercase; font-style: italic; text-align: center;">Actualización de tu Pedido <span style="color: #ff3366;">#${orderId}</span></h2>
         <p style="text-align: center;">Hola <strong>${order.customer?.name || 'cliente'}</strong>,</p>
@@ -181,29 +181,29 @@ export const mailApi = {
         ` : ''}
         
         <div style="margin-top: 30px; text-align: center;">
-          <a href="https://modasmelomerezco.es/cuenta/pedidos" style="background: #000; color: #fff; padding: 15px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
+          <a href="https://asfaltoygas.es/cuenta/pedidos" style="background: #000; color: #fff; padding: 15px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
             Ver mis pedidos
           </a>
         </div>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
-        <p style="font-size: 11px; color: #999; text-align: center;">Gracias por confiar en Modas Me lo Merezco.</p>
+        <p style="font-size: 11px; color: #999; text-align: center;">Gracias por confiar en Asfalto y Gas.</p>
       </div>
     `;
 
     return mailApi.send({
       to: customerEmail,
-      subject: `Actualización de pedido #${orderId}: ${statusName} - Modas Me lo Merezco`,
+      subject: `Actualización de pedido #${orderId}: ${statusName} - Asfalto y Gas`,
       html
     });
   },
 
-  sendNewsletter: async (to: string, subject: string, content: string, origin: string = 'https://modasmelomerezco.es') => {
-    const logoUrl = 'https://aoyafhjpgmxcygqnklvl.supabase.co/storage/v1/object/public/assets/logo/LOGO%20MELOMEREZCO%20completo%20color.png';
+  sendNewsletter: async (to: string, subject: string, content: string, origin: string = 'https://asfaltoygas.es') => {
+    const logoUrl = '/assets/logo/logo-asfaltoygas-blanco.svg';
     const unsubscribeUrl = `${origin}/desuscribir?email=${encodeURIComponent(to)}`;
     const html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; border-radius: 10px; background-color: #fff;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <img src="${logoUrl}" alt="Modas Me lo Merezco" style="width: 180px; height: auto;">
+          <img src="${logoUrl}" alt="Asfalto y Gas" style="width: 180px; height: auto;">
         </div>
         <div style="line-height: 1.6; color: #333; font-size: 16px; margin-bottom: 30px;">
           ${content.replace(/\n/g, '<br>')}
@@ -215,14 +215,14 @@ export const mailApi = {
             <a href="${unsubscribeUrl}" style="color: #999;">Darse de baja</a>
           </p>
           <div style="margin-top: 20px;">
-            <a href="https://www.instagram.com/modasmelomerezco" style="text-decoration: none; margin: 0 10px;">
+            <a href="https://www.instagram.com/asfaltoygas" style="text-decoration: none; margin: 0 10px;">
               <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" width="20" height="20" alt="Instagram">
             </a>
             <a href="https://www.facebook.com/profile.php?id=61555721379464" style="text-decoration: none; margin: 0 10px;">
               <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" width="20" height="20" alt="Facebook">
             </a>
           </div>
-          <p style="font-size: 10px; color: #ccc; margin-top: 20px;">© 2026 Modas Me lo Merezco. Todos los derechos reservados.</p>
+          <p style="font-size: 10px; color: #ccc; margin-top: 20px;">© 2026 Asfalto y Gas. Todos los derechos reservados.</p>
         </div>
       </div>
     `;
@@ -234,13 +234,13 @@ export const mailApi = {
     });
   },
 
-  sendConfirmationEmail: async (to: string, token: string, origin: string = 'https://modasmelomerezco.es') => {
-    const logoUrl = 'https://aoyafhjpgmxcygqnklvl.supabase.co/storage/v1/object/public/assets/logo/LOGO%20MELOMEREZCO%20completo%20color.png';
+  sendConfirmationEmail: async (to: string, token: string, origin: string = 'https://asfaltoygas.es') => {
+    const logoUrl = '/assets/logo/logo-asfaltoygas-blanco.svg';
     const confirmUrl = `${origin}/confirmar-suscripcion?token=${token}`;
     const html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; border-radius: 10px; background-color: #fff;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <img src="${logoUrl}" alt="Modas Me lo Merezco" style="width: 180px; height: auto;">
+          <img src="${logoUrl}" alt="Asfalto y Gas" style="width: 180px; height: auto;">
         </div>
         <h2 style="color: #000; text-transform: uppercase; font-style: italic; text-align: center;">¡Casi estás dentro!</h2>
         <p style="text-align: center; line-height: 1.6; color: #333; font-size: 16px;">
@@ -255,13 +255,13 @@ export const mailApi = {
           Si no has solicitado esto, puedes ignorar este correo con total tranquilidad.
         </p>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 40px 0;" />
-        <p style="font-size: 10px; color: #ccc; text-align: center;">© 2026 Modas Me lo Merezco.</p>
+        <p style="font-size: 10px; color: #ccc; text-align: center;">© 2026 Asfalto y Gas.</p>
       </div>
     `;
 
     return mailApi.send({
       to,
-      subject: 'Confirma tu suscripción - Modas Me lo Merezco',
+      subject: 'Confirma tu suscripción - Asfalto y Gas',
       html
     });
   }

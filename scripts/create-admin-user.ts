@@ -65,7 +65,7 @@ async function main() {
 
   console.log('Administrador creado correctamente.');
   console.log('  Email:', email);
-  console.log('  Login: https://www.modasmelomerezco.es/admin/login');
+  console.log('  Login: https://www.asfaltoygas.es/admin/login');
 }
 
 main().catch((err) => {

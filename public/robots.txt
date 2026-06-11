@@ -16,4 +16,4 @@ Disallow: /wp-content/
 Disallow: /wp-admin/
 Disallow: /ropa-2/
 
-Sitemap: https://www.modasmelomerezco.es/sitemap.xml
+Sitemap: https://www.asfaltoygas.es/sitemap.xml

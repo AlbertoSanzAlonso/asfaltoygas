@@ -33,7 +33,7 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
 
   useEffect(() => {
     const wImg = new Image();
-    wImg.src = '/LOGO%20MELOMEREZCO%20corona%20blanco.png';
+    wImg.src = '/assets/logo/logo-asfaltoygas-blanco.svg';
     wImg.onload = () => {
       watermarkRef.current = wImg;
     };

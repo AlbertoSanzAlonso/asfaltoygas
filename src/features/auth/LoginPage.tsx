@@ -122,7 +122,7 @@ export const LoginPage: React.FC = () => {
             className="flex justify-center mb-8"
           >
             <img 
-              src="/assets/logo/LOGO MELOMEREZCO corona.svg" 
+              src="/assets/logo/logo-asfaltoygas-icon.svg" 
               alt="Logo" 
               className="w-28 h-28 object-contain"
             />

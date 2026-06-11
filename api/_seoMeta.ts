@@ -1,12 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import { getCanonicalSiteUrl } from './_siteUrl.js';
+import { isSupabaseConfigured } from './_supabaseConfig.js';
 
 const SITE_URL = getCanonicalSiteUrl();
-const SITE_NAME = 'Modas Me lo Merezco';
+const SITE_NAME = 'Asfalto y Gas';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
-const DEFAULT_TITLE = `${SITE_NAME} | Tienda online de moda para mujer`;
+const DEFAULT_TITLE = `${SITE_NAME} | Tu tienda de cascos y equipación motera`;
 const DEFAULT_DESCRIPTION =
-  'Tienda online de moda para mujer. Ropa, vestidos, bolsos y complementos de tendencia. Descubre colecciones exclusivas en Modas Me lo Merezco.';
+  'Tienda online especializada en cascos de moto, equipación y accesorios. Marcas líderes como HJC, AGV, Shoei y más. Envío rápido en toda España.';
 
 export type SeoPageMeta = {
   title: string;
@@ -20,51 +21,51 @@ export type SeoPageMeta = {
 
 const STATIC_PAGES: Record<string, { title?: string; description: string }> = {
   '/': { description: DEFAULT_DESCRIPTION },
-  '/categoria/ropa': {
-    title: 'Ropa de mujer',
+  '/categoria/cascos': {
+    title: 'Cascos de moto',
     description:
-      'Colección de ropa de mujer: vestidos, blusas, pantalones y más. Moda actual con envío gratuito desde 50 € en Modas Me lo Merezco.',
+      'Cascos integrales, modulares, jet y off-road de HJC, AGV, Shoei, Nolan y más. Homologados ECE 22.06 con envío gratuito desde 50 €.',
   },
-  '/categoria/complementos': {
-    title: 'Complementos de moda',
+  '/categoria/equipacion': {
+    title: 'Equipación motera',
     description:
-      'Complementos y accesorios de moda para mujer. Descubre piezas únicas con envío gratuito desde 50 €.',
+      'Chaquetas, guantes, botas y pantalones para moto. Equipación de carretera y off-road con envío gratuito desde 50 €.',
   },
-  '/categoria/bolsos': {
-    title: 'Bolsos y accesorios',
+  '/categoria/accesorios': {
+    title: 'Accesorios para moto',
     description:
-      'Bolsos y accesorios de mujer. Estilo y calidad en Modas Me lo Merezco. Envío gratuito desde 50 €.',
+      'Accesorios y complementos para tu moto: intercomunicadores, mochilas, protecciones y más en Asfalto y Gas.',
   },
   '/conocenos': {
     title: 'Conócenos',
     description:
-      'Conoce Modas Me lo Merezco: moda para la mujer real, con piezas seleccionadas con mimo y las últimas tendencias.',
+      'Conoce Asfalto y Gas: tu tienda especializada en cascos y equipación motera con asesoramiento experto.',
   },
   '/envios': {
     title: 'Envíos',
     description:
-      'Información de envíos de Modas Me lo Merezco. Envío gratuito en pedidos superiores a 50 €. Entrega en 48 h.',
+      'Información de envíos de Asfalto y Gas. Envío gratuito en pedidos superiores a 50 €. Entrega en 48 h.',
   },
   '/devoluciones': {
     title: 'Devoluciones y cambios',
     description:
-      'Política de devoluciones y cambios de Modas Me lo Merezco. 14 días naturales desde la recepción del pedido.',
+      'Política de devoluciones y cambios de Asfalto y Gas. 14 días naturales desde la recepción del pedido.',
   },
   '/condiciones-venta': {
     title: 'Condiciones de venta',
-    description: 'Condiciones generales de compra en la tienda online Modas Me lo Merezco.',
+    description: 'Condiciones generales de compra en la tienda online Asfalto y Gas.',
   },
   '/aviso-legal': {
     title: 'Aviso legal',
-    description: 'Aviso legal e información del titular del sitio web Modas Me lo Merezco.',
+    description: 'Aviso legal e información del titular del sitio web Asfalto y Gas.',
   },
   '/politica-de-privacidad': {
     title: 'Política de privacidad',
-    description: 'Política de privacidad y protección de datos de Modas Me lo Merezco.',
+    description: 'Política de privacidad y protección de datos de Asfalto y Gas.',
   },
   '/cookies': {
     title: 'Política de cookies',
-    description: 'Información sobre el uso de cookies en modasmelomerezco.es.',
+    description: 'Información sobre el uso de cookies en asfaltoygas.es.',
   },
 };
 
@@ -97,6 +98,7 @@ function absoluteUrl(path: string): string {
 }
 
 function getSupabase() {
+  if (!isSupabaseConfigured()) return null;
   const url = process.env.VITE_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return null;
@@ -129,7 +131,7 @@ async function getProductMeta(productId: string): Promise<SeoPageMeta | null> {
 
   const description = truncateDescription(
     product.description ||
-      `${product.name}. Precio ${Number(product.price).toFixed(2)} €. Compra online en Modas Me lo Merezco.`,
+      `${product.name}. Precio ${Number(product.price).toFixed(2)} €. Compra online en Asfalto y Gas.`,
   );
 
   const path = `/producto/${product.product_id}`;
@@ -279,7 +281,7 @@ export async function getSeoMetaForPath(pathname: string): Promise<SeoPageMeta |
     if (path === '/') {
       jsonLd = {
         '@context': 'https://schema.org',
-        '@type': 'ClothingStore',
+        '@type': 'Store',
         name: SITE_NAME,
         url: SITE_URL,
         logo: `${SITE_URL}/logo.png`,
@@ -287,7 +289,7 @@ export async function getSeoMetaForPath(pathname: string): Promise<SeoPageMeta |
         description: staticPage.description,
         priceRange: '€€',
         telephone: '+34 685 011 494',
-        email: 'info@modasmelomerezco.es',
+        email: 'info@asfaltoygas.es',
         address: {
           '@type': 'PostalAddress',
           streetAddress: 'Calle Aragón, 2, Local 2',

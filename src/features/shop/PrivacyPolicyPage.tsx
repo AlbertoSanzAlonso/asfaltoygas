@@ -16,7 +16,7 @@ const PrivacyPolicyPage: FC = () => {
             <section className="space-y-6">
               <h2 className="text-xl font-bold tracking-widest uppercase text-secondary">1. Información al usuario</h2>
               <p className="text-secondary/80 leading-relaxed">
-                MODAS MELOMEREZCO, S.L., como Responsable del Tratamiento, le informa que, según lo dispuesto en el Reglamento (UE) 2016/679 (RGPD) y la L.O. 3/2018 (LOPDGDD), trataremos sus datos tal y como reflejamos en la presente Política de Privacidad.
+                ASFALTO Y GAS, S.L., como Responsable del Tratamiento, le informa que, según lo dispuesto en el Reglamento (UE) 2016/679 (RGPD) y la L.O. 3/2018 (LOPDGDD), trataremos sus datos tal y como reflejamos en la presente Política de Privacidad.
               </p>
             </section>
 
@@ -49,7 +49,7 @@ const PrivacyPolicyPage: FC = () => {
             <section className="space-y-6">
               <h2 className="text-xl font-bold tracking-widest uppercase text-secondary">5. Derechos</h2>
               <p className="text-secondary/80 leading-relaxed">
-                Usted puede ejercer sus derechos de acceso, rectificación, portabilidad, supresión, limitación y oposición enviando un correo electrónico a <a href="mailto:info@modasmelomerezco.es" className="text-primary hover:underline">info@modasmelomerezco.es</a>.
+                Usted puede ejercer sus derechos de acceso, rectificación, portabilidad, supresión, limitación y oposición enviando un correo electrónico a <a href="mailto:info@asfaltoygas.es" className="text-primary hover:underline">info@asfaltoygas.es</a>.
               </p>
             </section>
 

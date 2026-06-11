@@ -8,7 +8,7 @@ import {
 } from '../orderEmailHtml.js';
 
 const LOGO_URL =
-  'https://aoyafhjpgmxcygqnklvl.supabase.co/storage/v1/object/public/assets/logo/LOGO%20MELOMEREZCO%20completo%20color.png';
+  '/assets/logo/logo-asfaltoygas-blanco.svg';
 
 const DEFAULT_ADMIN_ORDER_EMAIL = 'infobenalumox@gmail.com';
 
@@ -34,7 +34,7 @@ export function getSiteUrl(): string {
   const url =
     process.env.SITE_URL ||
     process.env.VITE_SITE_URL ||
-    'https://modasmelomerezco.es';
+    'https://asfaltoygas.es';
   return url.replace(/\/$/, '');
 }
 
@@ -65,7 +65,7 @@ export function buildAdminNewOrderEmailHtml(
   return `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; border-radius: 10px;">
       <div style="text-align: center; margin-bottom: 20px;">
-        <img src="${LOGO_URL}" alt="Modas Me lo Merezco" style="width: 180px; height: auto;">
+        <img src="${LOGO_URL}" alt="Asfalto y Gas" style="width: 180px; height: auto;">
       </div>
       <h1 style="color: #000; text-transform: uppercase; font-style: italic; border-bottom: 2px solid #ff3366; padding-bottom: 16px; text-align: center; font-size: 22px;">
         Nuevo pedido <span style="color: #ff3366;">#${orderId}</span>
@@ -149,13 +149,13 @@ export async function sendCustomerOrderConfirmationEmail(
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; border-radius: 10px;">
       <div style="text-align: center; margin-bottom: 10px;">
-        <img src="${LOGO_URL}" alt="Modas Me lo Merezco" style="width: 200px; height: auto;">
+        <img src="${LOGO_URL}" alt="Asfalto y Gas" style="width: 200px; height: auto;">
       </div>
       <h1 style="color: #000; text-transform: uppercase; font-style: italic; border-bottom: 2px solid #000; padding-bottom: 20px; text-align: center;">
         Pedido <span style="color: #ff3366;">#${orderId}</span> Confirmado
       </h1>
       <p style="text-align: center;">¡Hola!</p>
-      <p style="text-align: center;">Gracias por tu compra en <strong>Modas Me lo Merezco</strong>. Tu pedido ya ha sido pagado y está siendo preparado.</p>
+      <p style="text-align: center;">Gracias por tu compra en <strong>Asfalto y Gas</strong>. Tu pedido ya ha sido pagado y está siendo preparado.</p>
       <div style="margin: 30px 0;">
         <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px; text-transform: uppercase; font-size: 12px; color: #888;">Detalles de tu compra</h3>
         <table style="width: 100%; border-collapse: collapse;">
@@ -176,9 +176,9 @@ export async function sendCustomerOrderConfirmationEmail(
 
   const gmailUser = process.env.GMAIL_USER!;
   await transporter.sendMail({
-    from: `"Modas Me lo Merezco" <${gmailUser}>`,
+    from: `"Asfalto y Gas" <${gmailUser}>`,
     to: customerEmail,
-    subject: `Confirmación de pedido #${orderId} - Modas Me lo Merezco`,
+    subject: `Confirmación de pedido #${orderId} - Asfalto y Gas`,
     html,
   });
 }
@@ -203,7 +203,7 @@ export async function sendAdminNewOrderEmail(
   const gmailUser = process.env.GMAIL_USER!;
 
   await transporter.sendMail({
-    from: `"Modas Me lo Merezco" <${gmailUser}>`,
+    from: `"Asfalto y Gas" <${gmailUser}>`,
     to,
     subject: `Nuevo pedido #${orderId} — generar etiqueta Nacex`,
     html,

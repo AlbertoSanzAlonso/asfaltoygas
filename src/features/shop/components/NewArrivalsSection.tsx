@@ -31,18 +31,18 @@ export const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
       <div className="max-w-[1800px] mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-center md:items-end text-center md:text-left mb-12 md:mb-24 gap-8">
           <div className="flex flex-col items-center md:items-start">
-            <span className="text-primary font-black tracking-[0.4em] uppercase text-xs mb-4 block">Date un capricho</span>
-            <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic text-secondary">Novedades</h3>
+            <span className="text-primary font-black tracking-[0.4em] uppercase text-xs mb-4 block">Lo más vendido</span>
+            <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-secondary">Top ventas</h3>
           </div>
-          <Link to="/categoria/ropa" className="group flex items-center gap-2 text-xs font-bold tracking-[0.2em] uppercase border-b border-secondary/10 pb-1 text-secondary hover:text-primary transition-all">
-            Ver colección completa <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          <Link to="/categoria/cascos" className="group flex items-center gap-2 text-xs font-bold tracking-[0.2em] uppercase border-b border-secondary/10 pb-1 text-secondary hover:text-primary transition-all">
+            Ver todo el catálogo <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
         {isLoading ? (
           <div className="flex gap-6 md:gap-12 overflow-hidden">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="w-[160px] sm:w-[300px] md:w-[450px] aspect-3/4 bg-white/5 animate-pulse rounded-2xl shrink-0" />
+              <div key={i} className="w-[160px] sm:w-[300px] md:w-[450px] aspect-3/4 bg-white/5 animate-pulse rounded-sm shrink-0" />
             ))}
           </div>
         ) : (
@@ -58,7 +58,7 @@ export const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
               </button>
             </div>
 
-            <motion.div 
+            <motion.div
               ref={scrollContainerRef}
               className="flex gap-6 md:gap-12 overflow-x-auto pb-8 md:pb-16 no-scrollbar snap-x snap-mandatory"
               initial={{ opacity: 0, y: 40 }}
@@ -67,7 +67,7 @@ export const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
               transition={{ duration: 0.8 }}
             >
               {products?.map((product: Product) => (
-                <div 
+                <div
                   key={product.product_id}
                   className="w-[160px] sm:w-[300px] md:w-[400px] lg:w-[450px] snap-center snap-always shrink-0"
                 >

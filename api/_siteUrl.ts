@@ -3,11 +3,11 @@ export function getCanonicalSiteUrl(): string {
   const raw = (
     process.env.SITE_URL ||
     process.env.VITE_SITE_URL ||
-    'https://www.modasmelomerezco.es'
+    'https://www.asfaltoygas.es'
   ).replace(/\/$/, '');
 
-  if (raw === 'https://modasmelomerezco.es' || raw === 'http://modasmelomerezco.es') {
-    return 'https://www.modasmelomerezco.es';
+  if (raw === 'https://asfaltoygas.es' || raw === 'http://asfaltoygas.es') {
+    return 'https://www.asfaltoygas.es';
   }
 
   return raw;

@@ -1,7 +1,7 @@
 import type { SeoPageMeta } from './_seoMeta.js';
 import { escapeAttr } from './_seoMeta.js';
 
-const SITE_NAME = 'Modas Me lo Merezco';
+const SITE_NAME = 'Asfalto y Gas';
 
 function replaceMetaTag(html: string, name: string, content: string): string {
   const pattern = new RegExp(

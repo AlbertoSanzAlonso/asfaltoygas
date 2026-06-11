@@ -166,7 +166,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const NACEX_AGENCY = process.env.NACEX_AGENCIA || '2924';
   const NACEX_CLIENT = process.env.NACEX_CLIENTE || '00472';
   const NACEX_CP_RECOGIDA = process.env.NACEX_CP_RECOGIDA || '29631';
-  const NACEX_NOMBRE_RECOGIDA = process.env.NACEX_NOMBRE_RECOGIDA || 'Modas Me lo Merezco';
+  const NACEX_NOMBRE_RECOGIDA = process.env.NACEX_NOMBRE_RECOGIDA || 'Asfalto y Gas';
   const NACEX_DIR_RECOGIDA = (process.env.NACEX_DIR_RECOGIDA || 'C/ Aragon, 2, L2').slice(0, 45);
   const NACEX_POBLACION_RECOGIDA = process.env.NACEX_POBLACION_RECOGIDA || 'Benalmadena';
   const NACEX_TEL_RECOGIDA = (process.env.NACEX_TEL_RECOGIDA || '951000000').replace(/\D/g, '').slice(0, 15);

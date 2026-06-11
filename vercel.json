@@ -10,7 +10,22 @@
     },
     {
       "source": "/ropa-2/:path*",
-      "destination": "/categoria/ropa",
+      "destination": "/categoria/cascos",
+      "permanent": true
+    },
+    {
+      "source": "/categoria/ropa",
+      "destination": "/categoria/cascos",
+      "permanent": true
+    },
+    {
+      "source": "/categoria/complementos",
+      "destination": "/categoria/equipacion",
+      "permanent": true
+    },
+    {
+      "source": "/categoria/bolsos",
+      "destination": "/categoria/accesorios",
       "permanent": true
     }
   ],

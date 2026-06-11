@@ -7,6 +7,7 @@ import {
   SITE_NAME,
   SITE_URL,
 } from '@/lib/seo/constants';
+import { BRAND } from '@/lib/brand';
 
 const STATIC_PAGES: Record<
   string,
@@ -15,51 +16,51 @@ const STATIC_PAGES: Record<
   '/': {
     description: DEFAULT_DESCRIPTION,
   },
-  '/categoria/ropa': {
-    title: 'Ropa de mujer',
+  '/categoria/cascos': {
+    title: 'Cascos de moto',
     description:
-      'Colección de ropa de mujer: vestidos, blusas, pantalones y más. Moda actual con envío gratuito desde 50 € en Modas Me lo Merezco.',
+      'Cascos integrales, modulares, jet y off-road de HJC, AGV, Shoei, Nolan y más. Homologados ECE 22.06 con envío gratuito desde 50 €.',
   },
-  '/categoria/complementos': {
-    title: 'Complementos de moda',
+  '/categoria/equipacion': {
+    title: 'Equipación motera',
     description:
-      'Complementos y accesorios de moda para mujer. Descubre piezas únicas con envío gratuito desde 50 €.',
+      'Chaquetas, guantes, botas y pantalones para moto. Equipación de carretera y off-road con envío gratuito desde 50 €.',
   },
-  '/categoria/bolsos': {
-    title: 'Bolsos y accesorios',
+  '/categoria/accesorios': {
+    title: 'Accesorios para moto',
     description:
-      'Bolsos y accesorios de mujer. Estilo y calidad en Modas Me lo Merezco. Envío gratuito desde 50 €.',
+      'Accesorios y complementos para tu moto: intercomunicadores, mochilas, protecciones y más en Asfalto y Gas.',
   },
   '/conocenos': {
     title: 'Conócenos',
     description:
-      'Conoce Modas Me lo Merezco: moda para la mujer real, con piezas seleccionadas con mimo y las últimas tendencias.',
+      'Conoce Asfalto y Gas: tu tienda especializada en cascos y equipación motera con asesoramiento experto.',
   },
   '/envios': {
     title: 'Envíos',
     description:
-      'Información de envíos de Modas Me lo Merezco. Envío gratuito en pedidos superiores a 50 €. Entrega en 48 h.',
+      'Información de envíos de Asfalto y Gas. Envío gratuito en pedidos superiores a 50 €. Entrega en 48 h.',
   },
   '/devoluciones': {
     title: 'Devoluciones y cambios',
     description:
-      'Política de devoluciones y cambios de Modas Me lo Merezco. 14 días naturales desde la recepción del pedido.',
+      'Política de devoluciones y cambios de Asfalto y Gas. 14 días naturales desde la recepción del pedido.',
   },
   '/condiciones-venta': {
     title: 'Condiciones de venta',
-    description: 'Condiciones generales de compra en la tienda online Modas Me lo Merezco.',
+    description: 'Condiciones generales de compra en la tienda online Asfalto y Gas.',
   },
   '/aviso-legal': {
     title: 'Aviso legal',
-    description: 'Aviso legal e información del titular del sitio web Modas Me lo Merezco.',
+    description: 'Aviso legal e información del titular del sitio web Asfalto y Gas.',
   },
   '/politica-de-privacidad': {
     title: 'Política de privacidad',
-    description: 'Política de privacidad y protección de datos de Modas Me lo Merezco.',
+    description: 'Política de privacidad y protección de datos de Asfalto y Gas.',
   },
   '/cookies': {
     title: 'Política de cookies',
-    description: 'Información sobre el uso de cookies en modasmelomerezco.es.',
+    description: 'Información sobre el uso de cookies en asfaltoygas.es.',
   },
 };
 
@@ -72,27 +73,27 @@ const NOINDEX_PATHS = [
 
 const HOME_JSON_LD = {
   '@context': 'https://schema.org',
-  '@type': 'ClothingStore',
+  '@type': 'Store',
   name: SITE_NAME,
   url: SITE_URL,
   logo: SITE_LOGO,
   image: DEFAULT_OG_IMAGE,
   description: DEFAULT_DESCRIPTION,
   priceRange: '€€',
-  telephone: '+34 685 011 494',
-  email: 'info@modasmelomerezco.es',
+  telephone: BRAND.phone,
+  email: BRAND.email,
   sameAs: [
-    'https://www.instagram.com/modasmelomerezco',
-    'https://www.tiktok.com/@modasmelomerezco',
-    'https://www.facebook.com/profile.php?id=61555721379464',
+    BRAND.social.instagram,
+    BRAND.social.tiktok,
+    BRAND.social.facebook,
   ],
   address: {
     '@type': 'PostalAddress',
-    streetAddress: 'Calle Aragón, 2, Local 2',
-    addressLocality: 'Benalmádena',
-    addressRegion: 'Málaga',
-    postalCode: '29631',
-    addressCountry: 'ES',
+    streetAddress: BRAND.address.street,
+    addressLocality: BRAND.address.city,
+    addressRegion: BRAND.address.region,
+    postalCode: BRAND.address.postalCode,
+    addressCountry: BRAND.address.country,
   },
   geo: {
     '@type': 'GeoCoordinates',

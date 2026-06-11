@@ -194,7 +194,7 @@ const ProductPage = () => {
         }}
         className="relative"
       >
-        <img src="/assets/logo/logo-corona.png" alt="Cargando..." className="w-16 h-16 object-contain" />
+        <img src="/assets/logo/logo-asfaltoygas-icon.svg" alt="Cargando..." className="w-16 h-16 object-contain" />
         <motion.div 
           animate={{ scale: [1, 2, 1], opacity: [0, 0.3, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, times: [0, 0.5, 1] }}
@@ -208,7 +208,7 @@ const ProductPage = () => {
       <div className="h-screen flex flex-col items-center justify-center">
         <SeoHelmet
           title="Producto no encontrado"
-          description="El producto que buscas no está disponible en Modas Me lo Merezco."
+          description="El producto que buscas no está disponible en Asfalto y Gas."
           path={`/producto/${id}`}
           noindex
         />
@@ -223,7 +223,7 @@ const ProductPage = () => {
   const requiresColor = hasColorVariants(product.variants);
   const productDescription = truncateDescription(
     product.description ||
-      `${product.name}. Precio ${product.price.toFixed(2)} €. Compra online en Modas Me lo Merezco.`,
+      `${product.name}. Precio ${product.price.toFixed(2)} €. Compra online en Asfalto y Gas.`,
   );
 
   const totalStock = product.variants.reduce((acc, v) => acc + v.stock, 0);
@@ -291,7 +291,7 @@ const ProductPage = () => {
               : absoluteUrl(displayImages[0]),
             brand: {
               '@type': 'Brand',
-              name: 'Modas Me lo Merezco',
+              name: 'Asfalto y Gas',
             },
             offers: {
               '@type': 'Offer',
@@ -398,7 +398,7 @@ const ProductPage = () => {
               {imageLoaded && (
                 <div className="absolute bottom-4 right-4 w-1/6 max-w-[120px] pointer-events-none opacity-60 select-none z-10">
                   <img 
-                    src="/LOGO%20MELOMEREZCO%20corona%20blanco.png" 
+                    src="/assets/logo/logo-asfaltoygas-blanco.svg" 
                     alt="" 
                     className="w-full h-auto drop-shadow-lg" 
                   />
@@ -565,7 +565,7 @@ const ProductPage = () => {
                   onClick={() => {
                     const shareData = {
                       title: product.name,
-                      text: `Mira esta pieza de Modas Me lo Merezco: ${product.name}`,
+                      text: `Mira esta pieza de Asfalto y Gas: ${product.name}`,
                       url: window.location.href,
                     };
 
@@ -647,7 +647,7 @@ const ProductPage = () => {
               </AnimatePresence>
               {/* Watermark */}
               <div className={`absolute pointer-events-none opacity-40 select-none transition-none ${isZoomed ? 'bottom-32 right-16 w-32 md:w-48' : 'bottom-6 right-6 w-20 md:w-32'}`}>
-                <img src="/LOGO%20MELOMEREZCO%20corona%20blanco.png" alt="" className="w-full h-auto" />
+                <img src="/assets/logo/logo-asfaltoygas-blanco.svg" alt="" className="w-full h-auto" />
               </div>
             </div>
           </div>

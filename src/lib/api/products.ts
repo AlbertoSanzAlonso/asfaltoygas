@@ -1,5 +1,6 @@
 
 import { supabase } from '../supabase';
+import { filterAllowedImageUrls, isSupabaseConfigured } from '../supabaseConfig';
 import type { Product } from '@/types';
 import {
   deriveProductColors,
@@ -107,12 +108,15 @@ const normalise = (p: any): Product => ({
   is_published: p.is_published ?? true,
   // Priorizar tabla relacional sobre columna JSON
   images: (() => {
+    let urls: string[] = [];
     if (p.product_images && p.product_images.length > 0) {
-      return p.product_images
+      urls = p.product_images
         .sort((a: any, b: any) => (a.orden || 0) - (b.orden || 0))
         .map((img: any) => img.image_url);
+    } else {
+      urls = p.images || [];
     }
-    return p.images || [];
+    return filterAllowedImageUrls(urls);
   })(),
   variants: (() => {
     const rawVariants =
@@ -151,6 +155,8 @@ export const products = {
     isNewOnly?: boolean,
     labelId?: number
   ): Promise<{ products: Product[], total: number }> => {
+    if (!isSupabaseConfigured()) return { products: [], total: 0 };
+
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
@@ -197,6 +203,8 @@ export const products = {
   },
 
   getSiblings: async (productId: string, categoryId?: string, subcategoryId?: string): Promise<{ nextId: string | null, prevId: string | null }> => {
+    if (!isSupabaseConfigured()) return { nextId: null, prevId: null };
+
     // Fetch all IDs in order to find siblings (simplest way to ensure correct sorting logic)
     let query = supabase
       .from('products')
@@ -222,6 +230,8 @@ export const products = {
   },
 
   getById: async (product_id: string): Promise<Product> => {
+    if (!isSupabaseConfigured()) throw new Error('Producto no encontrado');
+
     const selects = [
       PRODUCT_SELECT_FULL,
       PRODUCT_SELECT_WITH_LABELS,
@@ -251,6 +261,8 @@ export const products = {
   },
 
   getNewArrivals: async (publishedOnly = true): Promise<Product[]> => {
+    if (!isSupabaseConfigured()) return [];
+
     for (const select of [PRODUCT_SELECT_WITH_LABELS, PRODUCT_SELECT_BASE]) {
       let query = supabase.from('products').select(select).eq('is_new', true);
       if (publishedOnly !== undefined) query = query.eq('is_published', publishedOnly);

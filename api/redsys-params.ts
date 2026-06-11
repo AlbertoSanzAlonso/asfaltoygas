@@ -4,8 +4,8 @@ import CryptoJS from 'crypto-js';
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Add CORS headers
   const allowedOrigins = [
-    'https://modasmelomerezco.es',
-    'https://modasmelomerezco.vercel.app',
+    'https://asfaltoygas.es',
+    'https://asfaltoygas.vercel.app',
     'http://localhost:5173',
     'http://localhost:3000'
   ];
@@ -61,7 +61,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       DS_MERCHANT_MERCHANTURL: options?.urlNotification || '',
       DS_MERCHANT_URLOK: options?.urlOk || '',
       DS_MERCHANT_URLKO: options?.urlKo || '',
-      DS_MERCHANT_PRODUCTDESCRIPTION: options?.productDescription || 'Compra en Modas Me lo Merezco',
+      DS_MERCHANT_PRODUCTDESCRIPTION: options?.productDescription || 'Compra en Asfalto y Gas',
       DS_MERCHANT_MERCHANTDATA: orderId, // MANDAMOS EL UUID REAL AQUÍ
       ...(options?.paymentMethod === 'bizum' ? { DS_MERCHANT_PAYMETHODS: 'z' } : {}),
       ...(options?.paymentMethod === 'card' ? { DS_MERCHANT_PAYMETHODS: 'c' } : {})

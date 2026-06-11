@@ -9,6 +9,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { HeroSection } from './components/HeroSection';
 import { NewArrivalsSection } from './components/NewArrivalsSection';
 import { FeaturedSection } from './components/FeaturedSection';
+import { BrandsSection } from './components/BrandsSection';
 import { NewsletterSection } from './components/NewsletterSection';
 import { useScrollRestoration } from "@/lib/useScrollRestoration";
 
@@ -72,6 +73,8 @@ const HomePage = () => {
         products={products} 
         isLoading={isLoading} 
       />
+
+      <BrandsSection />
 
       <FeaturedSection />
 
