@@ -34,7 +34,7 @@ const STATIC_PAGES: Record<
   '/conocenos': {
     title: 'Conócenos',
     description:
-      'Conoce Asfalto y Gas: tu tienda especializada en cascos y equipación motera con asesoramiento experto.',
+      'Conoce Asfalto y Gas: Equipamiento para motorista con asesoramiento experto.',
   },
   '/envios': {
     title: 'Envíos',

@@ -50,7 +50,7 @@ export const Footer: FC = () => {
                 <img src="/assets/logo/logo-asfaltoygas-blanco.svg" alt={BRAND.name} className="h-32 w-auto object-contain opacity-100 transition-opacity mx-auto md:mx-0" />
               </Link>
               <p className="text-white/80 text-sm leading-relaxed max-w-xs font-medium">
-                Tu tienda de cascos y equipación motera. Protección, estilo y las mejores marcas para cada ruta.
+                {BRAND.tagline}. Protección, estilo y las mejores marcas para cada ruta.
               </p>
             </div>
             <div className="text-center lg:text-left">

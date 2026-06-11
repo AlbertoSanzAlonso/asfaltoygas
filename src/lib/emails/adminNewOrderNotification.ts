@@ -7,8 +7,9 @@ import {
   buildOrderTotalsEmailHtml,
 } from '../orderEmailHtml.js';
 
-const LOGO_URL =
-  '/assets/logo/logo-asfaltoygas-blanco.svg';
+import { getCanonicalSiteUrl } from '../../api/_siteUrl.js';
+
+const LOGO_URL = `${getCanonicalSiteUrl()}/logo.png`;
 
 const DEFAULT_ADMIN_ORDER_EMAIL = 'infobenalumox@gmail.com';
 

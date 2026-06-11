@@ -1,8 +1,8 @@
-/** Identidad de marca — Asfalto y Gas (cascos y equipación motera) */
+/** Identidad de marca — Asfalto y Gas */
 export const BRAND = {
   name: 'Asfalto y Gas',
   shortName: 'Asfalto y Gas',
-  tagline: 'Tu tienda de cascos y equipación motera',
+  tagline: 'Equipamiento para motorista',
   description:
     'Tienda online especializada en cascos de moto, equipación y accesorios. Marcas líderes como HJC, AGV, Shoei y más. Envío rápido en toda España.',
   email: 'info@asfaltoygas.es',

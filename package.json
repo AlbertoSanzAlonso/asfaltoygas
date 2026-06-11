@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "generate:brand": "node scripts/generate-brand-assets.mjs",
     "predeploy": "DEPLOY_TARGET=github npm run build",
     "deploy": "gh-pages -d dist"
   },
@@ -66,6 +67,7 @@
     "globals": "^17.5.0",
     "postcss": "^8.5.10",
     "tailwindcss": "^4.2.4",
+    "to-ico": "^1.1.5",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2"
   }

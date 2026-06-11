@@ -5,7 +5,7 @@ import { isSupabaseConfigured } from './_supabaseConfig.js';
 const SITE_URL = getCanonicalSiteUrl();
 const SITE_NAME = 'Asfalto y Gas';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
-const DEFAULT_TITLE = `${SITE_NAME} | Tu tienda de cascos y equipación motera`;
+const DEFAULT_TITLE = `${SITE_NAME} | Equipamiento para motorista`;
 const DEFAULT_DESCRIPTION =
   'Tienda online especializada en cascos de moto, equipación y accesorios. Marcas líderes como HJC, AGV, Shoei y más. Envío rápido en toda España.';
 
@@ -39,7 +39,7 @@ const STATIC_PAGES: Record<string, { title?: string; description: string }> = {
   '/conocenos': {
     title: 'Conócenos',
     description:
-      'Conoce Asfalto y Gas: tu tienda especializada en cascos y equipación motera con asesoramiento experto.',
+      'Conoce Asfalto y Gas: Equipamiento para motorista con asesoramiento experto.',
   },
   '/envios': {
     title: 'Envíos',

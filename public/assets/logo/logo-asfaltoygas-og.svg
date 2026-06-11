@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#0a0a0a"/>
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#dc2626" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#0a0a0a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect y="560" width="1200" height="6" fill="#dc2626"/>
+  <rect y="572" width="1200" height="3" fill="#ffffff" opacity="0.2"/>
+  <g transform="translate(480, 100) scale(2.2)">
+    <circle cx="50" cy="50" r="48" fill="#1a1a1a" stroke="#dc2626" stroke-width="2.5"/>
+    <path d="M28 58 C28 38, 38 26, 50 26 C62 26, 72 38, 72 58 L72 64 C72 70, 66 74, 50 74 C34 74, 28 70, 28 64 Z" fill="#0a0a0a" stroke="#dc2626" stroke-width="2"/>
+    <path d="M28 58 L72 58" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+    <path d="M34 44 C40 36, 60 36, 66 44" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <ellipse cx="50" cy="52" rx="6" ry="4" fill="#dc2626"/>
+  </g>
+  <text x="600" y="400" text-anchor="middle" font-family="Arial Black, Helvetica, sans-serif" font-weight="900" font-size="72" fill="#ffffff" letter-spacing="6">ASFALTO Y GAS</text>
+  <rect x="380" y="420" width="440" height="5" fill="#dc2626"/>
+  <text x="600" y="470" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="20" fill="#ffffff" opacity="0.85" letter-spacing="5">EQUIPAMIENTO PARA MOTORISTA</text>
+</svg>

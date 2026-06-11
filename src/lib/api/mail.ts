@@ -1,4 +1,6 @@
 import { generateInvoicePDF } from "@/utils/pdfGenerator";
+import { BRAND } from '@/lib/brand';
+import { BRAND_LOGO_PNG } from '@/lib/constants';
 import { useAuthStore } from "@/store/useAuthStore";
 import {
   buildOrderItemsEmailRows,
@@ -46,7 +48,7 @@ export const mailApi = {
 
   sendOrderConfirmation: async (order: any, customerEmail: string) => {
     const orderId = order.order_id.split('-')[0].toUpperCase();
-    const logoUrl = '/assets/logo/logo-asfaltoygas-blanco.svg';
+    const logoUrl = `${BRAND.url}${BRAND_LOGO_PNG}`;
     const { user } = useAuthStore.getState();
     
     // Generate PDF Invoice
@@ -115,7 +117,7 @@ export const mailApi = {
   },
 
   sendPasswordRecovery: async (email: string, resetLink: string) => {
-    const logoUrl = '/assets/logo/logo-asfaltoygas-blanco.svg';
+    const logoUrl = `${BRAND.url}${BRAND_LOGO_PNG}`;
     const html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; border-radius: 10px;">
         <div style="text-align: center; margin-bottom: 10px;">
@@ -142,7 +144,7 @@ export const mailApi = {
 
   sendStatusUpdate: async (order: any, customerEmail: string, newStatus: string) => {
     const orderId = order.order_id.split('-')[0].toUpperCase();
-    const logoUrl = '/assets/logo/logo-asfaltoygas-blanco.svg';
+    const logoUrl = `${BRAND.url}${BRAND_LOGO_PNG}`;
     const statusMap: Record<string, string> = {
       'Paid': 'Pagado',
       'Shipped': 'Enviado',
@@ -198,7 +200,7 @@ export const mailApi = {
   },
 
   sendNewsletter: async (to: string, subject: string, content: string, origin: string = 'https://asfaltoygas.es') => {
-    const logoUrl = '/assets/logo/logo-asfaltoygas-blanco.svg';
+    const logoUrl = `${BRAND.url}${BRAND_LOGO_PNG}`;
     const unsubscribeUrl = `${origin}/desuscribir?email=${encodeURIComponent(to)}`;
     const html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; border-radius: 10px; background-color: #fff;">
@@ -235,7 +237,7 @@ export const mailApi = {
   },
 
   sendConfirmationEmail: async (to: string, token: string, origin: string = 'https://asfaltoygas.es') => {
-    const logoUrl = '/assets/logo/logo-asfaltoygas-blanco.svg';
+    const logoUrl = `${BRAND.url}${BRAND_LOGO_PNG}`;
     const confirmUrl = `${origin}/confirmar-suscripcion?token=${token}`;
     const html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; border-radius: 10px; background-color: #fff;">

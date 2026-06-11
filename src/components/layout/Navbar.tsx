@@ -212,7 +212,7 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
                 </div>
                 <div className="text-center">
                   <p className="text-[10px] font-bold tracking-[0.4em] text-secondary/30 uppercase leading-relaxed">
-                    Cascos y equipación para moteros.
+                    {BRAND.tagline}
                   </p>
                 </div>
               </div>
