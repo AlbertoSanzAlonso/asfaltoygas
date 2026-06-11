@@ -1,5 +1,5 @@
-import { type FC } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { type FC, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Search, Menu, X, User as UserIcon, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from "@/store/useAuthStore";
@@ -26,6 +26,8 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const favoriteCount = user?.favorites?.length || 0;
   const location = useLocation();
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleInicioClick = (e: React.MouseEvent) => {
     if (location.pathname === '/') {
@@ -34,75 +36,119 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
     }
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (q) {
+      navigate(`/categoria/cascos?search=${encodeURIComponent(q)}`);
+    } else {
+      navigate('/categoria/cascos');
+    }
+  };
+
   return (
     <>
-      <nav className="fixed top-0 w-full z-50 bg-accent/90 backdrop-blur-md border-b border-secondary/5">
-        <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex lg:hidden flex-1">
-              <button onClick={() => setIsMenuOpen(true)} aria-label="Abrir menú de navegación" className="p-2 -ml-2 text-secondary hover:text-primary transition-colors">
-                <Menu className="w-6 h-6" />
-              </button>
-            </div>
-            <div className="hidden lg:flex items-center gap-8 flex-1">
-              {NAV_LINKS.map((link) => (
+      <header className="fixed top-0 w-full z-50 bg-white border-b border-secondary/8 shadow-sm">
+        <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
+          <div className="flex items-center gap-4 h-16 md:h-[72px]">
+            {/* Mobile menu */}
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              aria-label="Abrir menú"
+              className="lg:hidden p-2 -ml-2 text-secondary hover:text-primary transition-colors"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+
+            {/* Logo */}
+            <Link to="/" onClick={handleInicioClick} className="shrink-0 flex items-center gap-3 group">
+              <img
+                src="/assets/logo/logo-asfaltoygas-icon.svg"
+                alt={BRAND.name}
+                className="h-10 w-10 md:h-11 md:w-11 transition-transform group-hover:scale-105"
+              />
+              <div className="hidden sm:block leading-tight">
+                <span className="font-display font-bold text-secondary text-base md:text-lg uppercase tracking-wide block">
+                  {BRAND.name}
+                </span>
+                <span className="font-sans text-[10px] text-secondary/50 uppercase tracking-[0.2em]">
+                  {BRAND.tagline}
+                </span>
+              </div>
+            </Link>
+
+            {/* Search — desktop */}
+            <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-xl mx-auto">
+              <div className="flex w-full border border-secondary/15 overflow-hidden">
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Buscar cascos, chaquetas, marcas..."
+                  className="flex-1 px-4 py-2.5 font-sans text-sm text-secondary placeholder:text-secondary/40 focus:outline-none bg-accent/50"
+                />
+                <button
+                  type="submit"
+                  aria-label="Buscar"
+                  className="bg-primary hover:bg-primary-dark text-white px-5 transition-colors"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
+              </div>
+            </form>
+
+            {/* Nav links — desktop */}
+            <nav className="hidden xl:flex items-center gap-6 shrink-0">
+              {NAV_LINKS.slice(1).map((link) => (
                 <Link
                   key={link.label}
                   to={link.to}
-                  onClick={link.label === 'Inicio' ? handleInicioClick : undefined}
-                  className="text-[10px] font-bold tracking-[0.25em] uppercase text-secondary hover:text-primary transition-colors"
+                  className="font-display text-xs font-semibold tracking-[0.15em] uppercase text-secondary/80 hover:text-primary transition-colors"
                 >
                   {link.label}
                 </Link>
               ))}
-            </div>
-            <div className="shrink-0">
-              <Link to="/" className="group flex flex-col items-center leading-none">
-                <img src="/assets/logo/logo-asfaltoygas-icon.svg" alt={BRAND.name} className="h-12 w-12 object-contain transition-transform group-hover:scale-110" />
-              </Link>
-            </div>
-            <div className="flex items-center justify-end gap-4 md:gap-8 flex-1">
-              <button aria-label="Buscar productos" className="hidden md:flex items-center gap-3 text-[10px] font-bold tracking-[0.3em] uppercase text-secondary hover:text-primary transition-colors">
-                <Search className="w-5 h-5" />
-              </button>
+            </nav>
 
-              <Link to="/cuenta/favoritos" aria-label="Mis favoritos" className="group relative flex items-center gap-3 text-secondary">
-                <Heart className="w-5 h-5 group-hover:text-primary transition-colors" />
+            {/* Actions */}
+            <div className="flex items-center gap-3 md:gap-5 ml-auto shrink-0">
+              <Link to="/cuenta/favoritos" aria-label="Favoritos" className="relative text-secondary hover:text-primary transition-colors p-1">
+                <Heart className="w-5 h-5" />
                 {favoriteCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[8px] font-black rounded-full flex items-center justify-center animate-in zoom-in duration-300">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[8px] font-bold rounded-full flex items-center justify-center">
                     {favoriteCount}
                   </span>
                 )}
               </Link>
 
-              <Link to="/cuenta" aria-label="Mi cuenta" className="group flex items-center gap-3 text-secondary">
-                <div className={`relative ${isAuthenticated ? 'text-primary' : 'text-secondary'} transition-colors`}>
-                  <UserIcon className="w-5 h-5 group-hover:text-primary transition-colors" />
-                  {isAuthenticated && (
-                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full border border-accent shadow-sm animate-pulse" />
-                  )}
-                </div>
-                {isAuthenticated && user && (
-                  <span className="hidden md:block text-[10px] font-bold tracking-[0.3em] uppercase transition-colors group-hover:text-primary">
-                    {user.name.split(' ')[0]}
-                  </span>
+              <Link to="/cuenta" aria-label="Mi cuenta" className="relative text-secondary hover:text-primary transition-colors p-1">
+                <UserIcon className="w-5 h-5" />
+                {isAuthenticated && (
+                  <span className="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full" />
                 )}
               </Link>
 
-              <div onClick={() => setIsCartOpen(true)} aria-label="Abrir cesta de compra" className="relative cursor-pointer group flex items-center gap-3 text-secondary">
-                <ShoppingBag className="w-5 h-5 group-hover:text-primary transition-colors" />
+              <button
+                onClick={() => setIsCartOpen(true)}
+                aria-label="Cesta"
+                className="relative flex items-center gap-2 text-secondary hover:text-primary transition-colors p-1"
+              >
+                <ShoppingBag className="w-5 h-5" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[8px] font-black rounded-full flex items-center justify-center lg:hidden animate-in zoom-in duration-300">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[8px] font-bold rounded-full flex items-center justify-center">
                     {totalItems}
                   </span>
                 )}
-                <span className="hidden md:block text-[10px] font-bold tracking-[0.3em] uppercase">Cesta ({totalItems})</span>
-              </div>
+                <span className="hidden md:block font-display text-xs font-semibold tracking-[0.1em] uppercase">
+                  ({totalItems})
+                </span>
+              </button>
             </div>
           </div>
         </div>
-      </nav>
+      </header>
 
+      {/* Mobile drawer */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
@@ -111,7 +157,7 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-secondary/60 backdrop-blur-md z-60 lg:hidden"
+              className="fixed inset-0 bg-secondary/60 backdrop-blur-sm z-60 lg:hidden"
             />
             <motion.div
               initial={{ x: '-100%' }}
@@ -120,101 +166,45 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
               transition={{ type: 'spring', damping: 28, stiffness: 220 }}
               className="fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-white z-70 lg:hidden shadow-2xl flex flex-col"
             >
-              <div className="p-8 flex justify-between items-center border-b border-secondary/5">
-                <img src="/assets/logo/logo-asfaltoygas-negro.svg" alt={BRAND.name} className="h-10 w-auto" />
-                <button
-                  onClick={() => setIsMenuOpen(false)}
-                  className="p-3 bg-accent rounded-full text-secondary hover:text-primary hover:bg-primary/10 transition-all active:scale-95"
-                >
+              <div className="p-6 flex justify-between items-center border-b border-secondary/8">
+                <img src="/assets/logo/logo-asfaltoygas-negro.svg" alt={BRAND.name} className="h-9 w-auto" />
+                <button onClick={() => setIsMenuOpen(false)} className="p-2 text-secondary hover:text-primary">
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <nav className="flex-1 px-8 py-10 flex flex-col">
-                <motion.div
-                  initial="closed"
-                  animate="open"
-                  variants={{
-                    open: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
-                    closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
-                  }}
-                  className="flex flex-col gap-6"
-                >
-                  {NAV_LINKS.map((item) => (
-                    <motion.div
-                      key={item.label}
-                      variants={{
-                        open: { x: 0, opacity: 1 },
-                        closed: { x: -20, opacity: 0 }
-                      }}
-                    >
-                      <Link
-                        to={item.to}
-                        onClick={(e) => { if (item.label === 'Inicio') handleInicioClick(e); setIsMenuOpen(false); }}
-                        className="text-2xl font-light tracking-[0.2em] uppercase text-secondary hover:text-primary transition-all inline-block group"
-                      >
-                        {item.label}
-                        <div className="h-px w-0 group-hover:w-full bg-primary transition-all duration-300" />
-                      </Link>
-                    </motion.div>
-                  ))}
+              <form onSubmit={(e) => { handleSearch(e); setIsMenuOpen(false); }} className="p-4 border-b border-secondary/8">
+                <div className="flex border border-secondary/15 overflow-hidden">
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Buscar..."
+                    className="flex-1 px-3 py-2.5 text-sm focus:outline-none bg-accent/30"
+                  />
+                  <button type="submit" className="bg-primary text-white px-4">
+                    <Search className="w-4 h-4" />
+                  </button>
+                </div>
+              </form>
 
-                  <motion.div variants={{ open: { opacity: 1 }, closed: { opacity: 0 } }} className="h-px bg-secondary/10 my-4" />
-
-                  <motion.div variants={{ open: { x: 0, opacity: 1 }, closed: { x: -20, opacity: 0 } }}>
-                    <Link to="/cuenta/favoritos" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-5 text-secondary group py-2">
-                      <div className="w-12 h-12 rounded-full bg-white shadow-lg border border-secondary/5 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                        <Heart className="w-5 h-5" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs font-black uppercase tracking-[0.2em] group-hover:text-primary transition-colors">Mis Favoritos</span>
-                        <span className="text-[10px] text-secondary/40 uppercase tracking-widest">{favoriteCount} productos guardados</span>
-                      </div>
-                    </Link>
-                  </motion.div>
-
-                  <motion.div variants={{ open: { x: 0, opacity: 1 }, closed: { x: -20, opacity: 0 } }}>
-                    <Link to="/cuenta" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-5 text-secondary group py-2">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all group-hover:scale-110 shadow-lg ${isAuthenticated ? 'bg-primary text-white shadow-primary/20' : 'bg-white border border-secondary/5 text-primary'}`}>
-                        <UserIcon className="w-5 h-5" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs font-black uppercase tracking-[0.2em] group-hover:text-primary transition-colors">
-                          {isAuthenticated && user ? user.name.split(' ')[0] : 'Mi Cuenta'}
-                        </span>
-                        <span className="text-[10px] text-secondary/40 uppercase tracking-widest">
-                          {isAuthenticated ? 'Gestionar perfil' : 'Inicia sesión'}
-                        </span>
-                      </div>
-                    </Link>
-                  </motion.div>
-
-                  <motion.div variants={{ open: { opacity: 1 }, closed: { opacity: 0 } }} className="flex flex-col gap-4 mt-4">
-                    <Link to="/envios" onClick={() => setIsMenuOpen(false)} className="text-[10px] font-bold tracking-[0.3em] uppercase text-secondary/50 hover:text-primary transition-colors">Envíos</Link>
-                    <Link to="/devoluciones" onClick={() => setIsMenuOpen(false)} className="text-[10px] font-bold tracking-[0.3em] uppercase text-secondary/50 hover:text-primary transition-colors">Devoluciones</Link>
-                  </motion.div>
-                </motion.div>
+              <nav className="flex-1 px-6 py-8 flex flex-col gap-5">
+                {NAV_LINKS.map((item) => (
+                  <Link
+                    key={item.label}
+                    to={item.to}
+                    onClick={(e) => { if (item.label === 'Inicio') handleInicioClick(e); setIsMenuOpen(false); }}
+                    className="font-display text-xl font-semibold uppercase tracking-wide text-secondary hover:text-primary transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
               </nav>
 
-              <div className="p-10 bg-accent/30 border-t border-secondary/5 space-y-8">
-                <div className="flex gap-8 justify-center">
-                  {[
-                    { href: BRAND.social.instagram, icon: <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.281.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /> },
-                    { href: BRAND.social.tiktok, icon: <path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z" /> },
-                    { href: BRAND.social.facebook, icon: <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /> }
-                  ].map((social, idx) => (
-                    <a key={idx} href={social.href} target="_blank" rel="noopener noreferrer" className="text-secondary/40 hover:text-primary transition-all hover:scale-125">
-                      <svg className="w-5 h-5 fill-current" viewBox={social.href.includes('tiktok') ? "0 0 448 512" : "0 0 24 24"}>
-                        {social.icon}
-                      </svg>
-                    </a>
-                  ))}
-                </div>
-                <div className="text-center">
-                  <p className="text-[10px] font-bold tracking-[0.4em] text-secondary/30 uppercase leading-relaxed">
-                    {BRAND.tagline}
-                  </p>
-                </div>
+              <div className="p-6 border-t border-secondary/8">
+                <p className="font-sans text-[10px] text-secondary/40 uppercase tracking-[0.3em] text-center">
+                  {BRAND.tagline}
+                </p>
               </div>
             </motion.div>
           </>

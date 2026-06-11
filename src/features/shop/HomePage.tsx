@@ -3,15 +3,16 @@ import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from "@/lib/api";
 import { useCartStore } from "@/store/useCartStore";
-
-
-// Sub-components
-import { HeroSection } from './components/HeroSection';
-import { NewArrivalsSection } from './components/NewArrivalsSection';
-import { FeaturedSection } from './components/FeaturedSection';
-import { BrandsSection } from './components/BrandsSection';
-import { NewsletterSection } from './components/NewsletterSection';
 import { useScrollRestoration } from "@/lib/useScrollRestoration";
+
+import { HeroSliderSection } from './components/home/HeroSliderSection';
+import { CategoryGridSection } from './components/home/CategoryGridSection';
+import { BrandsCarouselSection } from './components/home/BrandsCarouselSection';
+import { TopSalesSection } from './components/home/TopSalesSection';
+import { CtaBannerSection } from './components/home/CtaBannerSection';
+import { TestimonialsSection } from './components/home/TestimonialsSection';
+import { AboutStripSection } from './components/home/AboutStripSection';
+import { NewsletterSection } from './components/NewsletterSection';
 
 const HomePage = () => {
   const [email, setEmail] = useState('');
@@ -27,16 +28,14 @@ const HomePage = () => {
     }
   });
 
-  // Restore scroll position
   useScrollRestoration('homepage', products);
 
   React.useEffect(() => {
-    if (hash === '#novedades') {
-      const element = document.getElementById('novedades');
+    if (hash === '#novedades' || hash === '#marcas') {
+      const id = hash.slice(1);
+      const element = document.getElementById(id);
       if (element) {
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+        setTimeout(() => element.scrollIntoView({ behavior: 'smooth' }), 100);
       }
     }
   }, [hash]);
@@ -46,11 +45,8 @@ const HomePage = () => {
     setIsSubmitting(true);
     try {
       const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      
       await api.subscriptions.create(email, 'pending', token);
-
       await api.mail.sendConfirmationEmail(email, token, window.location.origin);
-      
       setIsSubscribed(true);
       setEmail('');
     } catch (error) {
@@ -66,19 +62,15 @@ const HomePage = () => {
   };
 
   return (
-    <div className="bg-accent overflow-x-hidden">
-      <HeroSection />
-      
-      <NewArrivalsSection 
-        products={products} 
-        isLoading={isLoading} 
-      />
-
-      <BrandsSection />
-
-      <FeaturedSection />
-
-      <NewsletterSection 
+    <div className="bg-white overflow-x-hidden">
+      <HeroSliderSection />
+      <CategoryGridSection />
+      <BrandsCarouselSection />
+      <TopSalesSection products={products} isLoading={isLoading} />
+      <CtaBannerSection />
+      <TestimonialsSection />
+      <AboutStripSection />
+      <NewsletterSection
         email={email}
         setEmail={setEmail}
         isSubmitting={isSubmitting}
