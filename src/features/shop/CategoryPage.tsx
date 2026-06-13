@@ -13,8 +13,8 @@ import { absoluteUrl, truncateDescription } from '@/lib/seo/constants';
 import { isSupabaseConfigured } from '@/lib/supabaseConfig';
 
 const BrandLogo: React.FC<{ brand: Brand; size?: 'sm' | 'md' }> = ({ brand, size = 'md' }) => {
-  const height = size === 'sm' ? 28 : 40;
-  const maxWidth = size === 'sm' ? 90 : 130;
+  const height = size === 'sm' ? 34 : 50;
+  const maxWidth = size === 'sm' ? 110 : 160;
 
   if (brand.logo_url) {
     return (
