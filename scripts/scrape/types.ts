@@ -16,6 +16,8 @@ export interface ScrapedProduct {
   sku?: string;
   /** URLs absolutas de imágenes remotas */
   images: string[];
+  /** Galería por color (El Motorista y proveedores multi-color) */
+  imagesByColor?: { color: string; images: string[] }[];
   variants?: ScrapedVariant[];
   /** Subcategoría detectada (ej. Integral, Deportivo, Infantil) */
   subcategory?: string;

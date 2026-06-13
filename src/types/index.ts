@@ -5,6 +5,7 @@ export interface ProductImage {
   orden?: number;
   is_main?: boolean;
   alt_text?: string;
+  color_id?: number | null;
 }
 
 export interface Category {
@@ -51,6 +52,9 @@ export interface Product {
   subcategory?: string;
   /** Assembled from product_images rows, sorted by orden */
   images: string[];
+  /** URLs de galería indexadas por color_id */
+  imagesByColor?: Record<number, string[]>;
+  productImages?: ProductImage[];
   variants: ProductVariant[];
   is_new?: boolean;
   is_published?: boolean;

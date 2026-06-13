@@ -5,6 +5,7 @@ import {
   getServiceSupabase,
   productExistsByName,
   uploadImagesToStorage,
+  resolveColorId,
 } from './images.js';
 import { slugifyBrand } from './brands.js';
 
@@ -138,12 +139,47 @@ export async function importScrapedProduct(
   }
 
   console.log('  Subiendo imágenes...');
-  const imageUrls = await uploadImagesToStorage(
-    supabase,
-    scraped.name,
-    scraped.images,
-    scraped.sourceUrl
-  );
+  let imageUrls: string[] = [];
+  const imageRecords: {
+    product_id: string;
+    image_url: string;
+    orden: number;
+    is_main: boolean;
+    color_id: number | null;
+  }[] = [];
+
+  if (scraped.imagesByColor?.length) {
+    for (const group of scraped.imagesByColor) {
+      const colorId = (await resolveColorId(supabase, group.color)) ?? null;
+      const uploaded = await uploadImagesToStorage(
+        supabase,
+        `${scraped.name}-${group.color}`,
+        group.images,
+        scraped.sourceUrl
+      );
+      uploaded.forEach((url, index) => {
+        imageRecords.push({
+          product_id: '', // filled after product insert
+          image_url: url,
+          orden: index,
+          is_main: imageRecords.length === 0 && index === 0,
+          color_id: colorId,
+        });
+      });
+      if (!imageUrls.length) imageUrls = uploaded;
+    }
+  } else {
+    imageUrls = await uploadImagesToStorage(
+      supabase,
+      scraped.name,
+      scraped.images,
+      scraped.sourceUrl
+    );
+  }
+
+  if (!imageUrls.length) {
+    throw new Error('No se pudo subir ninguna imagen a Supabase Storage');
+  }
 
   const { data: product, error: productError } = await supabase
     .from('products')
@@ -182,13 +218,18 @@ export async function importScrapedProduct(
     if (error) throw error;
   }
 
-  const imageRecords = imageUrls.map((url, index) => ({
-    product_id: productId,
-    image_url: url,
-    orden: index,
-    is_main: index === 0,
-  }));
-  const { error: imgErr } = await supabase.from('product_images').insert(imageRecords);
+  const pendingImageRecords = imageRecords;
+
+  const finalImageRecords = pendingImageRecords.length
+    ? pendingImageRecords.map((r) => ({ ...r, product_id: productId }))
+    : imageUrls.map((url, index) => ({
+        product_id: productId,
+        image_url: url,
+        orden: index,
+        is_main: index === 0,
+        color_id: null as number | null,
+      }));
+  const { error: imgErr } = await supabase.from('product_images').insert(finalImageRecords);
   if (imgErr) throw imgErr;
 
   if (colorIds.length) {

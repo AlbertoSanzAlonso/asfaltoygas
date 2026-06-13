@@ -2,6 +2,7 @@
 import { supabase } from '../supabase';
 import { filterAllowedImageUrls, isSupabaseConfigured } from '../supabaseConfig';
 import type { Product } from '@/types';
+import { buildImagesByColor } from '../productImages';
 import {
   deriveProductColors,
   hasColorVariants,
@@ -109,14 +110,35 @@ const normalise = (p: any): Product => ({
   // Priorizar tabla relacional sobre columna JSON
   images: (() => {
     let urls: string[] = [];
-    if (p.product_images && p.product_images.length > 0) {
-      urls = p.product_images
+    const rawRows = p.product_images || [];
+    if (rawRows.length > 0) {
+      urls = rawRows
         .sort((a: any, b: any) => (a.orden || 0) - (b.orden || 0))
         .map((img: any) => img.image_url);
     } else {
       urls = p.images || [];
     }
     return filterAllowedImageUrls(urls);
+  })(),
+  productImages: (p.product_images || [])
+    .sort((a: any, b: any) => (a.orden || 0) - (b.orden || 0))
+    .map((img: any) => ({
+      id: img.id,
+      product_id: img.product_id,
+      image_url: img.image_url,
+      orden: img.orden,
+      is_main: img.is_main,
+      alt_text: img.alt_text,
+      color_id: img.color_id ?? null,
+    })),
+  imagesByColor: (() => {
+    const rows = (p.product_images || []).map((img: any) => ({
+      image_url: img.image_url,
+      orden: img.orden,
+      color_id: img.color_id ?? null,
+    }));
+    const byColor = buildImagesByColor(rows);
+    return Object.keys(byColor).length ? byColor : undefined;
   })(),
   variants: (() => {
     const rawVariants =

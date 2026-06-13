@@ -16,6 +16,7 @@ import {
   findVariant,
   hasColorVariants,
 } from '@/lib/productVariants';
+import { getImagesForColor } from '@/lib/productImages';
 import { SeoHelmet } from '@/components/seo/SeoHelmet';
 import {
   absoluteUrl,
@@ -53,6 +54,8 @@ const ProductPage = () => {
 
   const handleColorSelect = (colorId: number, colorName: string) => {
     setSelectedColorId(colorId);
+    setActiveImage(0);
+    setImageLoaded(false);
     if (isTouchDevice) {
       setActiveMobileColorTooltip(colorName);
       if (tooltipTimeoutRef.current) {
@@ -178,6 +181,12 @@ const ProductPage = () => {
     }
   }, [product]);
 
+  useEffect(() => {
+    if (!product) return;
+    setActiveImage(0);
+    setImageLoaded(false);
+  }, [selectedColorId, product?.product_id]);
+
   if (isLoading) return (
     <div className="h-screen bg-accent flex flex-col items-center justify-center gap-8">
       <motion.div
@@ -217,10 +226,12 @@ const ProductPage = () => {
     );
   }
 
-  const displayImages = product.images.length > 0 ? product.images : [PRODUCT_PLACEHOLDER];
+  const galleryImages = getImagesForColor(product, selectedColorId);
+  const displayImages = galleryImages.length > 0 ? galleryImages : [PRODUCT_PLACEHOLDER];
   const availableSizes = getUniqueSizes(product.variants);
   const catalogColors = product.colors || [];
   const requiresColor = hasColorVariants(product.variants);
+
   const productDescription = truncateDescription(
     product.description ||
       `${product.name}. Precio ${product.price.toFixed(2)} €. Compra online en Asfalto y Gas.`,
@@ -377,7 +388,7 @@ const ProductPage = () => {
               )}
               <AnimatePresence mode="wait">
                 <motion.img 
-                  key={activeImage}
+                  key={`${selectedColorId ?? 'n'}-${activeImage}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -636,7 +647,7 @@ const ProductPage = () => {
             >
               <AnimatePresence mode="wait">
                 <motion.img 
-                  key={activeImage}
+                  key={`${selectedColorId ?? 'n'}-${activeImage}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}

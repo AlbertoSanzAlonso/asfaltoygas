@@ -100,6 +100,75 @@ function guessColors($: cheerio.CheerioAPI): string[] {
   return [...new Set(colors)];
 }
 
+/** Colores desde enlaces ?color= en fichas El Motorista. */
+export function extractElmotoristaColors(html: string, sourceUrl: string): string[] {
+  const colors = new Set<string>();
+
+  try {
+    const param = new URL(sourceUrl).searchParams.get('color');
+    if (param) colors.add(decodeColorParam(param));
+  } catch {
+    // ignore invalid URL
+  }
+
+  const $ = cheerio.load(html);
+  $('a[href*="color="]').each((_, el) => {
+    const href = $(el).attr('href') || '';
+    const m = href.match(/[?&]color=([^&]+)/i);
+    if (m) colors.add(decodeColorParam(m[1]));
+  });
+
+  return [...colors].filter(Boolean);
+}
+
+/** Enlaces únicos color → URL de ficha en El Motorista. */
+export function extractElmotoristaColorLinks(
+  html: string,
+  sourceUrl: string
+): { name: string; url: string }[] {
+  const byName = new Map<string, string>();
+
+  try {
+    const param = new URL(sourceUrl).searchParams.get('color');
+    if (param) {
+      const name = decodeColorParam(param);
+      byName.set(name, sourceUrl);
+    }
+  } catch {
+    // ignore
+  }
+
+  const $ = cheerio.load(html);
+  $('a[href*="color="]').each((_, el) => {
+    const href = $(el).attr('href') || '';
+    const m = href.match(/[?&]color=([^&]+)/i);
+    if (!m) return;
+    const name = decodeColorParam(m[1]);
+    byName.set(name, resolveUrl(sourceUrl, href));
+  });
+
+  return [...byName.entries()].map(([name, url]) => ({ name, url }));
+}
+
+export function extractImagesFromHtml(
+  html: string,
+  sourceUrl: string,
+  selectors: ProviderSelectors = {}
+): string[] {
+  const $ = cheerio.load(html);
+  const baseUrl = sourceUrl;
+  const og = extractOg($, baseUrl);
+  let images = pickImages($, baseUrl, selectors.images);
+  if (!images.length) images = og.images;
+  return images;
+}
+
+function decodeColorParam(raw: string): string {
+  return decodeURIComponent(raw.replace(/\+/g, ' '))
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function buildVariants(
   sizes: string[],
   colors: string[],

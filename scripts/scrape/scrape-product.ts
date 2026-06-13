@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import type { ProviderConfig, ScrapedProduct } from './types.js';
 import { fetchPage } from './fetch-page.js';
 import { extractFromJsonLd } from './extract-jsonld.js';
-import { extractFromHtml, extractProductLinks, detectMaxListingPage } from './extract-html.js';
+import { extractFromHtml, extractProductLinks, detectMaxListingPage, extractElmotoristaColors, extractElmotoristaColorLinks, extractImagesFromHtml } from './extract-html.js';
 import { extractHelmetTypeFromHtml } from './helmet-types.js';
 import { resolveScrapedBrand } from './brands.js';
 
@@ -121,6 +121,34 @@ export async function scrapeProductUrl(
   if (opts.providerId === 'elmotorista' || url.includes('elmotorista.es')) {
     const helmetType = extractHelmetTypeFromHtml(html);
     if (helmetType) scraped.subcategory = helmetType;
+
+    const pageColors = extractElmotoristaColors(html, url);
+    if (pageColors.length && scraped.variants?.length) {
+      const sizes = [...new Set(scraped.variants.map((v) => v.size).filter(Boolean))];
+      const stock = scraped.variants[0]?.stock ?? defaultStock;
+      scraped.variants = sizes.flatMap((size) =>
+        pageColors.map((color) => ({ size, color, stock }))
+      );
+    }
+
+    const colorLinks = extractElmotoristaColorLinks(html, url);
+    if (colorLinks.length) {
+      const imagesByColor: { color: string; images: string[] }[] = [];
+      for (const { name, url: colorUrl } of colorLinks) {
+        const colorHtml = colorUrl === url ? html : await fetchPage(colorUrl);
+        const rawImages = extractImagesFromHtml(
+          colorHtml,
+          colorUrl,
+          provider?.selectors ?? {}
+        );
+        const images = normalizeImageUrls(rawImages);
+        if (images.length) imagesByColor.push({ color: name, images });
+      }
+      if (imagesByColor.length) {
+        scraped.imagesByColor = imagesByColor;
+        scraped.images = imagesByColor[0].images;
+      }
+    }
   }
 
   const brand = resolveScrapedBrand(html, scraped.name, scraped.brand);
