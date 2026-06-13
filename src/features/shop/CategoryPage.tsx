@@ -352,7 +352,7 @@ const CategoryPage: React.FC = () => {
                   exit={{ opacity: 0, y: -10 }}
                   className="absolute left-0 right-0 mt-2 bg-white border shadow-2xl overflow-hidden rounded-2xl"
                 >
-                  <div className="max-h-[70vh] overflow-y-auto py-3 px-5 space-y-5">
+                  <div className="max-h-[65vh] overflow-y-auto py-4 px-5 space-y-5 scroll-area-viewport" style={{ WebkitOverflowScrolling: 'touch' }}>
                     {renderTipoContent()}
                     {renderMarcaContent()}
                     {renderPriceContent()}
