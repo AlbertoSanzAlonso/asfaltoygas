@@ -383,29 +383,39 @@ const CategoryPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="hidden md:flex flex-wrap justify-center gap-3">
-          <button
-            type="button"
-            onClick={() => handleBrandChange(null)}
-            className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.25em] border rounded-full transition-all ${!selectedBrand ? 'bg-secondary border-secondary text-white' : 'border-secondary/10 hover:border-secondary'}`}
-          >
-            Todas
-          </button>
-          {categoryBrands.map((brand) => (
+        <div className="hidden md:block">
+          <div className="flex justify-center mb-2">
             <button
-              key={brand.id}
               type="button"
-              onClick={() => handleBrandChange(brand.id)}
-              title={brand.name}
-              className={`px-2 py-1.5 transition-all duration-300 rounded-lg ${
-                selectedBrand === brand.id
-                  ? 'ring-2 ring-primary ring-offset-2 scale-110'
-                  : 'opacity-70 hover:opacity-100 hover:scale-105'
-              }`}
+              onClick={() => handleBrandChange(null)}
+              className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.25em] border rounded-full transition-all ${!selectedBrand ? 'bg-secondary border-secondary text-white' : 'border-secondary/10 hover:border-secondary'}`}
             >
-              <BrandLogo brand={brand} size="md" />
+              Todas
             </button>
-          ))}
+          </div>
+          {(() => {
+            const mid = Math.ceil(categoryBrands.length / 2);
+            const rows = [categoryBrands.slice(0, mid), categoryBrands.slice(mid)];
+            return rows.map((rowBrands, ri) => (
+              <div key={ri} className="flex flex-wrap justify-center gap-3 mb-2">
+                {rowBrands.map((brand) => (
+                  <button
+                    key={brand.id}
+                    type="button"
+                    onClick={() => handleBrandChange(brand.id)}
+                    title={brand.name}
+                    className={`px-2 py-1.5 transition-all duration-300 rounded-lg ${
+                      selectedBrand === brand.id
+                        ? 'ring-2 ring-primary ring-offset-2 scale-110'
+                        : 'opacity-70 hover:opacity-100 hover:scale-105'
+                    }`}
+                  >
+                    <BrandLogo brand={brand} size="md" />
+                  </button>
+                ))}
+              </div>
+            ));
+          })()}
         </div>
       </div>
     );
