@@ -242,7 +242,9 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                     </div>
                   </td>
                   <td className="px-4 py-5 xl:px-8 xl:py-6 text-xs text-gray-500 uppercase tracking-widest font-bold whitespace-nowrap hidden lg:table-cell">
-                    {product.category} {product.subcategory && `• ${product.subcategory}`}
+                    {product.category}
+                    {product.subcategory && ` • ${product.subcategory}`}
+                    {product.brand?.name && ` • ${product.brand.name}`}
                   </td>
                   <td className="px-4 py-5 xl:px-8 xl:py-6 text-sm font-black italic text-(--text-main) whitespace-nowrap">{product.price.toFixed(2)}€</td>
                   <td className="px-4 py-5 xl:px-8 xl:py-6 whitespace-nowrap">

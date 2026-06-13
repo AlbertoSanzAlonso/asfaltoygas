@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from "@/lib/api";
 import { useCartStore } from "@/store/useCartStore";
-import type { Product, Category, Subcategory } from "@/types/index";
+import type { Product, Category, Subcategory, Brand } from "@/types/index";
 import {
   consolidateVariantsForSave,
   deriveProductColors,
@@ -16,6 +16,7 @@ export const useProductForm = (product: Product | null | undefined, onSave: (pro
     price: 0,
     category_id: undefined,
     subcategory_id: undefined,
+    brand_id: undefined,
     images: [],
     stock: 0,
     is_new: false,
@@ -28,6 +29,7 @@ export const useProductForm = (product: Product | null | undefined, onSave: (pro
 
   const [categoriesList, setCategoriesList] = useState<Category[]>([]);
   const [subcategoriesList, setSubcategoriesList] = useState<Subcategory[]>([]);
+  const [brandsList, setBrandsList] = useState<Brand[]>([]);
   const [availableColors, setAvailableColors] = useState<any[]>([]);
   const [availableLabels, setAvailableLabels] = useState<any[]>([]);
   const [availableDiscountCodes, setAvailableDiscountCodes] = useState<any[]>([]);
@@ -39,6 +41,7 @@ export const useProductForm = (product: Product | null | undefined, onSave: (pro
 
   useEffect(() => {
     api.categories.getAll().then(setCategoriesList);
+    api.brands.getAll().then(setBrandsList).catch(() => setBrandsList([]));
     api.colors.getAll().then(setAvailableColors).catch(console.error);
     api.labels.getAll().then(setAvailableLabels).catch(() => setAvailableLabels([]));
     api.discountCodes.getAll().then(setAvailableDiscountCodes).catch(() => setAvailableDiscountCodes([]));
@@ -234,6 +237,7 @@ export const useProductForm = (product: Product | null | undefined, onSave: (pro
     setFormData,
     categoriesList,
     subcategoriesList,
+    brandsList,
     availableColors,
     setAvailableColors,
     availableLabels,

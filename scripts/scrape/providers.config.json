@@ -1,0 +1,41 @@
+{
+  "providers": [
+    {
+      "id": "elmotorista",
+      "name": "El Motorista (referencia catálogo moto)",
+      "baseUrl": "https://www.elmotorista.es",
+      "selectors": {
+        "title": "h1",
+        "price": "[class*='price'], .product-price",
+        "description": "meta[name='description']@content",
+        "images": "img[src*='prod_images']@src",
+        "productLinks": "a[href*='/product/']@href"
+      },
+      "defaultSizes": ["XS", "S", "M", "L", "XL", "XXL"]
+    },
+    {
+      "id": "generico",
+      "name": "Tienda genérica (JSON-LD + Open Graph)",
+      "selectors": {
+        "title": "h1",
+        "price": ".price, .product-price, [itemprop='price'], .current-price",
+        "description": ".product-description, #description, [itemprop='description']",
+        "images": ".product-gallery img@src, .woocommerce-product-gallery img@src, .product-images img@data-src"
+      },
+      "defaultSizes": ["XS", "S", "M", "L", "XL", "XXL"]
+    },
+    {
+      "id": "ejemplo-listado",
+      "name": "Ejemplo — sustituye por tu proveedor real",
+      "baseUrl": "https://www.ejemplo-proveedor.com",
+      "selectors": {
+        "title": "h1.product-title",
+        "price": ".price .amount",
+        "description": ".product-description",
+        "images": ".product-gallery img@src",
+        "productLinks": ".product-item a@href"
+      },
+      "defaultSizes": ["S", "M", "L", "XL"]
+    }
+  ]
+}

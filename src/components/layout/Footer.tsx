@@ -1,48 +1,12 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MessageCircle, CreditCard, Truck, Shield } from 'lucide-react';
+import { Mail, Phone, MessageCircle } from 'lucide-react';
 import { BRAND } from '@/lib/brand';
 
 export const Footer: FC = () => {
   return (
     <>
-      <section className="bg-accent-dark py-20 border-t border-secondary/3">
-        <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
-            <div className="flex flex-col items-center text-center space-y-6">
-              <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm">
-                <Shield className="w-6 h-6 text-primary" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-secondary">Cascos homologados</h3>
-                <p className="text-sm text-secondary/60">Todos nuestros cascos cumplen la <br /><span className="font-bold text-secondary">normativa ECE 22.06</span></p>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center text-center space-y-6">
-              <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm">
-                <CreditCard className="w-6 h-6 text-primary" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-secondary">Pago seguro</h3>
-                <p className="text-sm text-secondary/60">Aceptamos <br /><span className="font-bold text-secondary">tarjeta o Bizum</span></p>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center text-center space-y-6">
-              <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm">
-                <Truck className="w-6 h-6 text-primary" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-secondary">Envío gratuito</h3>
-                <p className="text-sm text-secondary/60">Por compras <br /><span className="font-bold text-secondary">superiores a 50 €</span></p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <footer className="py-32 border-t border-secondary/3 bg-primary text-white">
+      <footer className="py-20 md:py-28 border-t border-secondary/3 bg-secondary text-white">
         <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-20 mb-24">
             <div className="col-span-1 flex flex-col items-center lg:items-start text-center lg:text-left">

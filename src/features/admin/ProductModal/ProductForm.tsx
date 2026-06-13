@@ -8,13 +8,14 @@ import { ProductLabels } from './ProductLabels';
 import { ProductDiscountCodes } from './ProductDiscountCodes';
 import { ProductPublishOptions } from './ProductPublishOptions';
 import { ProductFooter } from './ProductFooter';
-import type { Category, Subcategory, Color, Label, DiscountCode } from '@/types/index';
+import type { Category, Subcategory, Color, Label, DiscountCode, Brand } from '@/types/index';
 
 interface ProductFormProps {
   formData: any;
   setFormData: (data: any) => void;
   categoriesList: Category[];
   subcategoriesList: Subcategory[];
+  brandsList: Brand[];
   availableColors: Color[];
   setAvailableColors: React.Dispatch<React.SetStateAction<Color[]>>;
   availableLabels: Label[];
@@ -35,6 +36,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   setFormData,
   categoriesList,
   subcategoriesList,
+  brandsList,
   availableColors,
   setAvailableColors,
   availableLabels,
@@ -71,11 +73,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       <ProductCategories 
         categoryId={formData.category_id}
         subcategoryId={formData.subcategory_id}
+        brandId={formData.brand_id}
         categoriesList={categoriesList}
         subcategoriesList={subcategoriesList}
+        brandsList={brandsList}
         totalStock={formData.stock}
         onCategoryChange={(id) => setFormData({ ...formData, category_id: id, subcategory_id: undefined })}
         onSubcategoryChange={(id) => setFormData({ ...formData, subcategory_id: id })}
+        onBrandChange={(id) => setFormData({ ...formData, brand_id: id })}
       />
 
       <ProductInventory

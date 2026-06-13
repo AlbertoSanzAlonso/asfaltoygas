@@ -1,15 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #dc2626;
-  --color-primary-dark: #b91c1c;
-  --color-primary-light: #ef4444;
-  
+  --color-primary: #cc0000;
+  --color-primary-dark: #a30000;
+  --color-primary-light: #e60000;
+
+  --color-safety: #f5e000;
+  --color-safety-dark: #d4c200;
+
   --color-secondary: #0a0a0a;
   --color-secondary-light: #1a1a1a;
 
   --color-accent: #f5f5f5;
-  --color-accent-dark: #e5e5e5;
+  --color-accent-dark: #ebebeb;
   
   --font-sans: "Barlow", system-ui, sans-serif;
   --font-display: "Rajdhani", system-ui, sans-serif;
@@ -17,16 +20,19 @@
 }
 
 :root {
-  --color-primary: #dc2626;
-  --color-primary-dark: #b91c1c;
-  --color-primary-light: #ef4444;
-  
+  --color-primary: #cc0000;
+  --color-primary-dark: #a30000;
+  --color-primary-light: #e60000;
+
+  --color-safety: #f5e000;
+  --color-safety-dark: #d4c200;
+
   --color-secondary: #0a0a0a;
   --color-secondary-light: #1a1a1a;
 
   --color-accent: #f5f5f5;
-  --color-accent-dark: #e5e5e5;
-  
+  --color-accent-dark: #ebebeb;
+
   --bg-main: var(--color-accent);
   --text-main: #050505;
   --border-main: rgba(0, 0, 0, 0.05);
@@ -83,7 +89,7 @@ button {
   }
 
   .text-gradient {
-    background: linear-gradient(to right, #dc2626, #ef4444);
+    background: linear-gradient(to right, #cc0000, #e60000);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -149,6 +155,97 @@ button {
     position: relative;
     display: inline-block;
     z-index: 10;
+  }
+
+  /* Hero smoke — partículas blancas en el borde inferior */
+  .hero-smoke {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 42%;
+    min-height: 130px;
+    max-height: 220px;
+    z-index: 8;
+    pointer-events: none;
+    mask-image: linear-gradient(to top, black 0%, black 18%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to top, black 0%, black 18%, transparent 100%);
+  }
+
+  .hero-smoke__emit {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 28%;
+    min-height: 28px;
+    background: linear-gradient(
+      to top,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 255, 255, 0.2) 55%,
+      transparent 100%
+    );
+  }
+
+  .hero-smoke__particle {
+    position: absolute;
+    bottom: 0;
+    left: var(--left);
+    width: var(--size);
+    height: var(--size);
+    margin-left: calc(var(--size) / -2);
+    border-radius: 50%;
+    filter: blur(var(--blur));
+    will-change: transform, opacity;
+    animation: hero-smoke-rise var(--duration) ease-out infinite;
+    animation-delay: var(--delay);
+  }
+
+  .hero-smoke__particle--speck {
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
+  }
+
+  .hero-smoke__particle--puff {
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(255, 255, 255, 0.45) 30%,
+      rgba(255, 255, 255, 0.12) 60%,
+      transparent 100%
+    );
+  }
+
+  @keyframes hero-smoke-rise {
+    0% {
+      transform: translate(0, 0) scale(0.35);
+      opacity: 0;
+    }
+    10% {
+      opacity: var(--opacity);
+    }
+    60% {
+      opacity: calc(var(--opacity) * 0.65);
+    }
+    100% {
+      transform: translate(var(--drift), -130px) scale(2.6);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-smoke__particle {
+      animation: none;
+      opacity: 0;
+    }
+
+    .hero-smoke__emit {
+      opacity: 0.6;
+    }
   }
 
   .brush-underline-straight::after {

@@ -10,7 +10,7 @@ import {
 import type { Color, ProductVariant } from '@/types';
 
 const PRODUCT_SELECT_BASE =
-  '*, product_variants(*, colors(*)), product_images(*), categories(name), subcategories(name), product_colors(colors(*))';
+  '*, product_variants(*, colors(*)), product_images(*), categories(name), subcategories(name), brands(id, name, slug), product_colors(colors(*))';
 
 export function mapProductVariant(v: any): ProductVariant {
   const colorId = v.color_id ?? null;
@@ -142,6 +142,7 @@ const normalise = (p: any): Product => ({
   // Mapear categorías si vienen de un join
   category: p.categories?.name || p.category,
   subcategory: p.subcategories?.name || p.subcategory,
+  brand: p.brands || undefined,
 });
 
 export const products = {
@@ -153,7 +154,8 @@ export const products = {
     publishedOnly?: boolean,
     search?: string,
     isNewOnly?: boolean,
-    labelId?: number
+    labelId?: number,
+    brandId?: number
   ): Promise<{ products: Product[], total: number }> => {
     if (!isSupabaseConfigured()) return { products: [], total: 0 };
 
@@ -174,6 +176,7 @@ export const products = {
       if (search) query = query.ilike('name', `%${search}%`);
       if (publishedOnly !== undefined) query = query.eq('is_published', publishedOnly);
       if (isNewOnly !== undefined) query = query.eq('is_new', isNewOnly);
+      if (brandId) query = query.eq('brand_id', brandId);
       if (labelId && select.includes('product_labels')) {
         query = query.eq('product_labels.label_id', labelId);
       }
@@ -402,7 +405,7 @@ export const products = {
     // 1. Update product table
     const validColumns = [
       'name', 'description', 'price', 'is_published', 'is_new', 'stock',
-      'category_id', 'subcategory_id'
+      'category_id', 'subcategory_id', 'brand_id'
     ];
     const filteredUpdates = Object.fromEntries(
       Object.entries(pUpdates).filter(([key]) => validColumns.includes(key))

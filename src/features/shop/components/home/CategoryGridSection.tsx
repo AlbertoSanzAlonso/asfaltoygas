@@ -1,45 +1,140 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { HOME_CATEGORIES } from '../../data/homeContent';
 import { SectionHeading } from './SectionHeading';
 
-export const CategoryGridSection: React.FC = () => (
-  <section className="py-16 md:py-24 bg-white">
-    <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
-      <SectionHeading eyebrow="Catálogo" title="¿En qué podemos ayudarte?" />
+const CARD_WIDTH = 240;
+const CARD_GAP = 52;
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
-        {HOME_CATEGORIES.map((cat) => (
-          <Link
-            key={cat.label}
-            to={cat.href}
-            className="group relative aspect-[3/4] overflow-hidden bg-secondary"
+const getOffset = (index: number, active: number, total: number) => {
+  let offset = index - active;
+  const half = Math.floor(total / 2);
+  if (offset > half) offset -= total;
+  if (offset < -half) offset += total;
+  return offset;
+};
+
+export const CategoryGridSection: React.FC = () => {
+  const [active, setActive] = useState(2);
+  const total = HOME_CATEGORIES.length;
+
+  const prev = () => setActive((i) => (i - 1 + total) % total);
+  const next = () => setActive((i) => (i + 1) % total);
+
+  return (
+    <section className="py-16 md:py-24 bg-white overflow-hidden">
+      <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
+        <SectionHeading eyebrow="Catálogo" title="¿En qué podemos ayudarte?" align="left" />
+
+        <div className="relative mt-4 md:mt-8">
+          <button
+            type="button"
+            onClick={prev}
+            aria-label="Categoría anterior"
+            className="absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 bg-white shadow-lg border border-secondary/10 flex items-center justify-center text-secondary hover:text-primary transition-colors"
           >
-            <img
-              src={cat.image}
-              alt={cat.label}
-              className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-110 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-primary/70 mix-blend-multiply group-hover:bg-primary/60 transition-colors" />
-            <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 via-transparent to-transparent" />
-            <div className="absolute inset-0 flex items-center justify-center p-4">
-              <span className="font-display text-white text-lg md:text-xl lg:text-2xl font-bold uppercase tracking-wider text-center leading-tight group-hover:scale-105 transition-transform">
-                {cat.label}
-              </span>
-            </div>
-          </Link>
-        ))}
-      </div>
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={next}
+            aria-label="Categoría siguiente"
+            className="absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 bg-white shadow-lg border border-secondary/10 flex items-center justify-center text-secondary hover:text-primary transition-colors"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
 
-      <div className="text-center mt-10">
-        <Link
-          to="/categoria/cascos"
-          className="inline-flex items-center gap-2 bg-secondary hover:bg-secondary-light text-white font-display font-bold text-sm tracking-[0.2em] uppercase px-10 py-4 transition-colors"
-        >
-          Ver todo el catálogo <ArrowRight className="w-4 h-4" />
-        </Link>
+          <div
+            className="relative mx-auto h-[320px] sm:h-[380px] md:h-[420px] max-w-[1100px]"
+            style={{ perspective: '1400px' }}
+          >
+            <div className="absolute inset-0 flex items-center justify-center" style={{ transformStyle: 'preserve-3d' }}>
+              {HOME_CATEGORIES.map((cat, index) => {
+                const offset = getOffset(index, active, total);
+                const isActive = offset === 0;
+                const absOffset = Math.abs(offset);
+                const hidden = absOffset > 2;
+
+                return (
+                  <motion.div
+                    key={cat.label}
+                    className="absolute top-1/2 left-1/2 w-[200px] sm:w-[220px] md:w-[240px]"
+                    initial={false}
+                    animate={{
+                      x: offset * (CARD_WIDTH * 0.55 + CARD_GAP) - CARD_WIDTH / 2,
+                      y: '-50%',
+                      rotateY: offset * -38,
+                      scale: 1 - absOffset * 0.11,
+                      opacity: hidden ? 0 : 1 - absOffset * 0.18,
+                      zIndex: 20 - absOffset,
+                    }}
+                    transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+                    style={{
+                      transformStyle: 'preserve-3d',
+                      pointerEvents: hidden ? 'none' : 'auto',
+                    }}
+                  >
+                    <Link
+                      to={cat.href}
+                      onClick={(e) => {
+                        if (!isActive) {
+                          e.preventDefault();
+                          setActive(index);
+                        }
+                      }}
+                      className={`group relative block aspect-[3/4] overflow-hidden bg-secondary shadow-2xl ${
+                        isActive ? 'ring-2 ring-primary/40' : ''
+                      }`}
+                      style={{ backfaceVisibility: 'hidden' }}
+                    >
+                      <img
+                        src={cat.image}
+                        alt={cat.label}
+                        loading="lazy"
+                        decoding="async"
+                        className="absolute inset-0 w-full h-full object-cover opacity-55 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700"
+                        style={{ objectPosition: cat.objectPosition }}
+                      />
+                      <div className="absolute inset-0 bg-primary/70 mix-blend-multiply group-hover:bg-primary/60 transition-colors" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-secondary/85 via-secondary/20 to-transparent" />
+                      <div className="absolute inset-0 flex items-center justify-center p-4">
+                        <span className="font-display text-white text-xl md:text-2xl font-bold uppercase tracking-wider text-center leading-tight drop-shadow-lg">
+                          {cat.label}
+                        </span>
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex justify-center gap-2 mt-6">
+            {HOME_CATEGORIES.map((cat, i) => (
+              <button
+                key={cat.label}
+                type="button"
+                onClick={() => setActive(i)}
+                aria-label={`Ir a ${cat.label}`}
+                className={`h-1.5 transition-all ${
+                  i === active ? 'w-8 bg-primary' : 'w-3 bg-secondary/20 hover:bg-secondary/40'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="text-center mt-10">
+          <Link
+            to="/categoria/cascos"
+            className="inline-flex items-center gap-2 bg-secondary hover:bg-secondary-light text-white font-display font-bold text-sm tracking-[0.2em] uppercase px-10 py-4 transition-colors"
+          >
+            Ver todo el catálogo <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};

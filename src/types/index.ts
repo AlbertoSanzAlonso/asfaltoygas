@@ -18,6 +18,12 @@ export interface Subcategory {
   category_id: number;
 }
 
+export interface Brand {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 export interface Color {
   id: number;
   name: string;
@@ -37,6 +43,8 @@ export interface Product {
   price: number;
   category_id: number;
   subcategory_id?: number;
+  brand_id?: number;
+  brand?: Brand;
   /** @deprecated use category_id instead */
   category?: 'Ropa' | 'Bolsos' | string;
   /** @deprecated use subcategory_id instead */

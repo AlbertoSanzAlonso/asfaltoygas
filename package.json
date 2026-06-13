@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate:brand": "node scripts/generate-brand-assets.mjs",
+    "scrape:import": "npx tsx scripts/import-scraped-products.ts",
     "predeploy": "DEPLOY_TARGET=github npm run build",
     "deploy": "gh-pages -d dist"
   },
@@ -60,6 +61,7 @@
     "@types/react-dom": "^19.2.3",
     "@vercel/node": "^5.7.13",
     "autoprefixer": "^10.5.0",
+    "cheerio": "^1.2.0",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",

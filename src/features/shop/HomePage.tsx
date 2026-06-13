@@ -7,11 +7,13 @@ import { useScrollRestoration } from "@/lib/useScrollRestoration";
 
 import { HeroSliderSection } from './components/home/HeroSliderSection';
 import { CategoryGridSection } from './components/home/CategoryGridSection';
-import { BrandsCarouselSection } from './components/home/BrandsCarouselSection';
+import { HeroWidgetSection } from './components/home/HeroWidgetSection';
 import { TopSalesSection } from './components/home/TopSalesSection';
-import { CtaBannerSection } from './components/home/CtaBannerSection';
-import { TestimonialsSection } from './components/home/TestimonialsSection';
-import { AboutStripSection } from './components/home/AboutStripSection';
+import { StyleSelectorSection } from './components/home/StyleSelectorSection';
+import { AccessoryHighlightsSection } from './components/home/AccessoryHighlightsSection';
+import { ServicesStripSection } from './components/home/ServicesStripSection';
+import { BrandLogosSection } from './components/home/BrandLogosSection';
+import { SeoAboutSection } from './components/home/SeoAboutSection';
 import { NewsletterSection } from './components/NewsletterSection';
 
 const HomePage = () => {
@@ -65,11 +67,13 @@ const HomePage = () => {
     <div className="bg-white overflow-x-hidden">
       <HeroSliderSection />
       <CategoryGridSection />
-      <BrandsCarouselSection />
+      <HeroWidgetSection />
       <TopSalesSection products={products} isLoading={isLoading} />
-      <CtaBannerSection />
-      <TestimonialsSection />
-      <AboutStripSection />
+      <StyleSelectorSection />
+      <AccessoryHighlightsSection />
+      <ServicesStripSection />
+      <BrandLogosSection />
+      <SeoAboutSection />
       <NewsletterSection
         email={email}
         setEmail={setEmail}

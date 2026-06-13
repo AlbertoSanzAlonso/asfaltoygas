@@ -17,6 +17,7 @@ scratch/
 .env*.local
 .env.preview
 .env.production
+logs/
 
 # Cursor skills (proyecto) — compartir con el equipo
 # Los skills son documentación viva del proyecto

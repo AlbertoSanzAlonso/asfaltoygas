@@ -1,6 +1,34 @@
 export const HERO_SLIDES = [
   {
-    id: 'visit',
+    id: 'cascos',
+    titleLeft: 'Protección',
+    titleRight: 'certificada',
+    subtitle: 'Cascos homologados ECE 22.06',
+    href: '/categoria/cascos',
+    image: '/assets/images/hero-moto.jpg',
+  },
+  {
+    id: 'equipacion',
+    titleLeft: 'Equipamiento',
+    titleRight: 'para motorista',
+    subtitle: 'Chaquetas, guantes y botas de las mejores marcas',
+    href: '/categoria/equipacion',
+    image: 'https://images.unsplash.com/photo-1628035514544-ebd32b766089?q=80&w=2070&auto=format&fit=crop',
+  },
+  {
+    id: 'ofertas',
+    titleLeft: 'Top marcas',
+    titleRight: 'mejor precio',
+    subtitle: 'HJC · AGV · Shoei · Nolan · Airoh',
+    href: '/#novedades',
+    image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?q=80&w=2070&auto=format&fit=crop',
+  },
+] as const;
+
+export const WIDGET_SLIDES = [
+  {
+    id: 'visitanos',
+    eyebrow: 'Equipamiento para motorista',
     title: 'Visítanos',
     subtitle: 'Equipamiento para motorista',
     cta: 'Ver catálogo',
@@ -9,19 +37,21 @@ export const HERO_SLIDES = [
   },
   {
     id: 'cascos',
-    title: 'Cascos homologados',
-    subtitle: 'Integrales, modulares y off-road',
-    cta: 'Explorar cascos',
+    eyebrow: 'Protección certificada',
+    title: 'Cascos ECE 22.06',
+    subtitle: 'HJC · AGV · Shoei · Nolan · Airoh',
+    cta: 'Ver cascos',
     href: '/categoria/cascos',
     image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?q=80&w=2070&auto=format&fit=crop',
   },
   {
     id: 'equipacion',
-    title: 'Equipación premium',
-    subtitle: 'Protección certificada para cada ruta',
+    eyebrow: 'Para cada ruta',
+    title: 'Equipación completa',
+    subtitle: 'Chaquetas, guantes y botas de las mejores marcas',
     cta: 'Ver equipación',
     href: '/categoria/equipacion',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2070&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1628035514544-ebd32b766089?q=80&w=2070&auto=format&fit=crop',
   },
 ] as const;
 
@@ -32,8 +62,8 @@ export const HERO_WIDGET = {
   price: 'Desde 349 €',
   cta: 'Ver oferta',
   href: '/categoria/cascos',
-  image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?q=80&w=800&auto=format&fit=crop',
-};
+  image: 'https://images.unsplash.com/photo-1611004060674-7e8864bcb4e4?q=80&w=1200&auto=format&fit=crop',
+} as const;
 
 export const PROMO_BANNERS = [
   {
@@ -41,87 +71,70 @@ export const PROMO_BANNERS = [
     title: 'Envío gratuito',
     subtitle: 'En pedidos superiores a 50 €',
     href: '/envios',
-    image: 'https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?q=80&w=1200&auto=format&fit=crop',
-    accent: 'bg-primary',
+    image: 'https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?q=80&w=800&auto=format&fit=crop',
   },
   {
     id: 'marcas',
     title: 'Marcas líderes',
     subtitle: 'HJC · AGV · Shoei · Nolan',
     href: '/#marcas',
-    image: 'https://images.unsplash.com/photo-1558980664-769d59551b3d?q=80&w=1200&auto=format&fit=crop',
-    accent: 'bg-secondary',
+    image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?q=80&w=800&auto=format&fit=crop',
+    solid: true,
   },
   {
     id: 'asesoramiento',
     title: 'Asesoramiento experto',
     subtitle: 'Te ayudamos a elegir tu casco',
     href: '/conocenos',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=1200&auto=format&fit=crop',
-    accent: 'bg-secondary-light',
+    image: 'https://images.unsplash.com/photo-1600497934947-23786a93f382?q=80&w=800&auto=format&fit=crop',
   },
+] as const;
+
+export const NAV_CATEGORIES = [
+  { label: 'Cascos', href: '/categoria/cascos' },
+  { label: 'Chaquetas', href: '/categoria/equipacion' },
+  { label: 'Pantalones', href: '/categoria/equipacion' },
+  { label: 'Botas', href: '/categoria/equipacion' },
+  { label: 'Guantes', href: '/categoria/equipacion' },
 ] as const;
 
 export const HOME_CATEGORIES = [
-  {
-    label: 'Cascos',
-    href: '/categoria/cascos',
-    image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?q=80&w=800&auto=format&fit=crop',
-  },
-  {
-    label: 'Chaquetas',
-    href: '/categoria/equipacion',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=800&auto=format&fit=crop',
-  },
-  {
-    label: 'Calzado',
-    href: '/categoria/equipacion',
-    image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?q=80&w=800&auto=format&fit=crop',
-  },
-  {
-    label: 'Guantes',
-    href: '/categoria/equipacion',
-    image: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=800&auto=format&fit=crop',
-  },
-  {
-    label: 'Accesorios',
-    href: '/categoria/accesorios',
-    image: 'https://images.unsplash.com/photo-1558980664-769d59551b3d?q=80&w=800&auto=format&fit=crop',
-  },
+  { label: 'Cascos', href: '/categoria/cascos', image: '/assets/images/categories/cascos.jpg', objectPosition: 'center 28%' },
+  { label: 'Chaquetas', href: '/categoria/equipacion', image: '/assets/images/categories/chaquetas.jpg', objectPosition: 'center 35%' },
+  { label: 'Calzado', href: '/categoria/equipacion', image: '/assets/images/categories/botas.jpg', objectPosition: 'center 72%' },
+  { label: 'Guantes', href: '/categoria/equipacion', image: '/assets/images/categories/guantes.jpg', objectPosition: 'center 30%' },
+  { label: 'Accesorios', href: '/categoria/accesorios', image: '/assets/images/categories/accesorios.jpg', objectPosition: 'center 45%' },
 ] as const;
 
-export const BRAND_CAROUSEL = [
-  { name: 'HJC', image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?q=80&w=600&auto=format&fit=crop' },
-  { name: 'AGV', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28dc?q=80&w=600&auto=format&fit=crop' },
-  { name: 'Shoei', image: 'https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?q=80&w=600&auto=format&fit=crop' },
-  { name: 'Nolan', image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=600&auto=format&fit=crop' },
-  { name: 'Airoh', image: 'https://images.unsplash.com/photo-1558980664-769d59551b3d?q=80&w=600&auto=format&fit=crop' },
-  { name: 'Rev\'it!', image: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=600&auto=format&fit=crop' },
+export const RIDING_STYLES = [
+  { label: 'Racing', href: '/categoria/cascos', image: 'https://images.unsplash.com/photo-1611004060674-7e8864bcb4e4?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Sport', href: '/categoria/cascos', image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Adventure', href: '/categoria/equipacion', image: 'https://images.unsplash.com/photo-1628035514544-ebd32b766089?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Touring', href: '/categoria/equipacion', image: 'https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Custom', href: '/categoria/accesorios', image: 'https://images.unsplash.com/photo-1600497934947-23786a93f382?q=80&w=600&auto=format&fit=crop' },
 ] as const;
 
-export const TESTIMONIALS = [
-  {
-    name: 'Carlos M.',
-    location: 'Málaga',
-    text: 'Excelente asesoramiento para elegir mi casco integral. Envío rápido y producto impecable.',
-    rating: 5,
-  },
-  {
-    name: 'Laura R.',
-    location: 'Sevilla',
-    text: 'Gran variedad de marcas y precios competitivos. La chaqueta llegó en 48 h, tal como prometían.',
-    rating: 5,
-  },
-  {
-    name: 'Miguel A.',
-    location: 'Córdoba',
-    text: 'Tienda seria y profesional. Me ayudaron por WhatsApp a acertar con la talla del casco.',
-    rating: 5,
-  },
-  {
-    name: 'Elena P.',
-    location: 'Granada',
-    text: 'Repetiré sin duda. Equipación de calidad y atención al cliente de primer nivel.',
-    rating: 5,
-  },
+export const ACCESSORY_HIGHLIGHTS = [
+  { title: 'Airbags', discount: '-15%', href: '/categoria/equipacion', image: 'https://images.unsplash.com/photo-1628035514544-ebd32b766089?q=80&w=800&auto=format&fit=crop' },
+  { title: 'Baúles y maletas', discount: '-20%', href: '/categoria/accesorios', image: '/assets/images/categories/maletas.jpg' },
+  { title: 'Soportes móvil/GPS', discount: '-10%', href: '/categoria/accesorios', image: '/assets/images/categories/accesorios.jpg' },
+  { title: 'Intercomunicadores', discount: '-20%', href: '/categoria/accesorios', image: '/assets/images/categories/guantes.jpg' },
+] as const;
+
+export const SERVICES = [
+  { title: 'Seguimiento de pedido', href: '/cuenta/pedidos' },
+  { title: 'Consulta de stock', href: '/conocenos' },
+  { title: 'Cambio de talla', href: '/devoluciones' },
+  { title: 'Programa de fidelidad', href: '/cuenta' },
+] as const;
+
+export const BRAND_LOGOS = [
+  'HJC', 'AGV', 'Shoei', 'Nolan', 'Airoh', 'Alpinestars', "Rev'it!", 'Shark', 'MT Helmets', 'Caberg',
+] as const;
+
+export const INFO_BAR_ITEMS = [
+  'Envío gratuito desde 50 €',
+  'Cascos homologados ECE 22.06',
+  'Pago seguro con tarjeta o Bizum',
+  'Devolución en 14 días',
 ] as const;

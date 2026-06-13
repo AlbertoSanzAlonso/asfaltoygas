@@ -6,7 +6,7 @@ import { ChevronDown, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from "@/lib/api";
 import { ProductCard } from "@/components/shop/ProductCard";
-import type { Product, Subcategory, Label } from '@/types';
+import type { Product, Subcategory, Label, Brand } from '@/types';
 import { useScrollRestoration } from "@/lib/useScrollRestoration";
 import { SeoHelmet } from '@/components/seo/SeoHelmet';
 import { absoluteUrl, truncateDescription } from '@/lib/seo/constants';
@@ -16,8 +16,9 @@ const CategoryPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const subQuery = searchParams.get('sub');
   const labelQuery = searchParams.get('label');
+  const brandQuery = searchParams.get('marca');
 
-  const filterKey = `${subQuery || 'null'}-${labelQuery || 'null'}`;
+  const filterKey = `${subQuery || 'null'}-${labelQuery || 'null'}-${brandQuery || 'null'}`;
 
   // Ref to track if we have already performed the initial restoration
   const wasRestored = React.useRef(false);
@@ -28,6 +29,9 @@ const CategoryPage: React.FC = () => {
   const [selectedLabel, setSelectedLabel] = useState<number | null>(() =>
     labelQuery ? parseInt(labelQuery, 10) : null
   );
+  const [selectedBrand, setSelectedBrand] = useState<number | null>(() =>
+    brandQuery ? parseInt(brandQuery, 10) : null
+  );
 
   const [page, setPage] = useState(() => {
     const savedPage = sessionStorage.getItem(`page-${category}-${filterKey}`);
@@ -37,13 +41,19 @@ const CategoryPage: React.FC = () => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileLabelMenuOpen, setIsMobileLabelMenuOpen] = useState(false);
+  const [isMobileBrandMenuOpen, setIsMobileBrandMenuOpen] = useState(false);
 
-  const lastState = React.useRef({ category, subQuery, labelQuery });
+  const lastState = React.useRef({ category, subQuery, labelQuery, brandQuery });
 
-  const applyFilters = (subId: number | null, labelId: number | null) => {
+  const applyFilters = (
+    subId: number | null,
+    labelId: number | null,
+    brandId: number | null
+  ) => {
     const params = new URLSearchParams();
     if (subId) params.set('sub', subId.toString());
     if (labelId) params.set('label', labelId.toString());
+    if (brandId) params.set('marca', brandId.toString());
     setSearchParams(params);
     setPage(1);
     setAllProducts([]);
@@ -54,39 +64,47 @@ const CategoryPage: React.FC = () => {
     if (
       lastState.current.category !== category ||
       lastState.current.subQuery !== subQuery ||
-      lastState.current.labelQuery !== labelQuery
+      lastState.current.labelQuery !== labelQuery ||
+      lastState.current.brandQuery !== brandQuery
     ) {
       setSelectedSub(subQuery ? parseInt(subQuery, 10) : null);
       setSelectedLabel(labelQuery ? parseInt(labelQuery, 10) : null);
+      setSelectedBrand(brandQuery ? parseInt(brandQuery, 10) : null);
 
       const saved = sessionStorage.getItem(
-        `page-${category}-${subQuery || 'null'}-${labelQuery || 'null'}`
+        `page-${category}-${subQuery || 'null'}-${labelQuery || 'null'}-${brandQuery || 'null'}`
       );
       setPage(saved ? parseInt(saved, 10) : 1);
       setAllProducts([]);
       wasRestored.current = false;
 
-      lastState.current = { category, subQuery, labelQuery };
+      lastState.current = { category, subQuery, labelQuery, brandQuery };
     }
-  }, [subQuery, labelQuery, category]);
+  }, [subQuery, labelQuery, brandQuery, category]);
 
   React.useEffect(() => {
     sessionStorage.setItem(
-      `page-${category}-${selectedSub || 'null'}-${selectedLabel || 'null'}`,
+      `page-${category}-${selectedSub || 'null'}-${selectedLabel || 'null'}-${selectedBrand || 'null'}`,
       page.toString()
     );
-  }, [category, selectedSub, selectedLabel, page]);
+  }, [category, selectedSub, selectedLabel, selectedBrand, page]);
 
   const handleSubChange = (subId: number | null) => {
     setSelectedSub(subId);
-    applyFilters(subId, selectedLabel);
+    applyFilters(subId, selectedLabel, selectedBrand);
     setIsMobileMenuOpen(false);
   };
 
   const handleLabelChange = (labelId: number | null) => {
     setSelectedLabel(labelId);
-    applyFilters(selectedSub, labelId);
+    applyFilters(selectedSub, labelId, selectedBrand);
     setIsMobileLabelMenuOpen(false);
+  };
+
+  const handleBrandChange = (brandId: number | null) => {
+    setSelectedBrand(brandId);
+    applyFilters(selectedSub, selectedLabel, brandId);
+    setIsMobileBrandMenuOpen(false);
   };
   
   const pageSize = 12;
@@ -110,8 +128,14 @@ const CategoryPage: React.FC = () => {
     queryFn: () => api.labels.getAll(),
   });
 
+  const { data: categoryBrands } = useQuery<Brand[]>({
+    queryKey: ['brands', categoryId, selectedSub],
+    queryFn: () => api.brands.getByCategory(categoryId!, selectedSub ?? undefined),
+    enabled: !!categoryId,
+  });
+
   const { data: productsData, isLoading, isFetching } = useQuery<{ products: Product[], total: number }>({
-    queryKey: ['products', categoryId, selectedSub, selectedLabel, page],
+    queryKey: ['products', categoryId, selectedSub, selectedLabel, selectedBrand, page],
     queryFn: () => {
       const isRestoring = page > 1 && allProducts.length === 0;
       const actualPage = isRestoring ? 1 : page;
@@ -127,7 +151,8 @@ const CategoryPage: React.FC = () => {
         true,
         undefined,
         undefined,
-        selectedLabel ?? undefined
+        selectedLabel ?? undefined,
+        selectedBrand ?? undefined
       );
     },
     enabled: category?.toLowerCase() === 'todas' || !!categoryId,
@@ -140,7 +165,7 @@ const CategoryPage: React.FC = () => {
   // We use a more stable trigger for restoration
   const restorationTrigger = allProducts.length;
   useScrollRestoration(
-    `category-${category}-${selectedSub || 'null'}-${selectedLabel || 'null'}`,
+    `category-${category}-${selectedSub || 'null'}-${selectedLabel || 'null'}-${selectedBrand || 'null'}`,
     restorationTrigger
   );
 
@@ -267,6 +292,85 @@ const CategoryPage: React.FC = () => {
                     className={`px-8 py-3 text-[10px] font-black uppercase tracking-[0.3em] border transition-all duration-300 rounded-full ${selectedSub === sub.id ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'border-secondary/10 hover:border-secondary hover:translate-y-[-2px]'}`}
                   >
                     {sub.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {categoryBrands && categoryBrands.length > 0 && (
+            <div className="mt-10">
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-secondary/40 mb-6 text-center">
+                Filtrar por fabricante
+              </p>
+
+              <div className="block md:hidden px-6 relative z-25">
+                <div className="max-w-[280px] mx-auto">
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileBrandMenuOpen(!isMobileBrandMenuOpen)}
+                    className="w-full bg-accent-dark border border-secondary/10 px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-between rounded-xl"
+                  >
+                    <span className="flex-1 text-center">
+                      {selectedBrand
+                        ? categoryBrands.find((b) => b.id === selectedBrand)?.name.toUpperCase()
+                        : 'TODAS LAS MARCAS'}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-primary transition-transform ${isMobileBrandMenuOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                  <AnimatePresence>
+                    {isMobileBrandMenuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute left-6 right-6 mt-2 bg-white border shadow-2xl z-40 overflow-hidden rounded-2xl"
+                      >
+                        <div className="max-h-[50vh] overflow-y-auto py-2 px-2 space-y-1">
+                          <button
+                            type="button"
+                            onClick={() => handleBrandChange(null)}
+                            className={`w-full flex items-center justify-between px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl ${!selectedBrand ? 'text-primary bg-primary/5' : 'text-secondary'}`}
+                          >
+                            TODAS
+                            {!selectedBrand && <Check className="w-3 h-3" />}
+                          </button>
+                          {categoryBrands.map((brand) => (
+                            <button
+                              key={brand.id}
+                              type="button"
+                              onClick={() => handleBrandChange(brand.id)}
+                              className={`w-full flex items-center justify-between px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl ${selectedBrand === brand.id ? 'text-primary bg-primary/5' : 'text-secondary'}`}
+                            >
+                              {brand.name}
+                              {selectedBrand === brand.id && <Check className="w-3 h-3" />}
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              <div className="hidden md:flex flex-wrap justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleBrandChange(null)}
+                  className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.25em] border rounded-full transition-all ${!selectedBrand ? 'bg-secondary border-secondary text-white' : 'border-secondary/10 hover:border-secondary'}`}
+                >
+                  Todas
+                </button>
+                {categoryBrands.map((brand) => (
+                  <button
+                    key={brand.id}
+                    type="button"
+                    onClick={() => handleBrandChange(brand.id)}
+                    className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.25em] border rounded-full transition-all ${selectedBrand === brand.id ? 'bg-secondary border-secondary text-white' : 'border-secondary/10 hover:border-secondary'}`}
+                  >
+                    {brand.name}
                   </button>
                 ))}
               </div>

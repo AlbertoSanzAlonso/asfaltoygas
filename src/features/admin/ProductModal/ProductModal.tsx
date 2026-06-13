@@ -13,6 +13,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose, on
     setFormData,
     categoriesList,
     subcategoriesList,
+    brandsList,
     availableColors,
     setAvailableColors,
     availableLabels,
@@ -63,6 +64,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose, on
               setFormData={setFormData}
               categoriesList={categoriesList}
               subcategoriesList={subcategoriesList}
+              brandsList={brandsList}
               availableColors={availableColors}
               setAvailableColors={setAvailableColors}
               availableLabels={availableLabels}
