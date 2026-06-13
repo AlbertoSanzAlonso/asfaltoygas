@@ -92,17 +92,13 @@ export const PROMO_BANNERS = [
 
 export const NAV_CATEGORIES = [
   { label: 'Cascos', href: '/categoria/cascos' },
-  { label: 'Chaquetas', href: '/categoria/equipacion' },
-  { label: 'Pantalones', href: '/categoria/equipacion' },
-  { label: 'Botas', href: '/categoria/equipacion' },
-  { label: 'Guantes', href: '/categoria/equipacion' },
+  { label: 'Equipación', href: '/categoria/equipacion' },
+  { label: 'Accesorios', href: '/categoria/accesorios' },
 ] as const;
 
 export const HOME_CATEGORIES = [
   { label: 'Cascos', href: '/categoria/cascos', image: '/assets/images/categories/cascos.jpg', objectPosition: 'center 28%' },
-  { label: 'Chaquetas', href: '/categoria/equipacion', image: '/assets/images/categories/chaquetas.jpg', objectPosition: 'center 35%' },
-  { label: 'Calzado', href: '/categoria/equipacion', image: '/assets/images/categories/botas.jpg', objectPosition: 'center 72%' },
-  { label: 'Guantes', href: '/categoria/equipacion', image: '/assets/images/categories/guantes.jpg', objectPosition: 'center 30%' },
+  { label: 'Equipación', href: '/categoria/equipacion', image: '/assets/images/categories/chaquetas.jpg', objectPosition: 'center 35%' },
   { label: 'Accesorios', href: '/categoria/accesorios', image: '/assets/images/categories/accesorios.jpg', objectPosition: 'center 45%' },
 ] as const;
 

@@ -10,8 +10,10 @@ import {
 } from '../productVariants';
 import type { Color, ProductVariant } from '@/types';
 
-const PRODUCT_SELECT_BASE =
-  '*, product_variants(*, colors(*)), product_images(*), categories(name), subcategories(name), brands(id, name, slug), product_colors(colors(*))';
+const PRODUCT_SELECT_CORE =
+  '*, product_variants(*, colors(*)), product_images(*), categories(name), subcategories(name), product_colors(colors(*))';
+
+const PRODUCT_SELECT_BASE = `${PRODUCT_SELECT_CORE}, brands(id, name, slug)`;
 
 export function mapProductVariant(v: any): ProductVariant {
   const colorId = v.color_id ?? null;
@@ -185,8 +187,8 @@ export const products = {
     const to = from + pageSize - 1;
 
     const selects = labelId
-      ? [PRODUCT_SELECT_FILTER_BY_LABEL, PRODUCT_SELECT_BASE]
-      : [PRODUCT_SELECT_WITH_LABELS, PRODUCT_SELECT_BASE];
+      ? [PRODUCT_SELECT_FILTER_BY_LABEL, PRODUCT_SELECT_BASE, PRODUCT_SELECT_CORE]
+      : [PRODUCT_SELECT_WITH_LABELS, PRODUCT_SELECT_BASE, PRODUCT_SELECT_CORE];
 
     let lastError: typeof selects extends never[] ? never : object | null = null;
 
@@ -216,7 +218,9 @@ export const products = {
       }
 
       lastError = error;
-      if (!isMissingRelation(error, 'product_labels')) break;
+      if (isMissingRelation(error, 'product_labels')) continue;
+      if (isMissingRelation(error, 'brands')) continue;
+      break;
     }
 
     if (labelId && isMissingRelation(lastError as { code?: string; message?: string }, 'product_labels')) {
@@ -262,6 +266,7 @@ export const products = {
       PRODUCT_SELECT_WITH_LABELS,
       PRODUCT_SELECT_WITH_DISCOUNTS,
       PRODUCT_SELECT_BASE,
+      PRODUCT_SELECT_CORE,
     ];
     let lastError: { code?: string; message?: string } | null = null;
 
@@ -276,7 +281,8 @@ export const products = {
       lastError = error;
       if (
         !isMissingRelation(error, 'product_labels') &&
-        !isMissingRelation(error, 'product_discount_codes')
+        !isMissingRelation(error, 'product_discount_codes') &&
+        !isMissingRelation(error, 'brands')
       ) {
         throw error;
       }
@@ -288,13 +294,15 @@ export const products = {
   getNewArrivals: async (publishedOnly = true): Promise<Product[]> => {
     if (!isSupabaseConfigured()) return [];
 
-    for (const select of [PRODUCT_SELECT_WITH_LABELS, PRODUCT_SELECT_BASE]) {
+    for (const select of [PRODUCT_SELECT_WITH_LABELS, PRODUCT_SELECT_BASE, PRODUCT_SELECT_CORE]) {
       let query = supabase.from('products').select(select).eq('is_new', true);
       if (publishedOnly !== undefined) query = query.eq('is_published', publishedOnly);
 
       const { data, error } = await query.order('created_at', { ascending: false });
       if (!error) return (data || []).map(normalise);
-      if (!isMissingRelation(error, 'product_labels')) throw error;
+      if (isMissingRelation(error, 'product_labels')) continue;
+      if (isMissingRelation(error, 'brands')) continue;
+      throw error;
     }
     return [];
   },
