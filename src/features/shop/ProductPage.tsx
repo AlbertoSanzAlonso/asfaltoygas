@@ -501,7 +501,7 @@ const ProductPage = () => {
                         />
                         {/* Inner color swatch */}
                         <div 
-                          className="w-10 h-10 rounded-full border border-black/10 shadow-md relative overflow-hidden transition-all duration-300 group-hover:scale-105 active:scale-95"
+                          className="w-11 h-11 rounded-full shadow-inner ring-1 ring-black/5 relative overflow-hidden transition-all duration-300 group-hover:scale-105 active:scale-95"
                           style={{ background: c.hex }}
                         />
                         
