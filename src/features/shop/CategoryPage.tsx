@@ -60,8 +60,9 @@ const CategoryPage: React.FC = () => {
   const brandQuery = searchParams.get('marca');
   const priceMinQuery = searchParams.get('precioMin');
   const priceMaxQuery = searchParams.get('precioMax');
+  const sortQuery = searchParams.get('orden');
 
-  const filterKey = `${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}`;
+  const filterKey = `${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}-${sortQuery || 'null'}`;
   const wasRestored = React.useRef(false);
 
   const [selectedSub, setSelectedSub] = useState<number | null>(() =>
@@ -72,6 +73,7 @@ const CategoryPage: React.FC = () => {
   );
   const [priceMin, setPriceMin] = useState<string>(() => priceMinQuery || '');
   const [priceMax, setPriceMax] = useState<string>(() => priceMaxQuery || '');
+  const [sortOrder, setSortOrder] = useState<string>(() => sortQuery || '');
 
   const [page, setPage] = useState(() => {
     const savedPage = sessionStorage.getItem(`page-${category}-${filterKey}`);
@@ -81,15 +83,17 @@ const CategoryPage: React.FC = () => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [isMobileTipoOpen, setIsMobileTipoOpen] = useState(false);
   const [isMobileBrandMenuOpen, setIsMobileBrandMenuOpen] = useState(false);
+  const [isPriceOpen, setIsPriceOpen] = useState(false);
 
-  const lastState = React.useRef<{ category?: string; subQuery: string | null; brandQuery: string | null; priceMinQuery: string | null; priceMaxQuery: string | null }>({ category: undefined, subQuery: null, brandQuery: null, priceMinQuery: null, priceMaxQuery: null });
+  const lastState = React.useRef<{ category?: string; subQuery: string | null; brandQuery: string | null; priceMinQuery: string | null; priceMaxQuery: string | null; sortQuery: string | null }>({ category: undefined, subQuery: null, brandQuery: null, priceMinQuery: null, priceMaxQuery: null, sortQuery: null });
 
-  const applyFilters = (subId: number | null, brandId: number | null, pMin?: string, pMax?: string) => {
+  const applyFilters = (subId: number | null, brandId: number | null, pMin?: string, pMax?: string, sort?: string) => {
     const params = new URLSearchParams();
     if (subId) params.set('sub', subId.toString());
     if (brandId) params.set('marca', brandId.toString());
     if (pMin) params.set('precioMin', pMin);
     if (pMax) params.set('precioMax', pMax);
+    if (sort) params.set('orden', sort);
     setSearchParams(params);
     setPage(1);
     setAllProducts([]);
@@ -102,45 +106,54 @@ const CategoryPage: React.FC = () => {
       lastState.current.subQuery !== subQuery ||
       lastState.current.brandQuery !== brandQuery ||
       lastState.current.priceMinQuery !== priceMinQuery ||
-      lastState.current.priceMaxQuery !== priceMaxQuery
+      lastState.current.priceMaxQuery !== priceMaxQuery ||
+      lastState.current.sortQuery !== sortQuery
     ) {
       setSelectedSub(subQuery ? parseInt(subQuery, 10) : null);
       setSelectedBrand(brandQuery ? parseInt(brandQuery, 10) : null);
       setPriceMin(priceMinQuery || '');
       setPriceMax(priceMaxQuery || '');
+      setSortOrder(sortQuery || '');
 
       const saved = sessionStorage.getItem(
-        `page-${category}-${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}`
+        `page-${category}-${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}-${sortQuery || 'null'}`
       );
       setPage(saved ? parseInt(saved, 10) : 1);
       setAllProducts([]);
       wasRestored.current = false;
 
-      lastState.current = { category, subQuery, brandQuery, priceMinQuery, priceMaxQuery };
+      lastState.current = { category, subQuery, brandQuery, priceMinQuery, priceMaxQuery, sortQuery };
     }
-  }, [subQuery, brandQuery, category, priceMinQuery, priceMaxQuery]);
+  }, [subQuery, brandQuery, category, priceMinQuery, priceMaxQuery, sortQuery]);
 
   React.useEffect(() => {
     sessionStorage.setItem(
-      `page-${category}-${selectedSub || 'null'}-${selectedBrand || 'null'}-${priceMin || 'null'}-${priceMax || 'null'}`,
+      `page-${category}-${selectedSub || 'null'}-${selectedBrand || 'null'}-${priceMin || 'null'}-${priceMax || 'null'}-${sortOrder || 'null'}`,
       page.toString()
     );
-  }, [category, selectedSub, selectedBrand, priceMin, priceMax, page]);
+  }, [category, selectedSub, selectedBrand, priceMin, priceMax, sortOrder, page]);
 
   const handleSubChange = (subId: number | null) => {
     setSelectedSub(subId);
-    applyFilters(subId, selectedBrand, priceMin, priceMax);
+    applyFilters(subId, selectedBrand, priceMin, priceMax, sortOrder);
     setIsMobileTipoOpen(false);
   };
 
   const handleBrandChange = (brandId: number | null) => {
     setSelectedBrand(brandId);
-    applyFilters(selectedSub, brandId, priceMin, priceMax);
+    applyFilters(selectedSub, brandId, priceMin, priceMax, sortOrder);
     setIsMobileBrandMenuOpen(false);
   };
 
   const handlePriceApply = () => {
-    applyFilters(selectedSub, selectedBrand, priceMin, priceMax);
+    applyFilters(selectedSub, selectedBrand, priceMin, priceMax, sortOrder);
+    setIsPriceOpen(false);
+  };
+
+  const handleSortChange = (sort: string) => {
+    setSortOrder(sort);
+    applyFilters(selectedSub, selectedBrand, priceMin, priceMax, sort);
+    setIsPriceOpen(false);
   };
 
   const pageSize = 12;
@@ -175,7 +188,7 @@ const CategoryPage: React.FC = () => {
     isError,
     error,
   } = useQuery<{ products: Product[]; total: number }>({
-    queryKey: ['products', categoryId, selectedSub, selectedBrand, priceMin, priceMax, page],
+    queryKey: ['products', categoryId, selectedSub, selectedBrand, priceMin, priceMax, sortOrder, page],
     queryFn: () => {
       const isRestoring = page > 1 && allProducts.length === 0;
       const actualPage = isRestoring ? 1 : page;
@@ -195,6 +208,7 @@ const CategoryPage: React.FC = () => {
         selectedBrand ?? undefined,
         priceMin ? parseFloat(priceMin) : undefined,
         priceMax ? parseFloat(priceMax) : undefined,
+        sortOrder ? (sortOrder as 'asc' | 'desc') : undefined,
       );
     },
     enabled: category?.toLowerCase() === 'todas' || !!categoryId,
@@ -205,7 +219,7 @@ const CategoryPage: React.FC = () => {
 
   const restorationTrigger = allProducts.length;
   useScrollRestoration(
-    `category-${category}-${selectedSub || 'null'}-${selectedBrand || 'null'}-${priceMin || 'null'}-${priceMax || 'null'}`,
+    `category-${category}-${selectedSub || 'null'}-${selectedBrand || 'null'}-${priceMin || 'null'}-${priceMax || 'null'}-${sortOrder || 'null'}`,
     restorationTrigger
   );
 
@@ -299,24 +313,28 @@ const CategoryPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="hidden md:flex flex-wrap justify-center gap-4">
-          <button
-            type="button"
-            onClick={() => handleSubChange(null)}
-            className={`px-8 py-3 text-[10px] font-black uppercase tracking-[0.3em] border transition-all duration-300 rounded-full ${!selectedSub ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'border-secondary/10 hover:border-secondary hover:translate-y-[-2px]'}`}
-          >
-            Todos
-          </button>
-          {subcategories.map((sub) => (
-            <button
-              key={sub.id}
-              type="button"
-              onClick={() => handleSubChange(sub.id)}
-              className={`px-8 py-3 text-[10px] font-black uppercase tracking-[0.3em] border transition-all duration-300 rounded-full ${selectedSub === sub.id ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'border-secondary/10 hover:border-secondary hover:translate-y-[-2px]'}`}
-            >
-              {sub.name}
-            </button>
-          ))}
+        <div className="hidden md:block">
+          {(() => {
+            const all = [{ id: -1, name: '', isAll: true } as Subcategory & { isAll?: boolean }, ...subcategories];
+            const mid = Math.ceil(all.length / 2);
+            return [all.slice(0, mid), all.slice(mid)].map((row, ri) => (
+              <div key={ri} className="flex flex-wrap justify-center gap-4 mb-2">
+                {row.map((item) =>
+                  (item as any).isAll ? (
+                    <button key="all" type="button" onClick={() => handleSubChange(null)}
+                      className={`px-8 py-3 text-[10px] font-black uppercase tracking-[0.3em] border transition-all duration-300 rounded-full ${!selectedSub ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'border-secondary/10 hover:border-secondary hover:translate-y-[-2px]'}`}>
+                      Todos
+                    </button>
+                  ) : (
+                    <button key={item.id} type="button" onClick={() => handleSubChange(item.id)}
+                      className={`px-8 py-3 text-[10px] font-black uppercase tracking-[0.3em] border transition-all duration-300 rounded-full ${selectedSub === item.id ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'border-secondary/10 hover:border-secondary hover:translate-y-[-2px]'}`}>
+                      {item.name}
+                    </button>
+                  )
+                )}
+              </div>
+            ));
+          })()}
         </div>
       </div>
     );
@@ -384,35 +402,25 @@ const CategoryPage: React.FC = () => {
         </div>
 
         <div className="hidden md:block">
-          <div className="flex justify-center mb-2">
-            <button
-              type="button"
-              onClick={() => handleBrandChange(null)}
-              className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.25em] border rounded-full transition-all ${!selectedBrand ? 'bg-secondary border-secondary text-white' : 'border-secondary/10 hover:border-secondary'}`}
-            >
-              Todas
-            </button>
-          </div>
           {(() => {
-            const mid = Math.ceil(categoryBrands.length / 2);
-            const rows = [categoryBrands.slice(0, mid), categoryBrands.slice(mid)];
-            return rows.map((rowBrands, ri) => (
+            const pseudo: (Brand & { isAll?: boolean }) = { id: -1, slug: '', name: 'Todas', isAll: true };
+            const all = [pseudo, ...categoryBrands];
+            const mid = Math.ceil(all.length / 2);
+            return [all.slice(0, mid), all.slice(mid)].map((row, ri) => (
               <div key={ri} className="flex flex-wrap justify-center gap-3 mb-2">
-                {rowBrands.map((brand) => (
-                  <button
-                    key={brand.id}
-                    type="button"
-                    onClick={() => handleBrandChange(brand.id)}
-                    title={brand.name}
-                    className={`px-2 py-1.5 transition-all duration-300 rounded-lg ${
-                      selectedBrand === brand.id
-                        ? 'ring-2 ring-primary ring-offset-2 scale-110'
-                        : 'opacity-70 hover:opacity-100 hover:scale-105'
-                    }`}
-                  >
-                    <BrandLogo brand={brand} size="md" />
-                  </button>
-                ))}
+                {row.map((item) =>
+                  (item as any).isAll ? (
+                    <button key="all" type="button" onClick={() => handleBrandChange(null)}
+                      className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.25em] border rounded-full transition-all ${!selectedBrand ? 'bg-secondary border-secondary text-white' : 'border-secondary/10 hover:border-secondary'}`}>
+                      Todas
+                    </button>
+                  ) : (
+                    <button key={item.id} type="button" onClick={() => handleBrandChange(item.id)} title={item.name}
+                      className={`px-2 py-1.5 transition-all duration-300 rounded-lg ${selectedBrand === item.id ? 'ring-2 ring-primary ring-offset-2 scale-110' : 'opacity-70 hover:opacity-100 hover:scale-105'}`}>
+                      <BrandLogo brand={item} size="md" />
+                    </button>
+                  )
+                )}
               </div>
             ));
           })()}
@@ -422,64 +430,105 @@ const CategoryPage: React.FC = () => {
   };
 
   const renderPriceFilter = () => {
-    const isActive = priceMin !== '' || priceMax !== '';
+    const isActive = priceMin !== '' || priceMax !== '' || sortOrder !== '';
+    const sortLabel = sortOrder === 'asc' ? 'Menor precio' : sortOrder === 'desc' ? 'Mayor precio' : 'Precio';
 
     return (
       <div className="mt-10">
         <p className="text-[9px] font-black uppercase tracking-[0.4em] text-secondary/40 mb-6 text-center">
-          Precio
+          {sortLabel}
         </p>
 
-        <div className="flex items-center justify-center gap-2 max-w-[280px] mx-auto">
-          <input
-            type="number"
-            min="0"
-            step="1"
-            placeholder="Min"
-            value={priceMin}
-            onChange={(e) => setPriceMin(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
-            className="w-full bg-accent-dark border border-secondary/10 px-4 py-3 text-[11px] font-bold text-secondary placeholder:text-secondary/30 rounded-xl text-center focus:outline-none focus:border-primary/50 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-          <span className="text-xs font-bold text-secondary/40">–</span>
-          <input
-            type="number"
-            min="0"
-            step="1"
-            placeholder="Max"
-            value={priceMax}
-            onChange={(e) => setPriceMax(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
-            className="w-full bg-accent-dark border border-secondary/10 px-4 py-3 text-[11px] font-bold text-secondary placeholder:text-secondary/30 rounded-xl text-center focus:outline-none focus:border-primary/50 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-        </div>
-
-        <div className="flex justify-center mt-3">
+        <div className="max-w-[280px] mx-auto relative z-20">
           <button
             type="button"
-            onClick={handlePriceApply}
-            disabled={!isActive}
-            className={`px-6 py-2 text-[10px] font-black uppercase tracking-[0.25em] border rounded-full transition-all ${
-              isActive
-                ? 'bg-primary border-primary text-white shadow-md shadow-primary/20 hover:bg-primary-dark'
-                : 'border-secondary/10 text-secondary/30 cursor-not-allowed'
+            onClick={() => setIsPriceOpen(!isPriceOpen)}
+            className={`w-full bg-accent-dark border px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-between rounded-xl transition-all ${
+              isActive ? 'border-primary/50' : 'border-secondary/10 hover:border-primary/50'
             }`}
           >
-            Filtrar
+            <span className="flex-1 text-center">{sortLabel}</span>
+            <ChevronDown className={`w-4 h-4 text-primary transition-transform ${isPriceOpen ? 'rotate-180' : ''}`} />
           </button>
-          {isActive && (
-            <button
-              type="button"
-              onClick={() => {
-                setPriceMin('');
-                setPriceMax('');
-                applyFilters(selectedSub, selectedBrand, '', '');
-              }}
-              className="ml-2 px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] border border-secondary/10 rounded-full text-secondary/50 hover:text-primary hover:border-primary/30 transition-all"
-            >
-              Limpiar
-            </button>
-          )}
+
+          <AnimatePresence>
+            {isPriceOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute left-0 right-0 mt-2 bg-white border shadow-2xl overflow-hidden rounded-2xl"
+              >
+                <div className="py-3 px-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number" min="0" step="1" placeholder="Min"
+                      value={priceMin}
+                      onChange={(e) => setPriceMin(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
+                      className="w-full bg-accent-dark border border-secondary/10 px-3 py-2 text-[11px] font-bold text-secondary placeholder:text-secondary/30 rounded-lg text-center focus:outline-none focus:border-primary/50 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    <span className="text-xs font-bold text-secondary/40">–</span>
+                    <input
+                      type="number" min="0" step="1" placeholder="Max"
+                      value={priceMax}
+                      onChange={(e) => setPriceMax(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
+                      className="w-full bg-accent-dark border border-secondary/10 px-3 py-2 text-[11px] font-bold text-secondary placeholder:text-secondary/30 rounded-lg text-center focus:outline-none focus:border-primary/50 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange('asc')}
+                      className={`px-3 py-2 text-[9px] font-black uppercase tracking-[0.15em] rounded-lg border transition-all ${
+                        sortOrder === 'asc' ? 'bg-primary border-primary text-white' : 'border-secondary/10 hover:border-secondary/40'
+                      }`}
+                    >
+                      ↓ Más barato
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSortChange('desc')}
+                      className={`px-3 py-2 text-[9px] font-black uppercase tracking-[0.15em] rounded-lg border transition-all ${
+                        sortOrder === 'desc' ? 'bg-primary border-primary text-white' : 'border-secondary/10 hover:border-secondary/40'
+                      }`}
+                    >
+                      ↑ Más caro
+                    </button>
+                  </div>
+
+                  <div className="flex justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handlePriceApply}
+                      disabled={!isActive}
+                      className={`px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] border rounded-full transition-all ${
+                        isActive ? 'bg-primary border-primary text-white shadow-md shadow-primary/20 hover:bg-primary-dark' : 'border-secondary/10 text-secondary/30 cursor-not-allowed'
+                      }`}
+                    >
+                      Aplicar
+                    </button>
+                    {isActive && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPriceMin('');
+                          setPriceMax('');
+                          setSortOrder('');
+                          applyFilters(selectedSub, selectedBrand, '', '', '');
+                        }}
+                        className="px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] border border-secondary/10 rounded-full text-secondary/50 hover:text-primary hover:border-primary/30 transition-all"
+                      >
+                        Limpiar
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     );

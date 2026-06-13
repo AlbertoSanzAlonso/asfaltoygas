@@ -182,6 +182,7 @@ export const products = {
     brandId?: number,
     priceMin?: number,
     priceMax?: number,
+    sortOrder?: 'asc' | 'desc' | null,
   ): Promise<{ products: Product[], total: number }> => {
     if (!isSupabaseConfigured()) return { products: [], total: 0 };
 
@@ -210,7 +211,7 @@ export const products = {
       }
 
       const { data, count, error } = await query
-        .order('created_at', { ascending: false })
+        .order(sortOrder ? 'price' : 'created_at', { ascending: sortOrder ? sortOrder === 'asc' : false })
         .order('product_id', { ascending: true })
         .range(from, to);
 
