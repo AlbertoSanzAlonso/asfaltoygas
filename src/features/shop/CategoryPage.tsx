@@ -328,7 +328,7 @@ const CategoryPage: React.FC = () => {
             {categoryTitle}
           </h1>
 
-          <div className="max-w-[320px] mx-auto mt-8 relative z-30">
+          <div className="max-w-3xl mx-auto mt-8 relative z-30">
             <button
               type="button"
               onClick={() => setIsFiltersOpen(!isFiltersOpen)}
