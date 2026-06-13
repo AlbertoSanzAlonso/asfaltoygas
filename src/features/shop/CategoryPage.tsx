@@ -13,15 +13,16 @@ import { absoluteUrl, truncateDescription } from '@/lib/seo/constants';
 import { isSupabaseConfigured } from '@/lib/supabaseConfig';
 
 const BRAND_SCALES: Record<string, number> = {
-  'acerbis': 1.15,
-  'airoh': 1.15,
-  'hjc': 1.15,
-  'mt-helmets': 1.15,
-  'nolan': 1.15,
-  'piaggio': 1.15,
-  'shoei': 1.15,
-  'suomy': 1.15,
-  'unik-racing': 0.75,
+  'acerbis': 1.3,
+  'airoh': 1.3,
+  'hjc': 1.3,
+  'mt-helmets': 1.3,
+  'nolan': 1.3,
+  'piaggio': 1.3,
+  'shoei': 1.3,
+  'suomy': 1.3,
+  'gas-gas': 0.75,
+  'unik-racing': 0.65,
 };
 
 const BrandLogo: React.FC<{ brand: Brand; size?: 'sm' | 'md' }> = ({ brand, size = 'md' }) => {
