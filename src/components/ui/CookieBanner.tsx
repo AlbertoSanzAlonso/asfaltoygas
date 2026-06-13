@@ -39,7 +39,7 @@ export const CookieBanner = () => {
           className="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6"
         >
           <div className="max-w-7xl mx-auto">
-            <div className="relative overflow-hidden rounded-2xl bg-secondary dark:bg-[#050505] text-white shadow-2xl border border-white/10 glass">
+            <div className="relative overflow-hidden rounded-2xl bg-zinc-900/95 backdrop-blur-md text-white shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)] border border-white/10">
               
               {/* Accento rojo estilo velocidad/motos */}
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-dark via-primary to-primary-light" />
