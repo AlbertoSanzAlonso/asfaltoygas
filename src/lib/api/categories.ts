@@ -3,6 +3,18 @@ import { supabase } from '../supabase';
 import { isSupabaseConfigured } from '../supabaseConfig';
 import type { Category, Subcategory } from '@/types';
 
+/** Slugs de URL → nombre en BD */
+const CATEGORY_SLUGS: Record<string, string> = {
+  cascos: 'Cascos',
+  equipacion: 'Equipación',
+  accesorios: 'Accesorios',
+};
+
+function resolveCategoryName(input: string): string {
+  const key = input.trim().toLowerCase();
+  return CATEGORY_SLUGS[key] ?? input.trim();
+}
+
 export const categories = {
   getAll: async (): Promise<Category[]> => {
     if (!isSupabaseConfigured()) return [];
@@ -16,17 +28,18 @@ export const categories = {
     return data || [];
   },
 
-  getByName: async (name: string): Promise<Category | undefined> => {
-    if (!isSupabaseConfigured()) return undefined;
+  getByName: async (name: string): Promise<Category | null> => {
+    if (!isSupabaseConfigured()) return null;
 
+    const canonical = resolveCategoryName(name);
     const { data, error } = await supabase
       .from('categories')
       .select('*')
-      .ilike('name', name)
+      .ilike('name', canonical)
       .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "no rows found"
-    return data || undefined;
+    if (error && error.code !== 'PGRST116') throw error;
+    return data ?? null;
   },
 
   getSubcategories: async (categoryId?: number): Promise<Subcategory[]> => {

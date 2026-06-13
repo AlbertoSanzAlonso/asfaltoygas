@@ -111,8 +111,11 @@ const CategoryPage: React.FC = () => {
 
   const { data: categoryData } = useQuery({
     queryKey: ['category-info', category],
-    queryFn: () => api.categories.getByName(category!),
-    enabled: !!category
+    queryFn: async () => {
+      const found = await api.categories.getByName(category!);
+      return found ?? null;
+    },
+    enabled: !!category,
   });
 
   const categoryId = categoryData?.id;

@@ -44,8 +44,8 @@ export function SeoHelmet({
       <title>{pageTitle}</title>
       <meta name="description" content={desc} />
       <link rel="canonical" href={url} />
-      <link rel="alternate" hreflang="es-es" href={url} />
-      <link rel="alternate" hreflang="x-default" href={url} />
+      <link rel="alternate" hrefLang="es-es" href={url} />
+      <link rel="alternate" hrefLang="x-default" href={url} />
       {GOOGLE_SITE_VERIFICATION && (
         <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />
       )}
