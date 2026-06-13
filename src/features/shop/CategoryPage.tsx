@@ -127,20 +127,24 @@ const CategoryPage: React.FC = () => {
   const handleSubChange = (subId: number | null) => {
     setSelectedSub(subId);
     applyFilters(subId, selectedBrand, priceMin, priceMax, sortOrder);
+    setIsFiltersOpen(false);
   };
 
   const handleBrandChange = (brandId: number | null) => {
     setSelectedBrand(brandId);
     applyFilters(selectedSub, brandId, priceMin, priceMax, sortOrder);
+    setIsFiltersOpen(false);
   };
 
   const handlePriceApply = () => {
     applyFilters(selectedSub, selectedBrand, priceMin, priceMax, sortOrder);
+    setIsFiltersOpen(false);
   };
 
   const handleSortChange = (sort: string) => {
     setSortOrder(sort);
     applyFilters(selectedSub, selectedBrand, priceMin, priceMax, sort);
+    setIsFiltersOpen(false);
   };
 
   const pageSize = 12;
