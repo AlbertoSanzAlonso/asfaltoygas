@@ -380,7 +380,7 @@ const ProductPage = () => {
           {/* Left: Gallery */}
           <div className="lg:col-span-5 flex flex-col gap-4">
             <div 
-              className="relative aspect-3/4 overflow-hidden bg-black/20 cursor-pointer rounded-xl"
+              className="relative aspect-3/4 overflow-hidden bg-secondary/5 cursor-pointer rounded-xl"
               onClick={() => setShowFullscreen(true)}
             >
               {!imageLoaded && (
@@ -400,7 +400,7 @@ const ProductPage = () => {
                     console.error("Error loading image in ProductPage");
                     setImageLoaded(true); // Still set to true to show the broken image icon or placeholder
                   }}
-                  className={`w-full h-full object-cover transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  className={`w-full h-full object-contain p-6 md:p-10 transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                   loading="eager"
                   fetchPriority="high"
                 />
@@ -421,9 +421,9 @@ const ProductPage = () => {
                 <div 
                   key={idx}
                   onClick={() => setActiveImage(idx)}
-                  className={`shrink-0 w-20 h-24 cursor-pointer overflow-hidden border-2 transition-all ${activeImage === idx ? 'border-primary opacity-100' : 'border-transparent opacity-50 hover:opacity-75'}`}
+                  className={`shrink-0 w-16 h-20 cursor-pointer overflow-hidden border transition-all rounded-md ${activeImage === idx ? 'border-primary opacity-100' : 'border-secondary/10 opacity-60 hover:opacity-90'}`}
                 >
-                  <img src={img} alt="" loading="lazy" width={80} height={96} className="w-full h-full object-cover" />
+                  <img src={img} alt="" loading="lazy" width={64} height={80} className="w-full h-full object-contain p-1" />
                 </div>
               ))}
             </div>

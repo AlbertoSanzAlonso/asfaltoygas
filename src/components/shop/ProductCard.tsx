@@ -71,7 +71,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           alt={product.name} 
           onLoad={() => setIsLoaded(true)}
           aspectRatio="aspect-[3/4]"
-          containerClassName="rounded-xl shadow-lg group-hover:shadow-2xl transition-all duration-500"
+          className="p-4 md:p-6 object-contain"
+          containerClassName="rounded-xl shadow-md group-hover:shadow-lg transition-all duration-500"
         />
       </Link>
         
