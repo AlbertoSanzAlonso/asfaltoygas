@@ -12,9 +12,24 @@ import { SeoHelmet } from '@/components/seo/SeoHelmet';
 import { absoluteUrl, truncateDescription } from '@/lib/seo/constants';
 import { isSupabaseConfigured } from '@/lib/supabaseConfig';
 
+const BRAND_SCALES: Record<string, number> = {
+  'acerbis': 1.15,
+  'airoh': 1.15,
+  'hjc': 1.15,
+  'mt-helmets': 1.15,
+  'nolan': 1.15,
+  'piaggio': 1.15,
+  'shoei': 1.15,
+  'suomy': 1.15,
+  'unik-racing': 0.75,
+};
+
 const BrandLogo: React.FC<{ brand: Brand; size?: 'sm' | 'md' }> = ({ brand, size = 'md' }) => {
-  const height = size === 'sm' ? 34 : 50;
-  const maxWidth = size === 'sm' ? 110 : 160;
+  const baseHeight = size === 'sm' ? 34 : 50;
+  const baseMaxWidth = size === 'sm' ? 110 : 160;
+  const scale = BRAND_SCALES[brand.slug] ?? 1;
+  const height = Math.round(baseHeight * scale);
+  const maxWidth = Math.round(baseMaxWidth * scale);
 
   if (brand.logo_url) {
     return (
