@@ -17,8 +17,10 @@ const CategoryPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const subQuery = searchParams.get('sub');
   const brandQuery = searchParams.get('marca');
+  const priceMinQuery = searchParams.get('precioMin');
+  const priceMaxQuery = searchParams.get('precioMax');
 
-  const filterKey = `${subQuery || 'null'}-${brandQuery || 'null'}`;
+  const filterKey = `${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}`;
   const wasRestored = React.useRef(false);
 
   const [selectedSub, setSelectedSub] = useState<number | null>(() =>
@@ -27,6 +29,8 @@ const CategoryPage: React.FC = () => {
   const [selectedBrand, setSelectedBrand] = useState<number | null>(() =>
     brandQuery ? parseInt(brandQuery, 10) : null
   );
+  const [priceMin, setPriceMin] = useState<string>(() => priceMinQuery || '');
+  const [priceMax, setPriceMax] = useState<string>(() => priceMaxQuery || '');
 
   const [page, setPage] = useState(() => {
     const savedPage = sessionStorage.getItem(`page-${category}-${filterKey}`);
@@ -37,12 +41,14 @@ const CategoryPage: React.FC = () => {
   const [isMobileTipoOpen, setIsMobileTipoOpen] = useState(false);
   const [isMobileBrandMenuOpen, setIsMobileBrandMenuOpen] = useState(false);
 
-  const lastState = React.useRef({ category, subQuery, brandQuery });
+  const lastState = React.useRef<{ category?: string; subQuery: string | null; brandQuery: string | null; priceMinQuery: string | null; priceMaxQuery: string | null }>({ category: undefined, subQuery: null, brandQuery: null, priceMinQuery: null, priceMaxQuery: null });
 
-  const applyFilters = (subId: number | null, brandId: number | null) => {
+  const applyFilters = (subId: number | null, brandId: number | null, pMin?: string, pMax?: string) => {
     const params = new URLSearchParams();
     if (subId) params.set('sub', subId.toString());
     if (brandId) params.set('marca', brandId.toString());
+    if (pMin) params.set('precioMin', pMin);
+    if (pMax) params.set('precioMax', pMax);
     setSearchParams(params);
     setPage(1);
     setAllProducts([]);
@@ -53,39 +59,47 @@ const CategoryPage: React.FC = () => {
     if (
       lastState.current.category !== category ||
       lastState.current.subQuery !== subQuery ||
-      lastState.current.brandQuery !== brandQuery
+      lastState.current.brandQuery !== brandQuery ||
+      lastState.current.priceMinQuery !== priceMinQuery ||
+      lastState.current.priceMaxQuery !== priceMaxQuery
     ) {
       setSelectedSub(subQuery ? parseInt(subQuery, 10) : null);
       setSelectedBrand(brandQuery ? parseInt(brandQuery, 10) : null);
+      setPriceMin(priceMinQuery || '');
+      setPriceMax(priceMaxQuery || '');
 
       const saved = sessionStorage.getItem(
-        `page-${category}-${subQuery || 'null'}-${brandQuery || 'null'}`
+        `page-${category}-${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}`
       );
       setPage(saved ? parseInt(saved, 10) : 1);
       setAllProducts([]);
       wasRestored.current = false;
 
-      lastState.current = { category, subQuery, brandQuery };
+      lastState.current = { category, subQuery, brandQuery, priceMinQuery, priceMaxQuery };
     }
-  }, [subQuery, brandQuery, category]);
+  }, [subQuery, brandQuery, category, priceMinQuery, priceMaxQuery]);
 
   React.useEffect(() => {
     sessionStorage.setItem(
-      `page-${category}-${selectedSub || 'null'}-${selectedBrand || 'null'}`,
+      `page-${category}-${selectedSub || 'null'}-${selectedBrand || 'null'}-${priceMin || 'null'}-${priceMax || 'null'}`,
       page.toString()
     );
-  }, [category, selectedSub, selectedBrand, page]);
+  }, [category, selectedSub, selectedBrand, priceMin, priceMax, page]);
 
   const handleSubChange = (subId: number | null) => {
     setSelectedSub(subId);
-    applyFilters(subId, selectedBrand);
+    applyFilters(subId, selectedBrand, priceMin, priceMax);
     setIsMobileTipoOpen(false);
   };
 
   const handleBrandChange = (brandId: number | null) => {
     setSelectedBrand(brandId);
-    applyFilters(selectedSub, brandId);
+    applyFilters(selectedSub, brandId, priceMin, priceMax);
     setIsMobileBrandMenuOpen(false);
+  };
+
+  const handlePriceApply = () => {
+    applyFilters(selectedSub, selectedBrand, priceMin, priceMax);
   };
 
   const pageSize = 12;
@@ -120,7 +134,7 @@ const CategoryPage: React.FC = () => {
     isError,
     error,
   } = useQuery<{ products: Product[]; total: number }>({
-    queryKey: ['products', categoryId, selectedSub, selectedBrand, page],
+    queryKey: ['products', categoryId, selectedSub, selectedBrand, priceMin, priceMax, page],
     queryFn: () => {
       const isRestoring = page > 1 && allProducts.length === 0;
       const actualPage = isRestoring ? 1 : page;
@@ -137,7 +151,9 @@ const CategoryPage: React.FC = () => {
         undefined,
         undefined,
         undefined,
-        selectedBrand ?? undefined
+        selectedBrand ?? undefined,
+        priceMin ? parseFloat(priceMin) : undefined,
+        priceMax ? parseFloat(priceMax) : undefined,
       );
     },
     enabled: category?.toLowerCase() === 'todas' || !!categoryId,
@@ -148,7 +164,7 @@ const CategoryPage: React.FC = () => {
 
   const restorationTrigger = allProducts.length;
   useScrollRestoration(
-    `category-${category}-${selectedSub || 'null'}-${selectedBrand || 'null'}`,
+    `category-${category}-${selectedSub || 'null'}-${selectedBrand || 'null'}-${priceMin || 'null'}-${priceMax || 'null'}`,
     restorationTrigger
   );
 
@@ -348,6 +364,70 @@ const CategoryPage: React.FC = () => {
     );
   };
 
+  const renderPriceFilter = () => {
+    const isActive = priceMin !== '' || priceMax !== '';
+
+    return (
+      <div className="mt-10">
+        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-secondary/40 mb-6 text-center">
+          Precio
+        </p>
+
+        <div className="flex items-center justify-center gap-2 max-w-[280px] mx-auto">
+          <input
+            type="number"
+            min="0"
+            step="1"
+            placeholder="Min"
+            value={priceMin}
+            onChange={(e) => setPriceMin(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
+            className="w-full bg-accent-dark border border-secondary/10 px-4 py-3 text-[11px] font-bold text-secondary placeholder:text-secondary/30 rounded-xl text-center focus:outline-none focus:border-primary/50 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+          <span className="text-xs font-bold text-secondary/40">–</span>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            placeholder="Max"
+            value={priceMax}
+            onChange={(e) => setPriceMax(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
+            className="w-full bg-accent-dark border border-secondary/10 px-4 py-3 text-[11px] font-bold text-secondary placeholder:text-secondary/30 rounded-xl text-center focus:outline-none focus:border-primary/50 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+        </div>
+
+        <div className="flex justify-center mt-3">
+          <button
+            type="button"
+            onClick={handlePriceApply}
+            disabled={!isActive}
+            className={`px-6 py-2 text-[10px] font-black uppercase tracking-[0.25em] border rounded-full transition-all ${
+              isActive
+                ? 'bg-primary border-primary text-white shadow-md shadow-primary/20 hover:bg-primary-dark'
+                : 'border-secondary/10 text-secondary/30 cursor-not-allowed'
+            }`}
+          >
+            Filtrar
+          </button>
+          {isActive && (
+            <button
+              type="button"
+              onClick={() => {
+                setPriceMin('');
+                setPriceMax('');
+                applyFilters(selectedSub, selectedBrand, '', '');
+              }}
+              className="ml-2 px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] border border-secondary/10 rounded-full text-secondary/50 hover:text-primary hover:border-primary/30 transition-all"
+            >
+              Limpiar
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="bg-accent min-h-screen pt-12 pb-32 text-secondary">
       <SeoHelmet
@@ -381,6 +461,13 @@ const CategoryPage: React.FC = () => {
 
           {renderTipoFilter()}
           {renderMarcaFilter()}
+          {renderPriceFilter()}
+
+          {productsData && !isLoading && (
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-secondary/40 mt-8">
+              {productsData.total} artículo{productsData.total !== 1 ? 's' : ''}
+            </p>
+          )}
         </header>
 
         {supabaseMissing ? (

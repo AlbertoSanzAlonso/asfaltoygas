@@ -179,7 +179,9 @@ export const products = {
     search?: string,
     isNewOnly?: boolean,
     labelId?: number,
-    brandId?: number
+    brandId?: number,
+    priceMin?: number,
+    priceMax?: number,
   ): Promise<{ products: Product[], total: number }> => {
     if (!isSupabaseConfigured()) return { products: [], total: 0 };
 
@@ -201,6 +203,8 @@ export const products = {
       if (publishedOnly !== undefined) query = query.eq('is_published', publishedOnly);
       if (isNewOnly !== undefined) query = query.eq('is_new', isNewOnly);
       if (brandId) query = query.eq('brand_id', brandId);
+      if (priceMin !== undefined) query = query.gte('price', priceMin);
+      if (priceMax !== undefined) query = query.lte('price', priceMax);
       if (labelId && select.includes('product_labels')) {
         query = query.eq('product_labels.label_id', labelId);
       }
