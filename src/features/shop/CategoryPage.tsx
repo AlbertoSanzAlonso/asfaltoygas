@@ -2,12 +2,11 @@
 import React, { useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from "@/lib/api";
 import { ProductCard } from "@/components/shop/ProductCard";
 import type { Product, Subcategory, Brand } from '@/types';
-import { useScrollRestoration } from "@/lib/useScrollRestoration";
 import { SeoHelmet } from '@/components/seo/SeoHelmet';
 import { absoluteUrl, truncateDescription } from '@/lib/seo/constants';
 import { isSupabaseConfigured } from '@/lib/supabaseConfig';
@@ -63,7 +62,6 @@ const CategoryPage: React.FC = () => {
   const sortQuery = searchParams.get('orden');
 
   const filterKey = `${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}-${sortQuery || 'null'}`;
-  const wasRestored = React.useRef(false);
 
   const [selectedSub, setSelectedSub] = useState<number | null>(() =>
     subQuery ? parseInt(subQuery, 10) : null
@@ -80,10 +78,7 @@ const CategoryPage: React.FC = () => {
     return savedPage ? parseInt(savedPage, 10) : 1;
   });
 
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [isMobileTipoOpen, setIsMobileTipoOpen] = useState(false);
-  const [isMobileBrandMenuOpen, setIsMobileBrandMenuOpen] = useState(false);
-  const [isPriceOpen, setIsPriceOpen] = useState(false);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const lastState = React.useRef<{ category?: string; subQuery: string | null; brandQuery: string | null; priceMinQuery: string | null; priceMaxQuery: string | null; sortQuery: string | null }>({ category: undefined, subQuery: null, brandQuery: null, priceMinQuery: null, priceMaxQuery: null, sortQuery: null });
 
@@ -96,8 +91,6 @@ const CategoryPage: React.FC = () => {
     if (sort) params.set('orden', sort);
     setSearchParams(params);
     setPage(1);
-    setAllProducts([]);
-    wasRestored.current = false;
   };
 
   React.useEffect(() => {
@@ -119,8 +112,6 @@ const CategoryPage: React.FC = () => {
         `page-${category}-${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}-${sortQuery || 'null'}`
       );
       setPage(saved ? parseInt(saved, 10) : 1);
-      setAllProducts([]);
-      wasRestored.current = false;
 
       lastState.current = { category, subQuery, brandQuery, priceMinQuery, priceMaxQuery, sortQuery };
     }
@@ -136,24 +127,20 @@ const CategoryPage: React.FC = () => {
   const handleSubChange = (subId: number | null) => {
     setSelectedSub(subId);
     applyFilters(subId, selectedBrand, priceMin, priceMax, sortOrder);
-    setIsMobileTipoOpen(false);
   };
 
   const handleBrandChange = (brandId: number | null) => {
     setSelectedBrand(brandId);
     applyFilters(selectedSub, brandId, priceMin, priceMax, sortOrder);
-    setIsMobileBrandMenuOpen(false);
   };
 
   const handlePriceApply = () => {
     applyFilters(selectedSub, selectedBrand, priceMin, priceMax, sortOrder);
-    setIsPriceOpen(false);
   };
 
   const handleSortChange = (sort: string) => {
     setSortOrder(sort);
     applyFilters(selectedSub, selectedBrand, priceMin, priceMax, sort);
-    setIsPriceOpen(false);
   };
 
   const pageSize = 12;
@@ -190,17 +177,12 @@ const CategoryPage: React.FC = () => {
   } = useQuery<{ products: Product[]; total: number }>({
     queryKey: ['products', categoryId, selectedSub, selectedBrand, priceMin, priceMax, sortOrder, page],
     queryFn: () => {
-      const isRestoring = page > 1 && allProducts.length === 0;
-      const actualPage = isRestoring ? 1 : page;
-      const actualPageSize = isRestoring ? page * pageSize : pageSize;
-
       const catId = category?.toLowerCase() === 'todas' ? undefined : categoryId?.toString();
-
       return api.products.getAll(
         catId,
         selectedSub?.toString(),
-        actualPage,
-        actualPageSize,
+        page,
+        pageSize,
         true,
         undefined,
         undefined,
@@ -217,31 +199,10 @@ const CategoryPage: React.FC = () => {
 
   const products = productsData?.products;
 
-  const restorationTrigger = allProducts.length;
-  useScrollRestoration(
-    `category-${category}-${selectedSub || 'null'}-${selectedBrand || 'null'}-${priceMin || 'null'}-${priceMax || 'null'}-${sortOrder || 'null'}`,
-    restorationTrigger
-  );
+  const totalPages = productsData ? Math.ceil(productsData.total / pageSize) : 0;
 
-  React.useEffect(() => {
-    if (products) {
-      setAllProducts((prev) => {
-        if (prev.length === 0 || page === 1) {
-          if (products.length > pageSize) wasRestored.current = true;
-          return products;
-        }
-
-        const existingIds = new Set(prev.map((p) => p.product_id));
-        const newItems = products.filter((p) => !existingIds.has(p.product_id));
-        if (newItems.length === 0) return prev;
-        return [...prev, ...newItems];
-      });
-    }
-  }, [products, page]);
-
-  const hasMore = productsData ? allProducts.length < productsData.total : false;
   const showEmptyState =
-    !isLoading && !isFetching && !isError && productsData && allProducts.length === 0;
+    !isLoading && !isFetching && !isError && productsData && productsData.total === 0;
   const categoryNotFound =
     !isCategoryLoading && category && category.toLowerCase() !== 'todas' && !categoryData;
   const supabaseMissing = !isSupabaseConfigured();
@@ -252,283 +213,85 @@ const CategoryPage: React.FC = () => {
     `Descubre ${categoryTitle.toLowerCase()} en Asfalto y Gas. Cascos y equipación motera con envío gratuito desde 50 €.`,
   );
 
-  const renderTipoFilter = () => {
+  const renderTipoContent = () => {
     if (!subcategories?.length) return null;
-
     return (
-      <div className="mt-12">
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-secondary/40 mb-6 text-center">
-          {tipoLabel}
-        </p>
-
-        <div className="block md:hidden px-6 relative z-30">
-          <div className="max-w-[280px] mx-auto">
-            <button
-              type="button"
-              onClick={() => setIsMobileTipoOpen(!isMobileTipoOpen)}
-              className="w-full bg-accent-dark border border-secondary/10 px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-between group hover:border-primary/50 transition-all rounded-xl"
-            >
-              <span className="flex-1 text-center">
-                {selectedSub
-                  ? subcategories.find((s) => s.id === selectedSub)?.name.toUpperCase()
-                  : 'TODOS'}
-              </span>
-              <ChevronDown
-                className={`w-4 h-4 text-primary transition-transform duration-300 ${isMobileTipoOpen ? 'rotate-180' : ''}`}
-              />
-            </button>
-
-            <AnimatePresence>
-              {isMobileTipoOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute left-6 right-6 mt-2 bg-white border border-gray-100 shadow-2xl z-40 overflow-hidden rounded-2xl"
-                >
-                  <div className="max-h-[60vh] overflow-y-auto py-2 space-y-1 px-2">
-                    <button
-                      type="button"
-                      onClick={() => handleSubChange(null)}
-                      className={`w-full flex items-center justify-between px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-colors rounded-xl ${!selectedSub ? 'text-primary bg-primary/5' : 'text-secondary hover:bg-gray-50'}`}
-                    >
-                      TODOS
-                      {!selectedSub && <Check className="w-3 h-3" />}
-                    </button>
-                    {subcategories.map((sub) => (
-                      <button
-                        key={sub.id}
-                        type="button"
-                        onClick={() => handleSubChange(sub.id)}
-                        className={`w-full flex items-center justify-between px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-colors rounded-xl ${selectedSub === sub.id ? 'text-primary bg-primary/5' : 'text-secondary hover:bg-gray-50'}`}
-                      >
-                        {sub.name}
-                        {selectedSub === sub.id && <Check className="w-3 h-3" />}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-
-        <div className="hidden md:block">
-          {(() => {
-            const all = [{ id: -1, name: '', isAll: true } as Subcategory & { isAll?: boolean }, ...subcategories];
-            const mid = Math.ceil(all.length / 2);
-            return [all.slice(0, mid), all.slice(mid)].map((row, ri) => (
-              <div key={ri} className="flex flex-wrap justify-center gap-4 mb-2">
-                {row.map((item) =>
-                  (item as any).isAll ? (
-                    <button key="all" type="button" onClick={() => handleSubChange(null)}
-                      className={`px-8 py-3 text-[10px] font-black uppercase tracking-[0.3em] border transition-all duration-300 rounded-full ${!selectedSub ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'border-secondary/10 hover:border-secondary hover:translate-y-[-2px]'}`}>
-                      Todos
-                    </button>
-                  ) : (
-                    <button key={item.id} type="button" onClick={() => handleSubChange(item.id)}
-                      className={`px-8 py-3 text-[10px] font-black uppercase tracking-[0.3em] border transition-all duration-300 rounded-full ${selectedSub === item.id ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'border-secondary/10 hover:border-secondary hover:translate-y-[-2px]'}`}>
-                      {item.name}
-                    </button>
-                  )
-                )}
-              </div>
-            ));
-          })()}
-        </div>
-      </div>
-    );
-  };
-
-  const renderMarcaFilter = () => {
-    if (!categoryBrands?.length) return null;
-
-    return (
-      <div className="mt-10">
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-secondary/40 mb-6 text-center">
-          Marca
-        </p>
-
-        <div className="block md:hidden px-6 relative z-25">
-          <div className="max-w-[280px] mx-auto">
-            <button
-              type="button"
-              onClick={() => setIsMobileBrandMenuOpen(!isMobileBrandMenuOpen)}
-              className="w-full bg-accent-dark border border-secondary/10 px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-between rounded-xl"
-            >
-              <span className="flex-1 text-center">
-                {selectedBrand
-                  ? categoryBrands.find((b) => b.id === selectedBrand)?.name.toUpperCase()
-                  : 'TODAS'}
-              </span>
-              <ChevronDown
-                className={`w-4 h-4 text-primary transition-transform ${isMobileBrandMenuOpen ? 'rotate-180' : ''}`}
-              />
-            </button>
-            <AnimatePresence>
-              {isMobileBrandMenuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute left-6 right-6 mt-2 bg-white border shadow-2xl z-40 overflow-hidden rounded-2xl"
-                >
-                  <div className="max-h-[50vh] overflow-y-auto py-2 px-2 space-y-1">
-                    <button
-                      type="button"
-                      onClick={() => handleBrandChange(null)}
-                      className={`w-full flex items-center justify-between px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl ${!selectedBrand ? 'text-primary bg-primary/5' : 'text-secondary'}`}
-                    >
-                      TODAS
-                      {!selectedBrand && <Check className="w-3 h-3" />}
-                    </button>
-                    {categoryBrands.map((brand) => (
-                      <button
-                        key={brand.id}
-                        type="button"
-                        onClick={() => handleBrandChange(brand.id)}
-                        className={`w-full flex items-center gap-3 px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl transition-colors ${selectedBrand === brand.id ? 'text-primary bg-primary/5' : 'text-secondary hover:bg-gray-50'}`}
-                      >
-                        <BrandLogo brand={brand} size="sm" />
-                        {brand.name}
-                        {selectedBrand === brand.id && <Check className="w-3 h-3 ml-auto" />}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-
-        <div className="hidden md:block">
-          {(() => {
-            const pseudo: (Brand & { isAll?: boolean }) = { id: -1, slug: '', name: 'Todas', isAll: true };
-            const all = [pseudo, ...categoryBrands];
-            const mid = Math.ceil(all.length / 2);
-            return [all.slice(0, mid), all.slice(mid)].map((row, ri) => (
-              <div key={ri} className="flex flex-wrap justify-center gap-3 mb-2">
-                {row.map((item) =>
-                  (item as any).isAll ? (
-                    <button key="all" type="button" onClick={() => handleBrandChange(null)}
-                      className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.25em] border rounded-full transition-all ${!selectedBrand ? 'bg-secondary border-secondary text-white' : 'border-secondary/10 hover:border-secondary'}`}>
-                      Todas
-                    </button>
-                  ) : (
-                    <button key={item.id} type="button" onClick={() => handleBrandChange(item.id)} title={item.name}
-                      className={`px-2 py-1.5 transition-all duration-300 rounded-lg ${selectedBrand === item.id ? 'ring-2 ring-primary ring-offset-2 scale-110' : 'opacity-70 hover:opacity-100 hover:scale-105'}`}>
-                      <BrandLogo brand={item} size="md" />
-                    </button>
-                  )
-                )}
-              </div>
-            ));
-          })()}
-        </div>
-      </div>
-    );
-  };
-
-  const renderPriceFilter = () => {
-    const isActive = priceMin !== '' || priceMax !== '' || sortOrder !== '';
-    const sortLabel = sortOrder === 'asc' ? 'Menor precio' : sortOrder === 'desc' ? 'Mayor precio' : 'Precio';
-
-    return (
-      <div className="mt-10">
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-secondary/40 mb-6 text-center">
-          {sortLabel}
-        </p>
-
-        <div className="max-w-[280px] mx-auto relative z-20">
-          <button
-            type="button"
-            onClick={() => setIsPriceOpen(!isPriceOpen)}
-            className={`w-full bg-accent-dark border px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-between rounded-xl transition-all ${
-              isActive ? 'border-primary/50' : 'border-secondary/10 hover:border-primary/50'
-            }`}
-          >
-            <span className="flex-1 text-center">{sortLabel}</span>
-            <ChevronDown className={`w-4 h-4 text-primary transition-transform ${isPriceOpen ? 'rotate-180' : ''}`} />
+      <div>
+        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-secondary/40 mb-3">{tipoLabel}</p>
+        <div className="flex flex-wrap gap-2">
+          <button type="button" onClick={() => handleSubChange(null)}
+            className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] border rounded-full transition-all ${!selectedSub ? 'bg-primary border-primary text-white' : 'border-secondary/10 hover:border-secondary hover:translate-y-[-2px]'}`}>
+            Todos
           </button>
+          {subcategories.map((sub) => (
+            <button key={sub.id} type="button" onClick={() => handleSubChange(sub.id)}
+              className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] border rounded-full transition-all ${selectedSub === sub.id ? 'bg-primary border-primary text-white' : 'border-secondary/10 hover:border-secondary hover:translate-y-[-2px]'}`}>
+              {sub.name}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
-          <AnimatePresence>
-            {isPriceOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute left-0 right-0 mt-2 bg-white border shadow-2xl overflow-hidden rounded-2xl"
-              >
-                <div className="py-3 px-4 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number" min="0" step="1" placeholder="Min"
-                      value={priceMin}
-                      onChange={(e) => setPriceMin(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
-                      className="w-full bg-accent-dark border border-secondary/10 px-3 py-2 text-[11px] font-bold text-secondary placeholder:text-secondary/30 rounded-lg text-center focus:outline-none focus:border-primary/50 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                    <span className="text-xs font-bold text-secondary/40">–</span>
-                    <input
-                      type="number" min="0" step="1" placeholder="Max"
-                      value={priceMax}
-                      onChange={(e) => setPriceMax(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
-                      className="w-full bg-accent-dark border border-secondary/10 px-3 py-2 text-[11px] font-bold text-secondary placeholder:text-secondary/30 rounded-lg text-center focus:outline-none focus:border-primary/50 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                  </div>
+  const renderMarcaContent = () => {
+    if (!categoryBrands?.length) return null;
+    return (
+      <div>
+        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-secondary/40 mb-3">Marca</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" onClick={() => handleBrandChange(null)}
+            className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] border rounded-full transition-all ${!selectedBrand ? 'bg-secondary border-secondary text-white' : 'border-secondary/10 hover:border-secondary'}`}>
+            Todas
+          </button>
+          {categoryBrands.map((brand) => (
+            <button key={brand.id} type="button" onClick={() => handleBrandChange(brand.id)} title={brand.name}
+              className={`p-1.5 rounded-lg transition-all ${selectedBrand === brand.id ? 'ring-2 ring-primary ring-offset-1 scale-110' : 'opacity-70 hover:opacity-100 hover:scale-105'}`}>
+              <BrandLogo brand={brand} size="sm" />
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleSortChange('asc')}
-                      className={`px-3 py-2 text-[9px] font-black uppercase tracking-[0.15em] rounded-lg border transition-all ${
-                        sortOrder === 'asc' ? 'bg-primary border-primary text-white' : 'border-secondary/10 hover:border-secondary/40'
-                      }`}
-                    >
-                      ↓ Más barato
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleSortChange('desc')}
-                      className={`px-3 py-2 text-[9px] font-black uppercase tracking-[0.15em] rounded-lg border transition-all ${
-                        sortOrder === 'desc' ? 'bg-primary border-primary text-white' : 'border-secondary/10 hover:border-secondary/40'
-                      }`}
-                    >
-                      ↑ Más caro
-                    </button>
-                  </div>
-
-                  <div className="flex justify-center gap-2">
-                    <button
-                      type="button"
-                      onClick={handlePriceApply}
-                      disabled={!isActive}
-                      className={`px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] border rounded-full transition-all ${
-                        isActive ? 'bg-primary border-primary text-white shadow-md shadow-primary/20 hover:bg-primary-dark' : 'border-secondary/10 text-secondary/30 cursor-not-allowed'
-                      }`}
-                    >
-                      Aplicar
-                    </button>
-                    {isActive && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPriceMin('');
-                          setPriceMax('');
-                          setSortOrder('');
-                          applyFilters(selectedSub, selectedBrand, '', '', '');
-                        }}
-                        className="px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] border border-secondary/10 rounded-full text-secondary/50 hover:text-primary hover:border-primary/30 transition-all"
-                      >
-                        Limpiar
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+  const renderPriceContent = () => {
+    const isActive = priceMin !== '' || priceMax !== '' || sortOrder !== '';
+    return (
+      <div>
+        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-secondary/40 mb-3">Precio</p>
+        <div className="flex items-center gap-2 mb-3">
+          <input type="number" min="0" step="1" placeholder="Min" value={priceMin}
+            onChange={(e) => setPriceMin(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
+            className="w-full bg-accent-dark border border-secondary/10 px-3 py-2 text-[11px] font-bold text-secondary placeholder:text-secondary/30 rounded-lg text-center focus:outline-none focus:border-primary/50 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+          <span className="text-xs font-bold text-secondary/40">–</span>
+          <input type="number" min="0" step="1" placeholder="Max" value={priceMax}
+            onChange={(e) => setPriceMax(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
+            className="w-full bg-accent-dark border border-secondary/10 px-3 py-2 text-[11px] font-bold text-secondary placeholder:text-secondary/30 rounded-lg text-center focus:outline-none focus:border-primary/50 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+        </div>
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <button type="button" onClick={() => handleSortChange('asc')}
+            className={`px-3 py-2 text-[9px] font-black uppercase tracking-[0.15em] rounded-lg border transition-all ${sortOrder === 'asc' ? 'bg-primary border-primary text-white' : 'border-secondary/10 hover:border-secondary/40'}`}>
+            ↓ Más barato
+          </button>
+          <button type="button" onClick={() => handleSortChange('desc')}
+            className={`px-3 py-2 text-[9px] font-black uppercase tracking-[0.15em] rounded-lg border transition-all ${sortOrder === 'desc' ? 'bg-primary border-primary text-white' : 'border-secondary/10 hover:border-secondary/40'}`}>
+            ↑ Más caro
+          </button>
+        </div>
+        <div className="flex justify-center gap-2">
+          <button type="button" onClick={handlePriceApply} disabled={!isActive}
+            className={`px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] border rounded-full transition-all ${isActive ? 'bg-primary border-primary text-white shadow-md shadow-primary/20 hover:bg-primary-dark' : 'border-secondary/10 text-secondary/30 cursor-not-allowed'}`}>
+            Aplicar
+          </button>
+          {isActive && (
+            <button type="button" onClick={() => { setPriceMin(''); setPriceMax(''); setSortOrder(''); applyFilters(selectedSub, selectedBrand, '', '', ''); }}
+              className="px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] border border-secondary/10 rounded-full text-secondary/50 hover:text-primary hover:border-primary/30 transition-all">
+              Limpiar
+            </button>
+          )}
         </div>
       </div>
     );
@@ -565,9 +328,39 @@ const CategoryPage: React.FC = () => {
             {categoryTitle}
           </h1>
 
-          {renderTipoFilter()}
-          {renderMarcaFilter()}
-          {renderPriceFilter()}
+          <div className="max-w-[320px] mx-auto mt-8 relative z-30">
+            <button
+              type="button"
+              onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+              className={`w-full bg-accent-dark border px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-between rounded-xl transition-all ${
+                isFiltersOpen || selectedSub || selectedBrand || priceMin || priceMax || sortOrder
+                  ? 'border-primary/50'
+                  : 'border-secondary/10 hover:border-primary/50'
+              }`}
+            >
+              <span className="flex-1 text-center">
+                {selectedSub || selectedBrand || priceMin || priceMax || sortOrder ? 'Filtros activos' : 'Filtros'}
+              </span>
+              <ChevronDown className={`w-4 h-4 text-primary transition-transform ${isFiltersOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            <AnimatePresence>
+              {isFiltersOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute left-0 right-0 mt-2 bg-white border shadow-2xl overflow-hidden rounded-2xl"
+                >
+                  <div className="max-h-[70vh] overflow-y-auto py-3 px-5 space-y-5">
+                    {renderTipoContent()}
+                    {renderMarcaContent()}
+                    {renderPriceContent()}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {productsData && !isLoading && (
             <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-secondary/40 mt-8">
@@ -636,7 +429,7 @@ const CategoryPage: React.FC = () => {
         ) : (
           <div className="space-y-20">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
-              {allProducts.map((product: Product, index: number) => (
+              {(products ?? []).map((product: Product, index: number) => (
                 <motion.div
                   key={product.product_id}
                   id={`product-${product.product_id}`}
@@ -653,15 +446,43 @@ const CategoryPage: React.FC = () => {
               ))}
             </div>
 
-            {hasMore && (
-              <div className="flex justify-center pt-12">
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 pt-12">
                 <button
                   type="button"
-                  onClick={() => setPage((prev) => prev + 1)}
-                  disabled={isFetching}
-                  className="px-12 py-4 bg-transparent border-2 border-secondary text-secondary text-[10px] font-black uppercase tracking-[0.3em] hover:bg-secondary hover:text-white transition-all disabled:opacity-50 rounded-full"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1 || isFetching}
+                  className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] border border-secondary/10 rounded-full hover:border-secondary/40 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
-                  {isFetching ? 'Cargando más piezas...' : 'Ver más artículos'}
+                  Anterior
+                </button>
+                {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                  const start = Math.max(1, Math.min(page - 3, totalPages - 6));
+                  const p = start + i;
+                  if (p > totalPages) return null;
+                  return (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setPage(p)}
+                      disabled={isFetching}
+                      className={`w-9 h-9 text-[10px] font-black uppercase rounded-full transition-all ${
+                        p === page
+                          ? 'bg-secondary text-white'
+                          : 'hover:bg-secondary/5 text-secondary/60'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  );
+                })}
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page >= totalPages || isFetching}
+                  className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] border border-secondary/10 rounded-full hover:border-secondary/40 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                >
+                  Siguiente
                 </button>
               </div>
             )}
