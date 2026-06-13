@@ -13,8 +13,8 @@ import { absoluteUrl, truncateDescription } from '@/lib/seo/constants';
 import { isSupabaseConfigured } from '@/lib/supabaseConfig';
 
 const BrandLogo: React.FC<{ brand: Brand; size?: 'sm' | 'md' }> = ({ brand, size = 'md' }) => {
-  const dims = { sm: { w: 70, h: 26 }, md: { w: 100, h: 36 } };
-  const { w, h } = dims[size];
+  const height = size === 'sm' ? 28 : 40;
+  const maxWidth = size === 'sm' ? 90 : 130;
 
   if (brand.logo_url) {
     return (
@@ -22,7 +22,7 @@ const BrandLogo: React.FC<{ brand: Brand; size?: 'sm' | 'md' }> = ({ brand, size
         src={brand.logo_url}
         alt={brand.name}
         className="object-contain shrink-0"
-        style={{ width: w, height: h }}
+        style={{ height, maxWidth }}
       />
     );
   }
