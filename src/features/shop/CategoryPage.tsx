@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronDown } from 'lucide-react';
@@ -79,6 +79,18 @@ const CategoryPage: React.FC = () => {
   });
 
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isFiltersOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setIsFiltersOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [isFiltersOpen]);
 
   const lastState = React.useRef<{ category?: string; subQuery: string | null; brandQuery: string | null; priceMinQuery: string | null; priceMaxQuery: string | null; sortQuery: string | null }>({ category: undefined, subQuery: null, brandQuery: null, priceMinQuery: null, priceMaxQuery: null, sortQuery: null });
 
@@ -127,13 +139,11 @@ const CategoryPage: React.FC = () => {
   const handleSubChange = (subId: number | null) => {
     setSelectedSub(subId);
     applyFilters(subId, selectedBrand, priceMin, priceMax, sortOrder);
-    setIsFiltersOpen(false);
   };
 
   const handleBrandChange = (brandId: number | null) => {
     setSelectedBrand(brandId);
     applyFilters(selectedSub, brandId, priceMin, priceMax, sortOrder);
-    setIsFiltersOpen(false);
   };
 
   const handlePriceApply = () => {
@@ -332,7 +342,7 @@ const CategoryPage: React.FC = () => {
             {categoryTitle}
           </h1>
 
-          <div className="max-w-3xl mx-auto mt-8 relative z-30">
+          <div ref={filterRef} className="max-w-3xl mx-auto mt-8 relative z-30">
             <button
               type="button"
               onClick={() => setIsFiltersOpen(!isFiltersOpen)}
