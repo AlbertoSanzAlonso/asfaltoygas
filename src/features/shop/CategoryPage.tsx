@@ -418,7 +418,7 @@ const CategoryPage: React.FC = () => {
                 />
               </motion.div>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div key={i} className="aspect-3/4 bg-white/5 animate-pulse rounded-3xl" />
               ))}
@@ -432,7 +432,7 @@ const CategoryPage: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-20">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
               {(products ?? []).map((product: Product, index: number) => (
                 <motion.div
                   key={product.product_id}

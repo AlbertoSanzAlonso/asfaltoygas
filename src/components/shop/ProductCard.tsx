@@ -78,7 +78,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {/* Absolute Overlays (Heart and Badge) */}
       <button
         onClick={handleFavoriteClick}
-        className={`absolute top-1.5 right-1.5 md:top-2 md:right-2 p-1.5 md:p-2 rounded-full backdrop-blur-md transition-all duration-500 z-20 ${
+        className={`absolute top-2 right-2 md:top-4 md:right-4 p-2 md:p-3 rounded-full backdrop-blur-md transition-all duration-500 z-20 ${
           isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'
         } ${
           isFavorite 
@@ -86,11 +86,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             : 'bg-white/10 text-white hover:bg-white/20 hover:scale-110'
         }`}
       >
-        <Heart className={`w-3 h-3 md:w-3.5 md:h-3.5 ${isFavorite ? 'fill-current' : ''}`} />
+        <Heart className={`w-4 h-4 md:w-5 md:h-5 ${isFavorite ? 'fill-current' : ''}`} />
       </button>
 
       {((product as any).is_new || (product as any).featured) && (
-        <span className={`absolute top-1.5 left-1.5 md:top-2 md:left-2 bg-primary text-white text-[8px] font-bold px-1.5 py-0.5 md:px-2 md:py-0.5 uppercase tracking-widest italic transition-all duration-500 z-20 ${
+        <span className={`absolute top-2 left-2 md:top-4 md:left-4 bg-primary text-white text-[8px] md:text-[10px] font-bold px-2 py-0.5 md:px-3 md:py-1 uppercase tracking-widest italic transition-all duration-500 z-20 ${
           isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'
         }`}>
           Novedad
@@ -99,16 +99,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
       {/* Text Info */}
       <div className={`transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-        <div className="mt-2 md:mt-3 flex justify-between items-start gap-2">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-xs md:text-xs font-bold tracking-tight text-secondary uppercase italic truncate">
+        <div className="mt-3 md:mt-6 flex justify-between items-start">
+          <div className="flex-1">
+            <h3 className="text-xs md:text-sm font-bold tracking-tight text-secondary uppercase italic">
               {product.name}
             </h3>
-            <p className="text-[9px] text-secondary/40 mt-0.5 uppercase tracking-widest">
+            <p className="text-[10px] text-secondary/40 mt-1 uppercase tracking-widest">
               {product.category}
             </p>
           </div>
-          <p className="text-xs md:text-xs font-black text-secondary italic shrink-0">
+          <p className="text-xs md:text-sm font-black text-secondary italic">
             {product.price.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
           </p>
         </div>

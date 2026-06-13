@@ -376,11 +376,11 @@ const ProductPage = () => {
           </div>
         </nav>
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Left: Gallery */}
-          <div className="lg:col-span-6 flex flex-col gap-6">
+          <div className="lg:col-span-5 flex flex-col gap-4">
             <div 
-              className="relative aspect-3/4 overflow-hidden bg-black/20 cursor-pointer"
+              className="relative aspect-3/4 overflow-hidden bg-black/20 cursor-pointer rounded-xl"
               onClick={() => setShowFullscreen(true)}
             >
               {!imageLoaded && (
@@ -430,21 +430,21 @@ const ProductPage = () => {
           </div>
 
           {/* Right: Info */}
-          <div className="lg:col-span-6 flex flex-col justify-center">
-            <div className="mb-12 border-b border-secondary/5 pb-12">
-              <span className="text-primary font-black tracking-[0.4em] uppercase text-xs mb-4 block">{product.category}</span>
-              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-black tracking-tighter uppercase italic mb-6 leading-none">{product.name}</h1>
-              <p className="text-3xl font-light text-secondary">
+          <div className="lg:col-span-7 flex flex-col justify-center">
+            <div className="mb-8 border-b border-secondary/5 pb-8">
+              <span className="text-primary font-black tracking-[0.4em] uppercase text-[10px] mb-3 block">{product.category}</span>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter uppercase italic mb-4 leading-none">{product.name}</h1>
+              <p className="text-2xl font-light text-secondary">
                 {product.price.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
               </p>
             </div>
 
-            <div className="space-y-12">
+            <div className="space-y-8">
               <div>
-                <div className="mb-6">
+                <div className="mb-4">
                   <h4 className="text-[10px] font-black uppercase tracking-[0.3em]">Seleccionar Talla</h4>
                 </div>
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-4 gap-3">
                   {availableSizes.map((size) => {
                     const isOutOfStock = !hasStockForSize(product.variants, size);
                     return (
@@ -452,7 +452,7 @@ const ProductPage = () => {
                         key={size}
                         disabled={isOutOfStock}
                         onClick={() => handleSizeSelect(size)}
-                        className={`py-4 text-xs font-black tracking-widest transition-all border relative overflow-hidden
+                        className={`py-3 text-xs font-black tracking-widest transition-all border relative overflow-hidden
                           ${selectedSize === size 
                             ? 'bg-secondary text-white border-secondary shadow-xl' 
                             : isOutOfStock 
@@ -502,7 +502,7 @@ const ProductPage = () => {
                         {/* Inner color swatch */}
                         <div 
                           className="w-10 h-10 rounded-full border border-black/10 shadow-md relative overflow-hidden transition-all duration-300 group-hover:scale-105 active:scale-95"
-                          style={{ backgroundColor: c.hex }}
+                          style={{ background: c.hex }}
                         />
                         
                         {/* Tooltip */}
@@ -528,8 +528,8 @@ const ProductPage = () => {
 
               <div className="flex gap-4">
                 <Button 
-                  size="lg" 
-                  className="flex-1 py-6 text-base font-black tracking-widest uppercase italic bg-primary hover:bg-primary-dark text-white shadow-xl shadow-primary/20"
+                  size="default" 
+                  className="flex-1 py-4 text-sm font-black tracking-widest uppercase italic bg-primary hover:bg-primary-dark text-white shadow-xl shadow-primary/20"
                   onClick={() => {
                     if (!selectedSize) {
                       openModal({
