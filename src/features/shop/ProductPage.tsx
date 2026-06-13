@@ -380,7 +380,7 @@ const ProductPage = () => {
           {/* Left: Gallery */}
           <div className="lg:col-span-5 flex flex-col gap-4">
             <div 
-              className="relative aspect-3/4 overflow-hidden bg-secondary/5 cursor-pointer rounded-xl"
+              className="relative aspect-3/4 overflow-hidden bg-white cursor-pointer rounded-xl"
               onClick={() => setShowFullscreen(true)}
             >
               {!imageLoaded && (
