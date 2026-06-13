@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Construction } from 'lucide-react';
 import { HERO_SLIDES } from '../../data/homeContent';
 import { HeroSmokeEffect } from './HeroSmokeEffect';
 
@@ -21,6 +21,10 @@ export const HeroSliderSection: React.FC = () => {
 
   return (
     <section className="relative bg-secondary">
+      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-center gap-2 sm:gap-3 bg-safety text-secondary font-display font-bold uppercase text-xs sm:text-sm tracking-[0.15em] py-2.5 sm:py-3 px-4">
+        <Construction className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" strokeWidth={2.5} />
+        <span>Sitio en construcción · Próximamente disponible</span>
+      </div>
       <div className="relative w-full aspect-[16/9] md:aspect-[21/9] lg:aspect-[2.4/1] min-h-[320px] max-h-[560px]">
         <div className="absolute inset-0 overflow-hidden">
           <AnimatePresence mode="wait">
