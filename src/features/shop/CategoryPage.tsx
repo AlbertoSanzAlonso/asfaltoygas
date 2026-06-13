@@ -12,6 +12,31 @@ import { SeoHelmet } from '@/components/seo/SeoHelmet';
 import { absoluteUrl, truncateDescription } from '@/lib/seo/constants';
 import { isSupabaseConfigured } from '@/lib/supabaseConfig';
 
+const BrandCircle: React.FC<{ brand: Brand; size: 'sm' | 'md' }> = ({ brand, size }) => {
+  const dim = size === 'sm' ? 28 : 40;
+  const font = size === 'sm' ? 'text-[9px]' : 'text-[10px]';
+
+  if (brand.logo_url) {
+    return (
+      <img
+        src={brand.logo_url}
+        alt={brand.name}
+        className="object-contain rounded-full bg-white"
+        style={{ width: dim, height: dim }}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={`${font} font-black uppercase tracking-wider flex items-center justify-center rounded-full bg-secondary text-white shrink-0`}
+      style={{ width: dim, height: dim }}
+    >
+      {brand.name.charAt(0)}
+    </div>
+  );
+};
+
 const CategoryPage: React.FC = () => {
   const { category } = useParams<{ category: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -328,10 +353,11 @@ const CategoryPage: React.FC = () => {
                         key={brand.id}
                         type="button"
                         onClick={() => handleBrandChange(brand.id)}
-                        className={`w-full flex items-center justify-between px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl ${selectedBrand === brand.id ? 'text-primary bg-primary/5' : 'text-secondary'}`}
+                        className={`w-full flex items-center gap-3 px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl transition-colors ${selectedBrand === brand.id ? 'text-primary bg-primary/5' : 'text-secondary hover:bg-gray-50'}`}
                       >
+                        <BrandCircle brand={brand} size="sm" />
                         {brand.name}
-                        {selectedBrand === brand.id && <Check className="w-3 h-3" />}
+                        {selectedBrand === brand.id && <Check className="w-3 h-3 ml-auto" />}
                       </button>
                     ))}
                   </div>
@@ -354,9 +380,14 @@ const CategoryPage: React.FC = () => {
               key={brand.id}
               type="button"
               onClick={() => handleBrandChange(brand.id)}
-              className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.25em] border rounded-full transition-all ${selectedBrand === brand.id ? 'bg-secondary border-secondary text-white' : 'border-secondary/10 hover:border-secondary'}`}
+              title={brand.name}
+              className={`p-2 transition-all duration-300 rounded-full border-2 ${
+                selectedBrand === brand.id
+                  ? 'border-primary bg-primary/5 scale-110 shadow-md shadow-primary/15'
+                  : 'border-secondary/10 hover:border-secondary/40 hover:scale-105'
+              }`}
             >
-              {brand.name}
+              <BrandCircle brand={brand} size="md" />
             </button>
           ))}
         </div>

@@ -6,7 +6,10 @@ export interface Brand {
   id: number;
   name: string;
   slug: string;
+  logo_url?: string | null;
 }
+
+const BRAND_SELECT = 'id, name, slug, logo_url';
 
 export const brands = {
   getAll: async (): Promise<Brand[]> => {
@@ -14,7 +17,7 @@ export const brands = {
 
     const { data, error } = await supabase
       .from('brands')
-      .select('id, name, slug')
+      .select(BRAND_SELECT)
       .order('name');
 
     if (error) throw error;
@@ -30,7 +33,7 @@ export const brands = {
 
     let query = supabase
       .from('products')
-      .select('brand_id, brands(id, name, slug)')
+      .select('brand_id, brands(id, name, slug, logo_url)')
       .eq('category_id', categoryId)
       .eq('is_published', true)
       .not('brand_id', 'is', null);
@@ -74,7 +77,7 @@ export const brands = {
 
     const { data: brands, error: brandsError } = await supabase
       .from('brands')
-      .select('id, name, slug')
+      .select(BRAND_SELECT)
       .in('id', brandIds)
       .order('name');
 
