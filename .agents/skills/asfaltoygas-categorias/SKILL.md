@@ -49,6 +49,21 @@ description: >-
 | 2 | Líquido de freno |
 | 3 | Anticongelantes y líquido de embrague |
 
+## Merchandising
+
+*(Sin subcategorías)*
+
+## Equipación
+
+| # | Subcategoría |
+|---|--------------|
+| 1 | Chaqueta hombre |
+| 2 | Chaqueta mujer |
+| 3 | Pantalón hombre |
+| 4 | Pantalón mujer |
+| 5 | Guantes |
+| 6 | Botas |
+
 ---
 
 ### Notas

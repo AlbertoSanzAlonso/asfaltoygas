@@ -60,8 +60,9 @@ const CategoryPage: React.FC = () => {
   const priceMinQuery = searchParams.get('precioMin');
   const priceMaxQuery = searchParams.get('precioMax');
   const sortQuery = searchParams.get('orden');
+  const searchQuery = searchParams.get('search') || '';
 
-  const filterKey = `${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}-${sortQuery || 'null'}`;
+  const filterKey = `${searchQuery}-${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}-${sortQuery || 'null'}`;
 
   const [selectedSub, setSelectedSub] = useState<number | null>(() =>
     subQuery ? parseInt(subQuery, 10) : null
@@ -86,10 +87,11 @@ const CategoryPage: React.FC = () => {
     return () => { document.body.style.overflow = ''; };
   }, [isFiltersOpen]);
 
-  const lastState = React.useRef<{ category?: string; subQuery: string | null; brandQuery: string | null; priceMinQuery: string | null; priceMaxQuery: string | null; sortQuery: string | null }>({ category: undefined, subQuery: null, brandQuery: null, priceMinQuery: null, priceMaxQuery: null, sortQuery: null });
+  const lastState = React.useRef<{ category?: string; subQuery: string | null; brandQuery: string | null; priceMinQuery: string | null; priceMaxQuery: string | null; sortQuery: string | null; searchQuery: string }>({ category: undefined, subQuery: null, brandQuery: null, priceMinQuery: null, priceMaxQuery: null, sortQuery: null, searchQuery: '' });
 
   const applyFilters = (subId: number | null, brandId: number | null, pMin?: string, pMax?: string, sort?: string) => {
     const params = new URLSearchParams();
+    if (searchQuery) params.set('search', searchQuery);
     if (subId) params.set('sub', subId.toString());
     if (brandId) params.set('marca', brandId.toString());
     if (pMin) params.set('precioMin', pMin);
@@ -106,7 +108,8 @@ const CategoryPage: React.FC = () => {
       lastState.current.brandQuery !== brandQuery ||
       lastState.current.priceMinQuery !== priceMinQuery ||
       lastState.current.priceMaxQuery !== priceMaxQuery ||
-      lastState.current.sortQuery !== sortQuery
+      lastState.current.sortQuery !== sortQuery ||
+      lastState.current.searchQuery !== searchQuery
     ) {
       setSelectedSub(subQuery ? parseInt(subQuery, 10) : null);
       setSelectedBrand(brandQuery ? parseInt(brandQuery, 10) : null);
@@ -115,20 +118,20 @@ const CategoryPage: React.FC = () => {
       setSortOrder(sortQuery || '');
 
       const saved = sessionStorage.getItem(
-        `page-${category}-${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}-${sortQuery || 'null'}`
+        `page-${category}-${searchQuery}-${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}-${sortQuery || 'null'}`
       );
       setPage(saved ? parseInt(saved, 10) : 1);
 
-      lastState.current = { category, subQuery, brandQuery, priceMinQuery, priceMaxQuery, sortQuery };
+      lastState.current = { category, subQuery, brandQuery, priceMinQuery, priceMaxQuery, sortQuery, searchQuery };
     }
-  }, [subQuery, brandQuery, category, priceMinQuery, priceMaxQuery, sortQuery]);
+  }, [subQuery, brandQuery, category, priceMinQuery, priceMaxQuery, sortQuery, searchQuery]);
 
   React.useEffect(() => {
     sessionStorage.setItem(
-      `page-${category}-${selectedSub || 'null'}-${selectedBrand || 'null'}-${priceMin || 'null'}-${priceMax || 'null'}-${sortOrder || 'null'}`,
+      `page-${category}-${searchQuery}-${selectedSub || 'null'}-${selectedBrand || 'null'}-${priceMin || 'null'}-${priceMax || 'null'}-${sortOrder || 'null'}`,
       page.toString()
     );
-  }, [category, selectedSub, selectedBrand, priceMin, priceMax, sortOrder, page]);
+  }, [category, searchQuery, selectedSub, selectedBrand, priceMin, priceMax, sortOrder, page]);
 
   const handleSubChange = (subId: number | null) => {
     setSelectedSub(subId);
@@ -183,7 +186,7 @@ const CategoryPage: React.FC = () => {
     isError,
     error,
   } = useQuery<{ products: Product[]; total: number }>({
-    queryKey: ['products', categoryId, selectedSub, selectedBrand, priceMin, priceMax, sortOrder, page],
+    queryKey: ['products', categoryId, selectedSub, selectedBrand, priceMin, priceMax, sortOrder, searchQuery, page],
     queryFn: () => {
       const catId = category?.toLowerCase() === 'todas' ? undefined : categoryId?.toString();
       return api.products.getAll(
@@ -192,7 +195,7 @@ const CategoryPage: React.FC = () => {
         page,
         pageSize,
         true,
-        undefined,
+        searchQuery || undefined,
         undefined,
         undefined,
         selectedBrand ?? undefined,
@@ -215,7 +218,7 @@ const CategoryPage: React.FC = () => {
     !isCategoryLoading && category && category.toLowerCase() !== 'todas' && !categoryData;
   const supabaseMissing = !isSupabaseConfigured();
 
-  const categoryTitle = categoryData?.name || category || 'Categoría';
+  const categoryTitle = searchQuery ? `"${searchQuery}"` : categoryData?.name || category || 'Categoría';
   const tipoLabel = category?.toLowerCase() === 'cascos' ? 'Tipo de casco' : 'Tipo';
   const categoryDescription = truncateDescription(
     `Descubre ${categoryTitle.toLowerCase()} en Asfalto y Gas. Equipamiento para motorista con envío gratuito desde 50 €.`,

@@ -9,6 +9,8 @@ const CATEGORY_SLUGS: Record<string, string> = {
   equipaje: 'Equipaje',
   'aceites-y-lubricantes': 'Aceites y lubricantes',
   mantenimiento: 'Mantenimiento',
+  merchandising: 'Merchandising',
+  equipacion: 'Equipación',
 };
 
 function resolveCategoryName(input: string): string {

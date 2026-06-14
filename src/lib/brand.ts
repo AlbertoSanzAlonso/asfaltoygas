@@ -27,6 +27,8 @@ export const BRAND = {
     equipaje: { slug: 'equipaje', label: 'Equipaje' },
     'aceites-y-lubricantes': { slug: 'aceites-y-lubricantes', label: 'Aceites y lubricantes' },
     mantenimiento: { slug: 'mantenimiento', label: 'Mantenimiento' },
+    merchandising: { slug: 'merchandising', label: 'Merchandising' },
+    equipacion: { slug: 'equipacion', label: 'Equipación' },
   },
   helmetBrands: [
     'HJC', 'AGV', 'Shoei', 'Nolan', 'X-Lite', 'Airoh',

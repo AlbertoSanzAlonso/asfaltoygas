@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { AdminLayout } from "@/features/admin/AdminLayout";
 import { ProductModal } from "@/features/admin/ProductModal/ProductModal";
 import { OverviewTab } from "@/features/admin/AdminDashboard/components/OverviewTab";
@@ -11,8 +11,8 @@ import { CustomersTab } from "@/features/admin/AdminDashboard/components/Custome
 import { DiscountCodesTab } from "@/features/admin/AdminDashboard/components/DiscountCodesTab";
 import { OrderDetailsModal } from "@/features/admin/AdminDashboard/components/OrderDetailsModal";
 import { useAdminData } from './useAdminData';
-import { api } from "@/lib/api";
 import { getOrderContact } from '@/lib/orderContact';
+import type { Category, Brand as BrandType } from '@/types';
 import { canFulfillOrder } from '@/lib/orderPayment';
 import { useCartStore } from "@/store/useCartStore";
 import type { Product, Order } from "@/types";
@@ -33,13 +33,16 @@ export const AdminDashboard: React.FC = () => {
   const [productSearch, setProductSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<boolean | undefined>(undefined);
   const [isNewFilter, setIsNewFilter] = useState<boolean | undefined>(undefined);
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [subcategoryFilter, setSubcategoryFilter] = useState('');
+  const [brandFilter, setBrandFilter] = useState('');
   const [customerSearch, setCustomerSearch] = useState('');
   const pageSize = 10;
 
   // Reset page when filters or search change
   useEffect(() => {
     setProductPage(1);
-  }, [productSearch, statusFilter, isNewFilter]);
+  }, [productSearch, statusFilter, isNewFilter, categoryFilter, subcategoryFilter, brandFilter]);
 
   // Newsletter state
   const [newsletterSubject, setNewsletterSubject] = useState('');
@@ -57,7 +60,26 @@ export const AdminDashboard: React.FC = () => {
     totalOrders,
     subscriptions,
     queryClient
-  } = useAdminData(productPage, orderPage, customerPage, pageSize, productSearch, statusFilter, isNewFilter, customerSearch);
+  } = useAdminData(productPage, orderPage, customerPage, pageSize, productSearch, statusFilter, isNewFilter, customerSearch, categoryFilter, subcategoryFilter, brandFilter);
+
+  const { data: allCategories } = useQuery<Category[]>({
+    queryKey: ['admin-categories'],
+    queryFn: () => api.categories.getAll(),
+  });
+
+  const { data: allBrands } = useQuery<BrandType[]>({
+    queryKey: ['admin-brands'],
+    queryFn: () => api.brands.getAll(),
+  });
+
+  const { data: filteredSubcategories } = useQuery({
+    queryKey: ['admin-subcategories', categoryFilter],
+    queryFn: () => {
+      if (!categoryFilter) return [];
+      return api.categories.getSubcategories(parseInt(categoryFilter));
+    },
+    enabled: !!categoryFilter,
+  });
 
   const openModal = useCartStore((state) => state.openModal);
 
@@ -371,6 +393,15 @@ export const AdminDashboard: React.FC = () => {
               });
             }}
             onCreate={() => { setEditingProduct(null); setIsModalOpen(true); }}
+            categories={allCategories}
+            brands={allBrands}
+            categoryFilter={categoryFilter}
+            subcategoryFilter={subcategoryFilter}
+            brandFilter={brandFilter}
+            filteredSubcategories={filteredSubcategories}
+            onCategoryFilterChange={setCategoryFilter}
+            onSubcategoryFilterChange={setSubcategoryFilter}
+            onBrandFilterChange={setBrandFilter}
           />
         )}
 

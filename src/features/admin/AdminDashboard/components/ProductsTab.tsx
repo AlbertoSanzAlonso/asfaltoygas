@@ -2,7 +2,7 @@
 import React from 'react';
 import { Plus, Eye, Edit, Trash2, Search, Download, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/Button";
-import type { Product } from "@/types";
+import type { Product, Category, Subcategory, Brand } from "@/types";
 import { motion } from 'framer-motion';
 import { downloadProductImagesAsZip } from '@/utils/imageDownloader';
 
@@ -30,6 +30,15 @@ interface ProductsTabProps {
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
   onCreate: () => void;
+  categories?: Category[];
+  brands?: Brand[];
+  categoryFilter?: string;
+  subcategoryFilter?: string;
+  brandFilter?: string;
+  filteredSubcategories?: Subcategory[];
+  onCategoryFilterChange: (id: string) => void;
+  onSubcategoryFilterChange: (id: string) => void;
+  onBrandFilterChange: (id: string) => void;
 }
 
 const calculateStock = (product: Product) => {
@@ -58,7 +67,16 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
   onTogglePublish,
   onEdit,
   onDelete,
-  onCreate
+  onCreate,
+  categories,
+  brands,
+  categoryFilter,
+  subcategoryFilter,
+  brandFilter,
+  filteredSubcategories,
+  onCategoryFilterChange,
+  onSubcategoryFilterChange,
+  onBrandFilterChange,
 }) => {
   const [isDownloading, setIsDownloading] = React.useState(false);
   const totalPages = Math.ceil(totalProducts / pageSize);
@@ -128,6 +146,40 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
             <option value="">Todas las Fechas</option>
             <option value="true">Solo Novedades</option>
             <option value="false">No Novedades</option>
+          </select>
+
+          <select 
+            value={categoryFilter || ''}
+            onChange={(e) => { onCategoryFilterChange(e.target.value); onSubcategoryFilterChange(''); }}
+            className="px-3 py-2.5 text-[9px] sm:text-xs font-black uppercase tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:border-primary bg-white cursor-pointer"
+          >
+            <option value="">Todas las Categorías</option>
+            {categories?.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+
+          <select 
+            value={subcategoryFilter || ''}
+            onChange={(e) => onSubcategoryFilterChange(e.target.value)}
+            disabled={!categoryFilter}
+            className="px-3 py-2.5 text-[9px] sm:text-xs font-black uppercase tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:border-primary bg-white cursor-pointer disabled:opacity-40"
+          >
+            <option value="">Todas las Subcategorías</option>
+            {filteredSubcategories?.map((s) => (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
+          </select>
+
+          <select 
+            value={brandFilter || ''}
+            onChange={(e) => onBrandFilterChange(e.target.value)}
+            className="px-3 py-2.5 text-[9px] sm:text-xs font-black uppercase tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:border-primary bg-white cursor-pointer"
+          >
+            <option value="">Todas las Marcas</option>
+            {brands?.map((b) => (
+              <option key={b.id} value={b.id}>{b.name}</option>
+            ))}
           </select>
 
           <div className="relative col-span-2 md:flex-1 md:min-w-[200px]">
