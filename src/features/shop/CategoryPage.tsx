@@ -432,7 +432,7 @@ const CategoryPage: React.FC = () => {
         </header>
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
-          <aside className="hidden lg:block w-[260px] shrink-0">
+          <aside className="hidden lg:block w-[300px] shrink-0">
             <div className="sticky top-[160px] space-y-6 bg-white rounded-2xl border border-secondary/8 p-4">
               {renderTipoContent()}
               {renderMarcaContent()}
@@ -486,8 +486,8 @@ const CategoryPage: React.FC = () => {
                 />
               </motion.div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-8">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div key={i} className="aspect-3/4 bg-white/5 animate-pulse rounded-2xl" />
               ))}
             </div>
@@ -500,7 +500,7 @@ const CategoryPage: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-20">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
               {(products ?? []).map((product: Product, index: number) => (
                 <motion.div
                   key={product.product_id}
