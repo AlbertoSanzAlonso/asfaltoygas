@@ -309,7 +309,7 @@ const CategoryPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-accent min-h-screen pt-12 pb-32 text-secondary">
+    <div className="bg-accent min-h-screen pt-6 pb-32 text-secondary">
       <SeoHelmet
         title={categoryTitle}
         description={categoryDescription}
@@ -334,8 +334,8 @@ const CategoryPage: React.FC = () => {
         }}
       />
       <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
-        <header className="mb-20 text-center">
-          <h1 className="text-[10vw] font-black tracking-tighter uppercase italic mb-6 leading-none">
+        <header className="mb-10 text-center">
+          <h1 className="text-[7vw] font-black tracking-tighter uppercase italic mb-6 leading-none">
             {categoryTitle}
           </h1>
 
