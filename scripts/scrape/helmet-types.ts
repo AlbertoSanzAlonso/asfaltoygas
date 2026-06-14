@@ -2,15 +2,19 @@ import * as cheerio from 'cheerio';
 
 /** Slug familia-cascos-* de El Motorista → nombre en subcategories */
 export const HELMET_TYPE_MAP: Record<string, string> = {
-  deportivo: 'Deportivo',
-  integrales: 'Integral',
+  'cascos-jet': 'Jet',
+  'cascos-integrales': 'Integral',
+  'cascos-modulares': 'Modular',
+  // Slugs antiguos compatibles con el Motorista
   jet: 'Jet',
+  integrales: 'Integral',
   modulares: 'Modular',
-  cross: 'Cross',
-  infantiles: 'Infantil',
-  'urbano-scooters': 'Urbano',
-  vintage: 'Vintage',
-  'trail-adventure': 'Trail',
+  deportivo: 'Jet',
+  cross: 'Jet',
+  infantiles: 'Jet',
+  'urbano-scooters': 'Jet',
+  vintage: 'Jet',
+  'trail-adventure': 'Jet',
 };
 
 const KNOWN_SLUGS = new Set(Object.keys(HELMET_TYPE_MAP));

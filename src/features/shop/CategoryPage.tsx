@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, X, SlidersHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from "@/lib/api";
 import { ProductCard } from "@/components/shop/ProductCard";
@@ -79,17 +79,11 @@ const CategoryPage: React.FC = () => {
   });
 
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-  const filterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isFiltersOpen) return;
-    const handler = (e: MouseEvent) => {
-      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
-        setIsFiltersOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
   }, [isFiltersOpen]);
 
   const lastState = React.useRef<{ category?: string; subQuery: string | null; brandQuery: string | null; priceMinQuery: string | null; priceMaxQuery: string | null; sortQuery: string | null }>({ category: undefined, subQuery: null, brandQuery: null, priceMinQuery: null, priceMaxQuery: null, sortQuery: null });
@@ -342,11 +336,26 @@ const CategoryPage: React.FC = () => {
             {categoryTitle}
           </h1>
 
-          <div ref={filterRef} className="max-w-3xl mx-auto mt-8 relative z-30">
+          <div className="max-w-3xl mx-auto mt-8 relative z-30">
+            {/* Mobile: button opens full-screen drawer */}
+            <button
+              type="button"
+              onClick={() => setIsFiltersOpen(true)}
+              className={`lg:hidden w-full bg-accent-dark border px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 rounded-xl transition-all ${
+                selectedSub || selectedBrand || priceMin || priceMax || sortOrder
+                  ? 'border-primary/50 text-primary'
+                  : 'border-secondary/10 text-secondary hover:border-primary/50'
+              }`}
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              {selectedSub || selectedBrand || priceMin || priceMax || sortOrder ? 'Filtros activos' : 'Filtros'}
+            </button>
+
+            {/* Desktop: dropdown */}
             <button
               type="button"
               onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-              className={`w-full bg-accent-dark border px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-between rounded-xl transition-all ${
+              className={`hidden lg:flex w-full bg-accent-dark border px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] items-center justify-between rounded-xl transition-all ${
                 isFiltersOpen || selectedSub || selectedBrand || priceMin || priceMax || sortOrder
                   ? 'border-primary/50'
                   : 'border-secondary/10 hover:border-primary/50'
@@ -358,13 +367,14 @@ const CategoryPage: React.FC = () => {
               <ChevronDown className={`w-4 h-4 text-primary transition-transform ${isFiltersOpen ? 'rotate-180' : ''}`} />
             </button>
 
+            {/* Desktop dropdown panel */}
             <AnimatePresence>
               {isFiltersOpen && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute left-0 right-0 mt-2 bg-white border shadow-2xl overflow-hidden rounded-2xl"
+                  className="hidden lg:block absolute left-0 right-0 mt-2 bg-white border shadow-2xl overflow-hidden rounded-2xl"
                 >
                   <div className="max-h-[65vh] overflow-y-auto py-4 px-5 space-y-5 scroll-area-viewport" style={{ WebkitOverflowScrolling: 'touch' }}>
                     {renderTipoContent()}
@@ -375,6 +385,76 @@ const CategoryPage: React.FC = () => {
               )}
             </AnimatePresence>
           </div>
+
+          {/* Mobile full-screen filter drawer */}
+          <AnimatePresence>
+            {isFiltersOpen && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setIsFiltersOpen(false)}
+                  className="fixed inset-0 bg-secondary/50 backdrop-blur-sm z-60 lg:hidden"
+                />
+                <motion.div
+                  initial={{ x: '100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '100%' }}
+                  transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+                  className="fixed top-0 right-0 bottom-0 w-full z-70 lg:hidden bg-white shadow-2xl flex flex-col"
+                >
+                  {/* Drawer header */}
+                  <div className="flex items-center justify-between p-5 border-b border-secondary/10">
+                    <h2 className="font-display text-lg font-bold uppercase tracking-wide text-secondary">Filtros</h2>
+                    <button
+                      type="button"
+                      onClick={() => setIsFiltersOpen(false)}
+                      className="p-2 -mr-2 text-secondary hover:text-primary transition-colors"
+                      aria-label="Cerrar filtros"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* Drawer content */}
+                  <div className="flex-1 overflow-y-auto p-5 space-y-6 scroll-area-viewport" style={{ WebkitOverflowScrolling: 'touch' }}>
+                    {renderTipoContent()}
+                    {renderMarcaContent()}
+                    {renderPriceContent()}
+                  </div>
+
+                  {/* Drawer footer */}
+                  <div className="p-5 border-t border-secondary/10">
+                    <button
+                      type="button"
+                      onClick={() => setIsFiltersOpen(false)}
+                      className="w-full py-4 bg-secondary text-white font-display font-bold text-xs uppercase tracking-[0.2em] rounded-full hover:bg-primary transition-colors"
+                    >
+                      Ver {productsData?.total ?? ''} artículo{(productsData?.total ?? 1) !== 1 ? 's' : ''}
+                    </button>
+                    {(selectedSub || selectedBrand || priceMin || priceMax || sortOrder) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedSub(null);
+                          setSelectedBrand(null);
+                          setPriceMin('');
+                          setPriceMax('');
+                          setSortOrder('');
+                          applyFilters(null, null, '', '', '');
+                          setIsFiltersOpen(false);
+                        }}
+                        className="w-full mt-3 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-secondary/50 hover:text-primary transition-colors"
+                      >
+                        Limpiar filtros
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
 
           {productsData && !isLoading && (
             <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-secondary/40 mt-8">

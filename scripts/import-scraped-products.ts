@@ -8,7 +8,7 @@
  *   npx tsx scripts/import-scraped-products.ts --listing "https://proveedor.com/cascos" \
  *     --provider ejemplo-listado --category Cascos --limit 5
  *
- *   npx tsx scripts/import-scraped-products.ts --file productos.json --category Equipación
+ *   npx tsx scripts/import-scraped-products.ts --file productos.json --category Equipaje
  *
  * Flags:
  *   --dry-run          Solo muestra qué se importaría
@@ -30,7 +30,7 @@ Opciones:
   --url URL              Ficha de un producto
   --listing URL          Listado; requiere --provider con productLinks
   --file PATH            JSON con array de ScrapedProduct o { url, category, ... }
-  --category NAME        Cascos | Equipación | Accesorios (obligatorio)
+  --category NAME        Cascos | Equipaje | Aceites y lubricantes | Mantenimiento (obligatorio)
   --subcategory NAME     Integral, Chaquetas, etc.
   --stock N              Stock por variante (default: 0)
   --provider ID          Perfil en scripts/scrape/providers.config.json
@@ -124,7 +124,7 @@ async function main() {
     const entries = JSON.parse(readFileSync(args.file, 'utf8')) as FileEntry[];
     for (const entry of entries) {
       if ('sourceUrl' in entry && entry.name) {
-        const r = await importOne(entry, importBase, args.category || 'Accesorios', args.subcategory);
+        const r = await importOne(entry, importBase, args.category || 'Cascos', args.subcategory);
         results.push(r);
       } else if ('url' in entry) {
         const scraped = await scrapeProductUrl(entry.url, {
@@ -134,7 +134,7 @@ async function main() {
         const r = await importOne(
           scraped,
           importBase,
-          entry.category || args.category || 'Accesorios',
+          entry.category || args.category || 'Cascos',
           entry.subcategory ?? args.subcategory
         );
         results.push(r);
