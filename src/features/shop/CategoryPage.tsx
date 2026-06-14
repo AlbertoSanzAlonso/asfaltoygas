@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, X, SlidersHorizontal } from 'lucide-react';
+import { X, SlidersHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from "@/lib/api";
 import { ProductCard } from "@/components/shop/ProductCard";
@@ -339,12 +339,11 @@ const CategoryPage: React.FC = () => {
             {categoryTitle}
           </h1>
 
-          <div className="max-w-3xl mx-auto mt-8 relative z-30">
-            {/* Mobile: button opens full-screen drawer */}
+          <div className="max-w-3xl mx-auto mt-8 relative z-30 lg:hidden">
             <button
               type="button"
               onClick={() => setIsFiltersOpen(true)}
-              className={`lg:hidden w-full bg-accent-dark border px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 rounded-xl transition-all ${
+              className={`w-full bg-accent-dark border px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 rounded-xl transition-all ${
                 selectedSub || selectedBrand || priceMin || priceMax || sortOrder
                   ? 'border-primary/50 text-primary'
                   : 'border-secondary/10 text-secondary hover:border-primary/50'
@@ -353,40 +352,6 @@ const CategoryPage: React.FC = () => {
               <SlidersHorizontal className="w-4 h-4" />
               {selectedSub || selectedBrand || priceMin || priceMax || sortOrder ? 'Filtros activos' : 'Filtros'}
             </button>
-
-            {/* Desktop: dropdown */}
-            <button
-              type="button"
-              onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-              className={`hidden lg:flex w-full bg-accent-dark border px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] items-center justify-between rounded-xl transition-all ${
-                isFiltersOpen || selectedSub || selectedBrand || priceMin || priceMax || sortOrder
-                  ? 'border-primary/50'
-                  : 'border-secondary/10 hover:border-primary/50'
-              }`}
-            >
-              <span className="flex-1 text-center">
-                {selectedSub || selectedBrand || priceMin || priceMax || sortOrder ? 'Filtros activos' : 'Filtros'}
-              </span>
-              <ChevronDown className={`w-4 h-4 text-primary transition-transform ${isFiltersOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {/* Desktop dropdown panel */}
-            <AnimatePresence>
-              {isFiltersOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="hidden lg:block absolute left-0 right-0 mt-2 bg-white border shadow-2xl overflow-hidden rounded-2xl"
-                >
-                  <div className="max-h-[65vh] overflow-y-auto py-4 px-5 space-y-5 scroll-area-viewport" style={{ WebkitOverflowScrolling: 'touch' }}>
-                    {renderTipoContent()}
-                    {renderMarcaContent()}
-                    {renderPriceContent()}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
 
           {/* Mobile full-screen filter drawer */}
@@ -466,6 +431,16 @@ const CategoryPage: React.FC = () => {
           )}
         </header>
 
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
+          <aside className="hidden lg:block w-[200px] shrink-0">
+            <div className="sticky top-[160px] space-y-6 bg-white rounded-2xl border border-secondary/8 p-4">
+              {renderTipoContent()}
+              {renderMarcaContent()}
+              {renderPriceContent()}
+            </div>
+          </aside>
+
+          <div className="flex-1 min-w-0">
         {supabaseMissing ? (
           <div className="py-40 text-center">
             <p className="text-gray-500 uppercase tracking-[0.3em] font-bold">
@@ -511,9 +486,9 @@ const CategoryPage: React.FC = () => {
                 />
               </motion.div>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                <div key={i} className="aspect-3/4 bg-white/5 animate-pulse rounded-3xl" />
+                <div key={i} className="aspect-3/4 bg-white/5 animate-pulse rounded-2xl" />
               ))}
             </div>
           </div>
@@ -525,7 +500,7 @@ const CategoryPage: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-20">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
               {(products ?? []).map((product: Product, index: number) => (
                 <motion.div
                   key={product.product_id}
@@ -585,6 +560,8 @@ const CategoryPage: React.FC = () => {
             )}
           </div>
         )}
+          </div>
+        </div>
       </div>
     </div>
   );
