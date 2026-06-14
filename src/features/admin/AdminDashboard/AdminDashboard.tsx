@@ -15,6 +15,7 @@ import { getOrderContact } from '@/lib/orderContact';
 import type { Category, Brand as BrandType } from '@/types';
 import { canFulfillOrder } from '@/lib/orderPayment';
 import { useCartStore } from "@/store/useCartStore";
+import { api } from "@/lib/api";
 import type { Product, Order } from "@/types";
 
 export const AdminDashboard: React.FC = () => {
