@@ -43,7 +43,7 @@ export const CookieBanner = () => {
               
               {/* Imagen de fondo de moto */}
               <div 
-                className="absolute inset-0 opacity-10 bg-cover bg-center bg-no-repeat"
+                className="absolute inset-0 opacity-10 bg-cover bg-center bg-no-repeat pointer-events-none"
                 style={{
                   backgroundImage: 'url(https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1200&q=80)',
                   maskImage: 'linear-gradient(to right, transparent, black 30%, black 70%, transparent)',
