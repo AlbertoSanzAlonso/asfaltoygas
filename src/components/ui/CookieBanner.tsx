@@ -41,6 +41,16 @@ export const CookieBanner = () => {
           <div className="max-w-7xl mx-auto">
             <div className="relative overflow-hidden rounded-2xl bg-zinc-900/95 backdrop-blur-md text-white shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)] border border-white/10">
               
+              {/* Imagen de fondo de moto */}
+              <div 
+                className="absolute inset-0 opacity-10 bg-cover bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: 'url(https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1200&q=80)',
+                  maskImage: 'linear-gradient(to right, transparent, black 30%, black 70%, transparent)',
+                  WebkitMaskImage: 'linear-gradient(to right, transparent, black 30%, black 70%, transparent)'
+                }}
+              />
+              
               {/* Accento rojo estilo velocidad/motos */}
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-dark via-primary to-primary-light" />
               
