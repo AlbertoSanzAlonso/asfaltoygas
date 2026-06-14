@@ -24,8 +24,9 @@ export const BRAND = {
   },
   categories: {
     cascos: { slug: 'cascos', label: 'Cascos' },
-    equipacion: { slug: 'equipacion', label: 'Equipación' },
-    accesorios: { slug: 'accesorios', label: 'Accesorios' },
+    equipaje: { slug: 'equipaje', label: 'Equipaje' },
+    'aceites-y-lubricantes': { slug: 'aceites-y-lubricantes', label: 'Aceites y lubricantes' },
+    mantenimiento: { slug: 'mantenimiento', label: 'Mantenimiento' },
   },
   helmetBrands: [
     'HJC', 'AGV', 'Shoei', 'Nolan', 'X-Lite', 'Airoh',

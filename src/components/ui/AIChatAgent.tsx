@@ -155,7 +155,7 @@ INFORMACIÓN DE LA TIENDA:
 - Recogida: Gratis en tienda física.
 - Devoluciones: 14 días naturales desde la recepción. El producto debe estar sin usar y en su embalaje original. Los gastos de envío de devolución corren a cargo del cliente.
 - Pagos: Aceptamos Tarjeta y Bizum (pasarela segura Redsys).
-- Sobre nosotros: Especialistas en cascos de moto (integrales, modulares, jet, off-road) y equipación motera. Marcas como HJC, AGV, Shoei, Nolan, Airoh.
+- Sobre nosotros: Especialistas en cascos de moto (integrales, modulares, jet), equipaje y mantenimiento. Marcas como HJC, AGV, Shoei, Nolan, Airoh.
 `;
 
       const inventoryBlock = useProductSearch
@@ -175,8 +175,9 @@ REGLAS CRÍTICAS DE RESPUESTA:
 NOTA: En este momento no tengo acceso al catálogo de productos en tiempo real. NO inventes productos ni generes URLs de producto bajo ninguna circunstancia. Ayuda al cliente con información general de la tienda (envíos, devoluciones, tallas de casco, homologaciones) y sugiérele estas secciones reales de la web usando enlaces relativos:
 
 - Cascos: /categoria/cascos
-- Equipación: /categoria/equipacion
-- Accesorios: /categoria/accesorios
+- Equipaje: /categoria/equipaje
+- Aceites y lubricantes: /categoria/aceites-y-lubricantes
+- Mantenimiento: /categoria/mantenimiento
 - Top ventas: /#novedades
 
 Para dudas de stock, que contacte por WhatsApp (685 011 494). NUNCA escribas enlaces que no estén en esta lista. NUNCA incluyas el dominio completo (https://...) en los enlaces, usa siempre la forma relativa como se muestra arriba.`;

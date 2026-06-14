@@ -19,17 +19,22 @@ const STATIC_PAGES: Record<
   '/categoria/cascos': {
     title: 'Cascos de moto',
     description:
-      'Cascos integrales, modulares, jet y off-road de HJC, AGV, Shoei, Nolan y más. Homologados ECE 22.06 con envío gratuito desde 50 €.',
+      'Cascos integrales, modulares y jet de HJC, AGV, Shoei, Nolan y más. Homologados ECE 22.06 con envío gratuito desde 50 €.',
   },
-  '/categoria/equipacion': {
-    title: 'Equipación motera',
+  '/categoria/equipaje': {
+    title: 'Equipaje para moto',
     description:
-      'Chaquetas, guantes, botas y pantalones para moto. Equipación de carretera y off-road con envío gratuito desde 50 €.',
+      'Alforjas, maletas laterales, maletas superiores, bolsas sobredepósito y más. Envío gratuito desde 50 €.',
   },
-  '/categoria/accesorios': {
-    title: 'Accesorios para moto',
+  '/categoria/aceites-y-lubricantes': {
+    title: 'Aceites y lubricantes para moto',
     description:
-      'Accesorios y complementos para tu moto: intercomunicadores, mochilas, protecciones y más en Asfalto y Gas.',
+      'Aceites de motor 2T y 4T, aceite de horquilla, transmisión y más. Las mejores marcas para tu moto.',
+  },
+  '/categoria/mantenimiento': {
+    title: 'Mantenimiento de moto',
+    description:
+      'Aditivos, líquido de freno, anticongelantes y líquido de embrague. Todo para el mantenimiento de tu moto.',
   },
   '/conocenos': {
     title: 'Conócenos',

@@ -19,7 +19,7 @@ export const CtaBannerSection: React.FC = () => (
           No sigas el camino.<br />Créalo.
         </h2>
         <Link
-          to="/categoria/equipacion"
+          to="/categoria/equipaje"
           className="inline-flex items-center gap-2 w-fit border-2 border-white text-white hover:bg-white hover:text-secondary font-display font-bold text-sm tracking-[0.2em] uppercase px-8 py-3.5 transition-colors"
         >
           Descubre la gama <ArrowRight className="w-4 h-4" />

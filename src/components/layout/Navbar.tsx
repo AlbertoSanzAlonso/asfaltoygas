@@ -16,8 +16,9 @@ interface NavbarProps {
 const MOBILE_LINKS = [
   { to: '/', label: 'Inicio' },
   { to: '/categoria/cascos', label: 'Cascos' },
-  { to: '/categoria/equipacion', label: 'Equipación' },
-  { to: '/categoria/accesorios', label: 'Accesorios' },
+  { to: '/categoria/equipaje', label: 'Equipaje' },
+  { to: '/categoria/aceites-y-lubricantes', label: 'Aceites y lubricantes' },
+  { to: '/categoria/mantenimiento', label: 'Mantenimiento' },
   { to: '/#novedades', label: 'Imprescindibles' },
   { to: '/conocenos', label: 'Conócenos' },
 ];
@@ -85,7 +86,7 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
                     type="search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Buscar cascos, chaquetas, marcas..."
+                    placeholder="Buscar cascos, equipaje, marcas..."
                     className="flex-1 px-4 py-2.5 font-sans text-sm text-secondary placeholder:text-secondary/40 focus:outline-none bg-accent/50"
                   />
                   <button

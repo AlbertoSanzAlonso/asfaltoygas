@@ -21,8 +21,9 @@ export const Footer: FC = () => {
               <h4 className="text-xs font-black uppercase tracking-[0.4em] mb-10 text-white">Catálogo</h4>
               <ul className="text-white/70 text-[10px] font-bold tracking-[0.2em] space-y-6 uppercase">
                 <li><Link to="/categoria/cascos" className="hover:text-white transition-colors">Cascos</Link></li>
-                <li><Link to="/categoria/equipacion" className="hover:text-white transition-colors">Equipación</Link></li>
-                <li><Link to="/categoria/accesorios" className="hover:text-white transition-colors">Accesorios</Link></li>
+                <li><Link to="/categoria/equipaje" className="hover:text-white transition-colors">Equipaje</Link></li>
+                <li><Link to="/categoria/aceites-y-lubricantes" className="hover:text-white transition-colors">Aceites y lubricantes</Link></li>
+                <li><Link to="/categoria/mantenimiento" className="hover:text-white transition-colors">Mantenimiento</Link></li>
                 <li><Link to="/#novedades" className="hover:text-white transition-colors">Top ventas</Link></li>
                 <li><Link to="/conocenos" className="hover:text-white transition-colors">Conócenos</Link></li>
               </ul>

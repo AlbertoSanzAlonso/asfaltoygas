@@ -56,10 +56,10 @@ export const HeroSection: React.FC = () => {
               Ver cascos <ChevronRight className="w-4 h-4" />
             </Link>
             <Link
-              to="/categoria/equipacion"
+              to="/categoria/equipaje"
               className="inline-flex items-center justify-center gap-2 border border-white/40 text-white px-10 py-4 text-xs font-black tracking-[0.25em] uppercase hover:bg-white/10 transition-colors backdrop-blur-sm"
             >
-              Equipación
+              Equipaje
             </Link>
           </div>
         </motion.div>

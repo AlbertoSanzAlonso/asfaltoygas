@@ -1,12 +1,12 @@
 ---
-name: melomerezco-inventario
+name: asfaltoygas-inventario
 description: >-
-  Inventario y variantes de producto en Modas Me lo Merezco (talla × color, admin
-  ProductInventory, Supabase product_variants.color_id). Usar al editar stock,
+  Inventario y variantes de producto en Asfalto y Gas (stock por variante,
+  admin ProductInventory, Supabase product_variants). Usar al editar stock,
   colores, admin de piezas, carrito, checkout, pedidos o stock en tienda.
 ---
 
-# Inventario talla × color (melomerezco)
+# Inventario — Asfalto y Gas
 
 ## Fuente de verdad
 
@@ -31,9 +31,12 @@ description: >-
 - Carrito: clave por `getCartItemKey()` (`variant_id` o `color_id`).
 - Pedidos: `order_items` guardan `color` como **texto** (snapshot), no FK.
 
-## Migración
+## Categorías y variantes
 
-- SQL: `supabase/migrations/product_variants_color_id.sql` (añade `color_id`, migra legacy, elimina columna `color`).
+- Cascos: variantes por talla (XS–XXL) y, opcionalmente, color.
+- Equipaje y accesorios: generalmente sin talla, solo stock unitario (`color_id` null, talla única).
+- Aceites y lubricantes: sin talla, stock unitario.
+- Ver skill `asfaltoygas-categorias` para la taxonomía completa.
 
 ## Al cambiar inventario
 

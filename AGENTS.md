@@ -4,10 +4,11 @@
 
 | Skill | Cuándo usarla |
 |-------|----------------|
-| [melomerezco](.cursor/skills/melomerezco/SKILL.md) | Contexto general del repo, stack, env, estructura, SEO |
-| [melomerezco-inventario](.cursor/skills/melomerezco-inventario/SKILL.md) | Stock, tallas, colores, variantes, admin de piezas, pedidos |
+| [asfaltoygas](.agents/skills/asfaltoygas/SKILL.md) | Contexto general del repo, stack, env, estructura, SEO |
+| [asfaltoygas-inventario](.agents/skills/asfaltoygas-inventario/SKILL.md) | Stock, variantes, admin de piezas, pedidos |
 | [supabase](.agents/skills/supabase/SKILL.md) | Supabase (Auth, cliente, migrations, RLS, Storage, Edge Functions, CLI/MCP) |
 | [supabase-postgres-best-practices](.agents/skills/supabase-postgres-best-practices/SKILL.md) | Queries, índices, schema, RLS, pooling y rendimiento en Postgres |
+| [asfaltoygas-categorias](.agents/skills/asfaltoygas-categorias/SKILL.md) | Taxonomía de categorías y subcategorías de productos |
 
 ## Reglas rápidas
 

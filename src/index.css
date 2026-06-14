@@ -20,23 +20,14 @@
 }
 
 :root {
-  --color-primary: #cc0000;
-  --color-primary-dark: #a30000;
-  --color-primary-light: #e60000;
-
-  --color-safety: #f5e000;
-  --color-safety-dark: #d4c200;
-
-  --color-secondary: #0a0a0a;
-  --color-secondary-light: #1a1a1a;
-
-  --color-accent: #f5f5f5;
-  --color-accent-dark: #ebebeb;
-
   --bg-main: var(--color-accent);
   --text-main: #050505;
   --border-main: rgba(0, 0, 0, 0.05);
   --bg-card: rgba(255, 255, 255, 0.8);
+
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .dark {
@@ -44,17 +35,11 @@
   --text-main: #faf9f6;
   --border-main: rgba(255, 255, 255, 0.05);
   --bg-card: rgba(20, 20, 20, 0.8);
-  
+
   --color-accent: #0a0a0a;
   --color-accent-dark: #000000;
   --color-secondary: #faf9f6;
   --color-secondary-light: #f0eee9;
-}
-
-:root {
-  background-color: var(--bg-main);
-  color: var(--text-main);
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body {
@@ -89,7 +74,7 @@ button {
   }
 
   .text-gradient {
-    background: linear-gradient(to right, #cc0000, #e60000);
+    background: linear-gradient(to right, var(--color-primary), var(--color-primary-light));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;

@@ -1,6 +1,6 @@
-# Modas Me Lo Merezco
+# Asfalto y Gas
 
-Boutique de moda femenina online. Proyecto construido con React, Vite, Tailwind CSS v4 y Framer Motion.
+Tienda online de equipamiento para motorista. Proyecto construido con React, Vite, Tailwind CSS v4 y Framer Motion.
 
 ## Características
 

@@ -8,11 +8,11 @@ export const HERO_SLIDES = [
     image: '/assets/images/hero-moto.jpg',
   },
   {
-    id: 'equipacion',
-    titleLeft: 'Equipamiento',
-    titleRight: 'para motorista',
-    subtitle: 'Chaquetas, guantes y botas de las mejores marcas',
-    href: '/categoria/equipacion',
+    id: 'equipaje',
+    titleLeft: 'Equipaje',
+    titleRight: 'para moto',
+    subtitle: 'Alforjas, maletas y bolsas de las mejores marcas',
+    href: '/categoria/equipaje',
     image: 'https://images.unsplash.com/photo-1628035514544-ebd32b766089?q=80&w=2070&auto=format&fit=crop',
   },
   {
@@ -45,12 +45,12 @@ export const WIDGET_SLIDES = [
     image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?q=80&w=2070&auto=format&fit=crop',
   },
   {
-    id: 'equipacion',
+    id: 'equipaje',
     eyebrow: 'Para cada ruta',
-    title: 'Equipación completa',
-    subtitle: 'Chaquetas, guantes y botas de las mejores marcas',
-    cta: 'Ver equipación',
-    href: '/categoria/equipacion',
+    title: 'Equipaje completo',
+    subtitle: 'Alforjas, maletas y bolsas de las mejores marcas',
+    cta: 'Ver equipaje',
+    href: '/categoria/equipaje',
     image: 'https://images.unsplash.com/photo-1628035514544-ebd32b766089?q=80&w=2070&auto=format&fit=crop',
   },
 ] as const;
@@ -92,29 +92,31 @@ export const PROMO_BANNERS = [
 
 export const NAV_CATEGORIES = [
   { label: 'Cascos', href: '/categoria/cascos' },
-  { label: 'Equipación', href: '/categoria/equipacion' },
-  { label: 'Accesorios', href: '/categoria/accesorios' },
+  { label: 'Equipaje', href: '/categoria/equipaje' },
+  { label: 'Aceites y lubricantes', href: '/categoria/aceites-y-lubricantes' },
+  { label: 'Mantenimiento', href: '/categoria/mantenimiento' },
 ] as const;
 
 export const HOME_CATEGORIES = [
   { label: 'Cascos', href: '/categoria/cascos', image: '/assets/images/categories/cascos.jpg', objectPosition: 'center 28%' },
-  { label: 'Equipación', href: '/categoria/equipacion', image: '/assets/images/categories/chaquetas.jpg', objectPosition: 'center 35%' },
-  { label: 'Accesorios', href: '/categoria/accesorios', image: '/assets/images/categories/accesorios.jpg', objectPosition: 'center 45%' },
+  { label: 'Equipaje', href: '/categoria/equipaje', image: '/assets/images/categories/chaquetas.jpg', objectPosition: 'center 35%' },
+  { label: 'Aceites y lubricantes', href: '/categoria/aceites-y-lubricantes', image: '/assets/images/categories/accesorios.jpg', objectPosition: 'center 45%' },
+  { label: 'Mantenimiento', href: '/categoria/mantenimiento', image: '/assets/images/categories/accesorios.jpg', objectPosition: 'center 45%' },
 ] as const;
 
 export const RIDING_STYLES = [
-  { label: 'Racing', href: '/categoria/cascos', image: 'https://images.unsplash.com/photo-1611004060674-7e8864bcb4e4?q=80&w=600&auto=format&fit=crop' },
-  { label: 'Sport', href: '/categoria/cascos', image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?q=80&w=600&auto=format&fit=crop' },
-  { label: 'Adventure', href: '/categoria/equipacion', image: 'https://images.unsplash.com/photo-1628035514544-ebd32b766089?q=80&w=600&auto=format&fit=crop' },
-  { label: 'Touring', href: '/categoria/equipacion', image: 'https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?q=80&w=600&auto=format&fit=crop' },
-  { label: 'Custom', href: '/categoria/accesorios', image: 'https://images.unsplash.com/photo-1600497934947-23786a93f382?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Jet', href: '/categoria/cascos', image: 'https://images.unsplash.com/photo-1611004060674-7e8864bcb4e4?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Integral', href: '/categoria/cascos', image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Modular', href: '/categoria/cascos', image: 'https://images.unsplash.com/photo-1628035514544-ebd32b766089?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Alforjas', href: '/categoria/equipaje', image: 'https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Aceites', href: '/categoria/aceites-y-lubricantes', image: 'https://images.unsplash.com/photo-1600497934947-23786a93f382?q=80&w=600&auto=format&fit=crop' },
 ] as const;
 
 export const ACCESSORY_HIGHLIGHTS = [
-  { title: 'Airbags', discount: '-15%', href: '/categoria/equipacion', image: 'https://images.unsplash.com/photo-1628035514544-ebd32b766089?q=80&w=800&auto=format&fit=crop' },
-  { title: 'Baúles y maletas', discount: '-20%', href: '/categoria/accesorios', image: '/assets/images/categories/maletas.jpg' },
-  { title: 'Soportes móvil/GPS', discount: '-10%', href: '/categoria/accesorios', image: '/assets/images/categories/accesorios.jpg' },
-  { title: 'Intercomunicadores', discount: '-20%', href: '/categoria/accesorios', image: '/assets/images/categories/guantes.jpg' },
+  { title: 'Alforjas', discount: '-15%', href: '/categoria/equipaje', image: 'https://images.unsplash.com/photo-1628035514544-ebd32b766089?q=80&w=800&auto=format&fit=crop' },
+  { title: 'Maletas laterales', discount: '-20%', href: '/categoria/equipaje', image: '/assets/images/categories/maletas.jpg' },
+  { title: 'Aceite de motor', discount: '-10%', href: '/categoria/aceites-y-lubricantes', image: '/assets/images/categories/accesorios.jpg' },
+  { title: 'Líquido de freno', discount: '-20%', href: '/categoria/mantenimiento', image: '/assets/images/categories/guantes.jpg' },
 ] as const;
 
 export const SERVICES = [

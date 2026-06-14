@@ -1,4 +1,4 @@
--- Esquema base Asfalto y Gas (compatible con melomerezco)
+-- Esquema base Asfalto y Gas
 -- Ejecutar una sola vez en un proyecto Supabase vacío.
 
 create extension if not exists "pgcrypto";
@@ -346,29 +346,35 @@ on conflict (name) do nothing;
 
 insert into categories (name) values
   ('Cascos'),
-  ('Equipación'),
-  ('Accesorios')
+  ('Equipaje'),
+  ('Aceites y lubricantes'),
+  ('Mantenimiento')
 on conflict (name) do nothing;
 
 insert into subcategories (name, category_id)
 select v.name, c.id
 from (values
-  ('Integral', 'Cascos'),
-  ('Modular', 'Cascos'),
   ('Jet', 'Cascos'),
-  ('Cross', 'Cascos'),
-  ('Deportivo', 'Cascos'),
-  ('Infantil', 'Cascos'),
-  ('Urbano', 'Cascos'),
-  ('Vintage', 'Cascos'),
-  ('Trail', 'Cascos'),
-  ('Chaquetas', 'Equipación'),
-  ('Pantalones', 'Equipación'),
-  ('Guantes', 'Equipación'),
-  ('Botas', 'Equipación'),
-  ('Intercoms', 'Accesorios'),
-  ('Maletas', 'Accesorios'),
-  ('Outlet', 'Accesorios')
+  ('Modular', 'Cascos'),
+  ('Integral', 'Cascos'),
+  ('Alforjas', 'Equipaje'),
+  ('Bolsas sobredepósito', 'Equipaje'),
+  ('Maletas laterales', 'Equipaje'),
+  ('Maletas superiores', 'Equipaje'),
+  ('Fijaciones', 'Equipaje'),
+  ('Accesorios y recambios maletas', 'Equipaje'),
+  ('Aceites y lubricantes', 'Aceites y lubricantes'),
+  ('Aceite de motor', 'Aceites y lubricantes'),
+  ('Motores 2T', 'Aceites y lubricantes'),
+  ('Motores 4T', 'Aceites y lubricantes'),
+  ('Aceite de horquilla', 'Aceites y lubricantes'),
+  ('Aceite de transmisión', 'Aceites y lubricantes'),
+  ('Aceite amortiguadores', 'Aceites y lubricantes'),
+  ('Aceite de filtro de aire', 'Aceites y lubricantes'),
+  ('Otros lubricantes', 'Aceites y lubricantes'),
+  ('Aditivos', 'Mantenimiento'),
+  ('Líquido de freno', 'Mantenimiento'),
+  ('Anticongelantes y líquido de embrague', 'Mantenimiento')
 ) as v(name, category)
 join categories c on c.name = v.category
 on conflict (name, category_id) do nothing;

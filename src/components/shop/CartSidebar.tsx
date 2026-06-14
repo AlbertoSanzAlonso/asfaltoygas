@@ -63,7 +63,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => 
                 <div className="h-full flex flex-col items-center justify-center text-center">
                   <ShoppingBag className="w-12 h-12 text-gray-800 mb-4" />
                   <p className="text-gray-500 mb-8">Tu carrito está vacío</p>
-                  <Link to="/categoria/ropa" onClick={onClose} className="w-full max-w-[200px]">
+                  <Link to="/categoria/cascos" onClick={onClose} className="w-full max-w-[200px]">
                     <Button variant="outline" className="w-full">Empezar a comprar</Button>
                   </Link>
                 </div>

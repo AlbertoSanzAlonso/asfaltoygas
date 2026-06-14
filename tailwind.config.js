@@ -6,21 +6,6 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        primary: {
-          DEFAULT: '#ff4f70',
-          dark: '#e63e5d',
-          light: '#ff758f',
-        },
-        secondary: {
-          DEFAULT: '#000000',
-          light: '#1a1a1a',
-        }
-      },
-      fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        display: ['Outfit', 'sans-serif'],
-      },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out forwards',
         'slide-up': 'slideUp 0.5s ease-out forwards',

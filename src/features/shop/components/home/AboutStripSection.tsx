@@ -20,7 +20,7 @@ export const AboutStripSection: React.FC = () => (
           <div className="space-y-4 font-sans text-secondary/70 text-sm md:text-base leading-relaxed">
             <p>
               En <strong className="text-secondary font-semibold">{BRAND.name}</strong> encontrarás
-              cascos, chaquetas, guantes y accesorios de las principales marcas del sector.
+              cascos, equipaje, aceites y mantenimiento de las principales marcas del sector.
               {BRAND.tagline} con asesoramiento experto y envío rápido en toda España.
             </p>
             <p>

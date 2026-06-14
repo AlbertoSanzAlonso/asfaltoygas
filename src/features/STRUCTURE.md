@@ -1,4 +1,4 @@
-# Estructura de Componentes del Proyecto (Modas Me Lo Merezco)
+# Estructura de Componentes del Proyecto (Asfalto y Gas)
 
 Este documento sirve como guía para agentes de IA y desarrolladores para localizar los componentes refactorizados.
 

@@ -6,8 +6,9 @@ import type { Category, Subcategory } from '@/types';
 /** Slugs de URL → nombre en BD */
 const CATEGORY_SLUGS: Record<string, string> = {
   cascos: 'Cascos',
-  equipacion: 'Equipación',
-  accesorios: 'Accesorios',
+  equipaje: 'Equipaje',
+  'aceites-y-lubricantes': 'Aceites y lubricantes',
+  mantenimiento: 'Mantenimiento',
 };
 
 function resolveCategoryName(input: string): string {

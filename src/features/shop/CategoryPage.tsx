@@ -224,7 +224,7 @@ const CategoryPage: React.FC = () => {
   const categoryTitle = categoryData?.name || category || 'Categoría';
   const tipoLabel = category?.toLowerCase() === 'cascos' ? 'Tipo de casco' : 'Tipo';
   const categoryDescription = truncateDescription(
-    `Descubre ${categoryTitle.toLowerCase()} en Asfalto y Gas. Cascos y equipación motera con envío gratuito desde 50 €.`,
+    `Descubre ${categoryTitle.toLowerCase()} en Asfalto y Gas. Equipamiento para motorista con envío gratuito desde 50 €.`,
   );
 
   const renderTipoContent = () => {
