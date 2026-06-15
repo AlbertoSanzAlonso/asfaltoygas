@@ -662,10 +662,6 @@ const ProductPage = () => {
                   onClick={(e) => { e.stopPropagation(); setIsZoomed(!isZoomed); }}
                 />
               </AnimatePresence>
-              {/* Watermark */}
-              <div className={`absolute pointer-events-none opacity-40 select-none transition-none ${isZoomed ? 'bottom-8 right-8 w-24 md:w-32' : 'bottom-6 right-6 w-20 md:w-32'}`}>
-                <img src="/assets/logo/logo-asfaltoygas-blanco.svg" alt="" className="w-full h-auto" />
-              </div>
             </div>
           </div>
 
