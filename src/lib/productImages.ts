@@ -1,6 +1,6 @@
 import type { Product, ProductImage } from '@/types';
 
-/** Agrupa filas de product_images por color_id. Solo devuelve la mejor imagen por color. */
+/** Agrupa filas de product_images por color_id. Mantiene todas las imágenes ordenadas por is_main y orden. */
 export function buildImagesByColor(rows: ProductImage[]): Record<number | null, string[]> {
   const buckets = new Map<number | null, ProductImage[]>();
 
@@ -12,11 +12,12 @@ export function buildImagesByColor(rows: ProductImage[]): Record<number | null, 
 
   const out: Record<number | null, string[]> = {};
   for (const [colorId, list] of buckets) {
-    const sorted = list.sort((a, b) => {
-      if (a.is_main !== b.is_main) return a.is_main ? -1 : 1;
-      return (a.orden ?? 0) - (b.orden ?? 0);
-    });
-    out[colorId] = [sorted[0].image_url];
+    out[colorId] = list
+      .sort((a, b) => {
+        if (a.is_main !== b.is_main) return a.is_main ? -1 : 1;
+        return (a.orden ?? 0) - (b.orden ?? 0);
+      })
+      .map((r) => r.image_url);
   }
   return out;
 }
@@ -29,10 +30,7 @@ export function getImagesForColor(
   if (colorId != null && product.imagesByColor?.[colorId]?.length) {
     return product.imagesByColor[colorId];
   }
-  if (colorId == null && product.imagesByColor) {
-    if (product.imagesByColor[null]?.length) return product.imagesByColor[null];
-    const first = Object.values(product.imagesByColor)[0];
-    if (first?.length) return first;
-  }
+  const first = Object.values(product.imagesByColor ?? {})[0];
+  if (first?.length) return first;
   return product.images?.length ? product.images : [];
 }
