@@ -668,9 +668,9 @@ const ProductPage = () => {
           </div>
 
           {/* Thumbnails row */}
-          {!isZoomed && product.images.length > 1 && (
+          {!isZoomed && displayImages.length > 1 && (
             <div className="fixed bottom-12 left-1/2 -translate-x-1/2 flex gap-3 px-6 py-4 bg-black/40 backdrop-blur-md rounded-2xl z-120">
-              {product.images.map((img: string, idx: number) => (
+              {displayImages.map((img: string, idx: number) => (
                 <button
                   key={idx}
                   onClick={(e) => { e.stopPropagation(); setActiveImage(idx); }}

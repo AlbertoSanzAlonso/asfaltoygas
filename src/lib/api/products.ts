@@ -115,7 +115,10 @@ const normalise = (p: any): Product => ({
     const rawRows = p.product_images || [];
     if (rawRows.length > 0) {
       urls = rawRows
-        .sort((a: any, b: any) => (a.orden || 0) - (b.orden || 0))
+        .sort((a: any, b: any) => {
+          if (a.is_main !== b.is_main) return a.is_main ? -1 : 1;
+          return (a.orden || 0) - (b.orden || 0);
+        })
         .map((img: any) => img.image_url);
     } else {
       urls = p.images || [];
@@ -123,7 +126,10 @@ const normalise = (p: any): Product => ({
     return filterAllowedImageUrls(urls);
   })(),
   productImages: (p.product_images || [])
-    .sort((a: any, b: any) => (a.orden || 0) - (b.orden || 0))
+    .sort((a: any, b: any) => {
+      if (a.is_main !== b.is_main) return a.is_main ? -1 : 1;
+      return (a.orden || 0) - (b.orden || 0);
+    })
     .map((img: any) => ({
       id: img.id,
       product_id: img.product_id,
@@ -138,6 +144,7 @@ const normalise = (p: any): Product => ({
       image_url: img.image_url,
       orden: img.orden,
       color_id: img.color_id ?? null,
+      is_main: img.is_main ?? false,
     }));
     const byColor = buildImagesByColor(rows);
     return Object.keys(byColor).length ? byColor : undefined;
