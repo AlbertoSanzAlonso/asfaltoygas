@@ -2,7 +2,7 @@ import type { Product, ProductImage } from '@/types';
 
 const HIGH_QUALITY_PREFIX = 'products/cascos/';
 
-function isHighQuality(url: string): boolean {
+export function isHighQuality(url: string): boolean {
   return url.includes(HIGH_QUALITY_PREFIX);
 }
 
