@@ -643,7 +643,7 @@ const ProductPage = () => {
 
 
           <div 
-            className={`min-h-full min-w-full flex items-center justify-center ${isZoomed ? 'w-[300vw] h-[300vh]' : ''}`}
+            className="min-h-full min-w-full flex items-center justify-center"
           >
             <div 
               className={`relative ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
@@ -657,11 +657,11 @@ const ProductPage = () => {
                   exit={{ opacity: 0 }}
                   src={displayImages[activeImage]} 
                   alt={product.name}
-                  className={`transition-all duration-500 shadow-2xl rounded-sm ${isZoomed ? 'max-w-none w-[180vw] md:w-[120vw]' : 'max-w-[90vw] max-h-[85vh] object-contain'}`}
+                  className={`transition-all duration-500 shadow-2xl rounded-sm ${isZoomed ? 'max-w-[180vh] max-h-[90vh] object-contain' : 'max-w-[90vw] max-h-[85vh] object-contain'}`}
                 />
               </AnimatePresence>
               {/* Watermark */}
-              <div className={`absolute pointer-events-none opacity-40 select-none transition-none ${isZoomed ? 'bottom-32 right-16 w-32 md:w-48' : 'bottom-6 right-6 w-20 md:w-32'}`}>
+              <div className={`absolute pointer-events-none opacity-40 select-none transition-none ${isZoomed ? 'bottom-8 right-8 w-24 md:w-32' : 'bottom-6 right-6 w-20 md:w-32'}`}>
                 <img src="/assets/logo/logo-asfaltoygas-blanco.svg" alt="" className="w-full h-auto" />
               </div>
             </div>
