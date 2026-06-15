@@ -1,5 +1,20 @@
 # Tareas pendientes — Asfalto y Gas
 
+## Completado: Re-scraping de cascos — descripciones e imágenes en alta
+
+- URL: `https://www.elmotorista.es/shop-motos/casco-moto/categoria-cascos-moto/familia-cascos-jet.cascos-integrales.cascos-modulares`
+- **565 cascos** actualizados:
+  - 344 **Integral** (subcategory_id=61)
+  - 127 **Jet** (subcategory_id=59)
+  - 94 **Modular** (subcategory_id=60)
+- **559 descripciones** reemplazadas (las originales eran "Comprar... en el Motorista")
+- **565 imágenes** en alta resolución subidas a Storage:
+  - `products/cascos/{integral|jet|modular}/{marca}/{slug}.webp`
+- **76 cascos eliminados** de la BD por no pertenecer a Jet/Integral/Modular
+- Subcategorías corregidas donde estaban mal asignadas
+
+---
+
 ## Completado: Importar productos de Mantenimiento desde El Motorista
 
 - URL scrapeada: `https://www.elmotorista.es/shop-motos/lubricante-moto/categoria-lubricantes-anticongelantes.hidraulicos.lubricantes-aditivos`
