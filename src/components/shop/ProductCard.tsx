@@ -65,7 +65,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   return (
     <div className="group relative flex flex-col bg-transparent">
-      <Link to={`/producto/${product.product_id}`}>
+      <Link to={`/producto/${product.slug}`}>
         <ProductImage 
           src={product.images?.[0]} 
           alt={product.name} 

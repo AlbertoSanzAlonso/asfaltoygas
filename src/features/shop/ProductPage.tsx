@@ -27,7 +27,7 @@ import {
 } from '@/lib/seo/constants';
 
 const ProductPage = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [selectedSize, setSelectedSize] = useState<string>('');
@@ -129,21 +129,21 @@ const ProductPage = () => {
   };
 
   const { data: product, isLoading } = useQuery({
-    queryKey: ['product', id],
-    queryFn: () => api.products.getById(id!),
-    enabled: !!id
+    queryKey: ['product', slug],
+    queryFn: () => api.products.getBySlug(slug!),
+    enabled: !!slug
   });
 
   const { data: siblings } = useQuery({
-    queryKey: ['product-siblings', id, product?.category_id, product?.subcategory_id],
-    queryFn: () => api.products.getSiblings(id!, product?.category_id?.toString(), product?.subcategory_id?.toString()),
+    queryKey: ['product-siblings', slug, product?.category_id, product?.subcategory_id],
+    queryFn: () => api.products.getSiblings(product?.product_id!, product?.category_id?.toString(), product?.subcategory_id?.toString()),
     enabled: !!product
   });
 
   useEffect(() => {
     setSelectedSize('');
     setSelectedColorId(null);
-  }, [id]);
+  }, [slug]);
 
   useEffect(() => {
     if (!product) return;
@@ -219,7 +219,7 @@ const ProductPage = () => {
         <SeoHelmet
           title="Producto no encontrado"
           description="El producto que buscas no está disponible en Asfalto y Gas."
-          path={`/producto/${id}`}
+          path={`/producto/${slug}`}
           noindex
         />
         <p>Producto no encontrado</p>
@@ -246,7 +246,7 @@ const ProductPage = () => {
       <SeoHelmet
         title={product.name}
         description={productDescription}
-        path={`/producto/${product.product_id}`}
+        path={`/producto/${product.slug}`}
         image={displayImages[0]}
         type="product"
         jsonLd={[
@@ -280,7 +280,7 @@ const ProductPage = () => {
                       '@type': 'ListItem',
                       position: 4,
                       name: product.name,
-                      item: absoluteUrl(`/producto/${product.product_id}`),
+                      item: absoluteUrl(`/producto/${product.slug}`),
                     },
                   ]
                 : [
@@ -288,7 +288,7 @@ const ProductPage = () => {
                       '@type': 'ListItem',
                       position: 3,
                       name: product.name,
-                      item: absoluteUrl(`/producto/${product.product_id}`),
+                      item: absoluteUrl(`/producto/${product.slug}`),
                     },
                   ]),
             ],
@@ -349,17 +349,17 @@ const ProductPage = () => {
           <div className="flex items-center gap-4 sm:gap-8">
             <div className="flex items-center gap-2 border-r border-secondary/10 pr-4 sm:pr-8">
               <Link 
-                to={siblings?.prevId ? `/producto/${siblings.prevId}` : '#'}
+                to={siblings?.prevSlug ? `/producto/${siblings.prevSlug}` : '#'}
                 replace={true}
-                className={`p-2 transition-all ${!siblings?.prevId ? 'opacity-20 cursor-not-allowed' : 'hover:text-primary hover:bg-primary/5 rounded-full'}`}
+                className={`p-2 transition-all ${!siblings?.prevSlug ? 'opacity-20 cursor-not-allowed' : 'hover:text-primary hover:bg-primary/5 rounded-full'}`}
                 title="Producto Anterior"
               >
                 <ChevronLeft className="w-5 h-5" />
               </Link>
               <Link 
-                to={siblings?.nextId ? `/producto/${siblings.nextId}` : '#'}
+                to={siblings?.nextSlug ? `/producto/${siblings.nextSlug}` : '#'}
                 replace={true}
-                className={`p-2 transition-all ${!siblings?.nextId ? 'opacity-20 cursor-not-allowed' : 'hover:text-primary hover:bg-primary/5 rounded-full'}`}
+                className={`p-2 transition-all ${!siblings?.nextSlug ? 'opacity-20 cursor-not-allowed' : 'hover:text-primary hover:bg-primary/5 rounded-full'}`}
                 title="Siguiente Producto"
               >
                 <ChevronRight className="w-5 h-5" />

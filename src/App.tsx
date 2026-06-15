@@ -169,7 +169,7 @@ function App() {
               >
                 <Routes>
                   <Route index element={<HomePage />} />
-                  <Route path="/producto/:id" element={<ProductPage />} />
+                  <Route path="/producto/:slug" element={<ProductPage />} />
                   <Route path="/categoria/:category" element={<CategoryPage />} />
                   <Route path="/checkout" element={<CheckoutPage />} />
                   <Route path="/aviso-legal" element={<AvisoLegalPage />} />

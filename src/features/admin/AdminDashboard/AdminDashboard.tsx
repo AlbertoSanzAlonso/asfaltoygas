@@ -115,7 +115,7 @@ export const AdminDashboard: React.FC = () => {
             queryClient.invalidateQueries({ queryKey: ['products'] });
             queryClient.invalidateQueries({ queryKey: ['admin-products'] });
             queryClient.invalidateQueries({ queryKey: ['products-all-chat'] });
-            window.open(`/producto/${product.product_id}`, '_blank');
+            window.open(`/producto/${product.slug}`, '_blank');
           },
           secondaryActionLabel: 'Dejar en Borrador',
           onSecondaryAction: async () => {
@@ -132,7 +132,7 @@ export const AdminDashboard: React.FC = () => {
           type: 'success',
           actionLabel: 'Ver el producto',
           onAction: () => {
-            window.open(`/producto/${product.product_id}`, '_blank');
+            window.open(`/producto/${product.slug}`, '_blank');
           }
         });
       }

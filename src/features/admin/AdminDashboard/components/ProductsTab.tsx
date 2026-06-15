@@ -340,7 +340,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                         title="Ver en la web"
                         onClick={(e) => {
                           e.stopPropagation();
-                          window.open(`/producto/${product.product_id}`, '_blank');
+                          window.open(`/producto/${product.slug}`, '_blank');
                         }}
                       >
                         <Eye className="w-4 h-4" />
@@ -482,10 +482,10 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                    <p className="text-[8px] font-bold text-gray-400 uppercase mt-0.5">{calculateStock(product)} UNI</p>
                  </div>
                  <div className="flex gap-1">
-                   <button 
-                     onClick={(e) => { e.stopPropagation(); window.open(`/producto/${product.product_id}`, '_blank'); }}
-                     className="p-2 text-gray-400 hover:text-primary"
-                   >
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); window.open(`/producto/${product.slug}`, '_blank'); }}
+                      className="p-2 text-gray-400 hover:text-primary"
+                    >
                      <Eye className="w-4 h-4" />
                    </button>
                    <button 

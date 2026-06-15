@@ -245,13 +245,13 @@ export const products = {
     throw lastError;
   },
 
-  getSiblings: async (productId: string, categoryId?: string, subcategoryId?: string): Promise<{ nextId: string | null, prevId: string | null }> => {
-    if (!isSupabaseConfigured()) return { nextId: null, prevId: null };
+  getSiblings: async (productId: string, categoryId?: string, subcategoryId?: string): Promise<{ nextSlug: string | null, prevSlug: string | null }> => {
+    if (!isSupabaseConfigured()) return { nextSlug: null, prevSlug: null };
 
     // Fetch all IDs in order to find siblings (simplest way to ensure correct sorting logic)
     let query = supabase
       .from('products')
-      .select('product_id')
+      .select('product_id, slug')
       .eq('is_published', true);
 
     if (categoryId) query = query.eq('category_id', categoryId);
@@ -264,11 +264,12 @@ export const products = {
     if (error) throw error;
 
     const ids = data.map(p => p.product_id);
+    const slugs = data.map(p => p.slug);
     const currentIndex = ids.indexOf(productId);
 
     return {
-      prevId: currentIndex > 0 ? ids[currentIndex - 1] : null,
-      nextId: currentIndex < ids.length - 1 ? ids[currentIndex + 1] : null
+      prevSlug: currentIndex > 0 ? slugs[currentIndex - 1] : null,
+      nextSlug: currentIndex < ids.length - 1 ? slugs[currentIndex + 1] : null
     };
   },
 
@@ -289,6 +290,39 @@ export const products = {
         .from('products')
         .select(select)
         .eq('product_id', product_id)
+        .maybeSingle();
+
+      if (!error) return normalise(data);
+      lastError = error;
+      if (
+        !isMissingRelation(error, 'product_labels') &&
+        !isMissingRelation(error, 'product_discount_codes') &&
+        !isMissingRelation(error, 'brands')
+      ) {
+        throw error;
+      }
+    }
+    if (lastError) throw lastError;
+    throw new Error('Producto no encontrado');
+  },
+
+  getBySlug: async (slug: string): Promise<Product> => {
+    if (!isSupabaseConfigured()) throw new Error('Producto no encontrado');
+
+    const selects = [
+      PRODUCT_SELECT_FULL,
+      PRODUCT_SELECT_WITH_LABELS,
+      PRODUCT_SELECT_WITH_DISCOUNTS,
+      PRODUCT_SELECT_BASE,
+      PRODUCT_SELECT_CORE,
+    ];
+    let lastError: { code?: string; message?: string } | null = null;
+
+    for (const select of selects) {
+      const { data, error } = await supabase
+        .from('products')
+        .select(select)
+        .eq('slug', slug)
         .maybeSingle();
 
       if (!error) return normalise(data);

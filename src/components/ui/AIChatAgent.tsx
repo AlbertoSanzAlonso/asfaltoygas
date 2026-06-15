@@ -135,7 +135,7 @@ export const AIChatAgent = () => {
                 return `${label}: ${v.stock}uds`;
               }).join(', ') || 'Sin info de stock';
               const novelty = p.is_new ? '✨ NOVEDAD ✨' : '';
-              return `Artículo: ${p.name} ${novelty}. Precio: ${p.price}€. URL: /producto/${p.product_id}. Tallas/Stock: ${stockInfo}. Descripción: ${p.description}`;
+              return `Artículo: ${p.name} ${novelty}. Precio: ${p.price}€. URL: /producto/${p.slug}. Tallas/Stock: ${stockInfo}. Descripción: ${p.description}`;
             }).join('\n---\n')
           : 'No hay artículos específicos en el catálogo que coincidan.';
       } catch {
