@@ -1,6 +1,12 @@
 import type { Product, ProductImage } from '@/types';
 
-/** Agrupa filas de product_images por color_id. Mantiene todas las imágenes ordenadas por is_main y orden. */
+const HIGH_QUALITY_PREFIX = 'products/cascos/';
+
+function isHighQuality(url: string): boolean {
+  return url.includes(HIGH_QUALITY_PREFIX);
+}
+
+/** Agrupa filas de product_images por color_id. Solo incluye imágenes de alta calidad (products/cascos/). */
 export function buildImagesByColor(rows: ProductImage[]): Record<number | null, string[]> {
   const buckets = new Map<number | null, ProductImage[]>();
 
@@ -12,12 +18,13 @@ export function buildImagesByColor(rows: ProductImage[]): Record<number | null, 
 
   const out: Record<number | null, string[]> = {};
   for (const [colorId, list] of buckets) {
-    out[colorId] = list
-      .sort((a, b) => {
-        if (a.is_main !== b.is_main) return a.is_main ? -1 : 1;
-        return (a.orden ?? 0) - (b.orden ?? 0);
-      })
-      .map((r) => r.image_url);
+    const highQuality = list.filter((r) => isHighQuality(r.image_url));
+    const sorted = highQuality.length > 0 ? highQuality : list;
+    sorted.sort((a, b) => {
+      if (a.is_main !== b.is_main) return a.is_main ? -1 : 1;
+      return (a.orden ?? 0) - (b.orden ?? 0);
+    });
+    out[colorId] = sorted.map((r) => r.image_url);
   }
   return out;
 }

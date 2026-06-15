@@ -2,7 +2,7 @@
 import { supabase } from '../supabase';
 import { filterAllowedImageUrls, isSupabaseConfigured } from '../supabaseConfig';
 import type { Product } from '@/types';
-import { buildImagesByColor } from '../productImages';
+import { buildImagesByColor, isHighQuality } from '../productImages';
 import {
   deriveProductColors,
   hasColorVariants,
@@ -109,17 +109,19 @@ async function syncProductDiscountCodes(
 const normalise = (p: any): Product => ({
   ...p,
   is_published: p.is_published ?? true,
-  // Priorizar tabla relacional sobre columna JSON
+  // Priorizar tabla relacional sobre columna JSON, solo imágenes de alta calidad
   images: (() => {
     let urls: string[] = [];
     const rawRows = p.product_images || [];
     if (rawRows.length > 0) {
-      urls = rawRows
-        .sort((a: any, b: any) => {
-          if (a.is_main !== b.is_main) return a.is_main ? -1 : 1;
-          return (a.orden || 0) - (b.orden || 0);
-        })
-        .map((img: any) => img.image_url);
+      const sorted = [...rawRows].sort((a: any, b: any) => {
+        if (a.is_main !== b.is_main) return a.is_main ? -1 : 1;
+        return (a.orden || 0) - (b.orden || 0);
+      });
+      const highQuality = sorted.filter((img: any) => isHighQuality(img.image_url));
+      urls = highQuality.length > 0
+        ? highQuality.map((img: any) => img.image_url)
+        : sorted.map((img: any) => img.image_url);
     } else {
       urls = p.images || [];
     }
