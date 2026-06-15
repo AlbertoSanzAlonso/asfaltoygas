@@ -8,46 +8,56 @@ description: >-
 
 # Categorías y subcategorías — Asfalto y Gas
 
-## Cascos
+## Cascos (category_id = 1)
 
-| # | Subcategoría |
-|---|--------------|
-| 1 | Jet |
-| 2 | Modular |
-| 3 | Integral |
+| subcategory_id | Subcategoría |
+|----------------|--------------|
+| — | Jet |
+| — | Modular |
+| — | Integral |
 
-## Equipaje
+## Equipaje (category_id = 2)
 
-| # | Subcategoría |
-|---|--------------|
-| 1 | Alforjas |
-| 2 | Bolsas sobredepósito |
-| 3 | Maletas laterales |
-| 4 | Maletas superiores |
-| 5 | Fijaciones |
-| 6 | Accesorios y recambios maletas |
+| subcategory_id | Subcategoría |
+|----------------|--------------|
+| — | Alforjas |
+| — | Bolsas sobredepósito |
+| — | Maletas laterales |
+| — | Maletas superiores |
+| — | Fijaciones |
+| — | Accesorios y recambios maletas |
 
-## Aceites y lubricantes
+## Aceites y lubricantes (category_id = 3)
 
-| # | Subcategoría |
-|---|--------------|
-| 1 | Aceites y lubricantes (general) |
-| 2 | Aceite de motor |
-| 3 | Motores 2T |
-| 4 | Motores 4T |
-| 5 | Aceite de horquilla |
-| 6 | Aceite de transmisión |
-| 7 | Aceite amortiguadores |
-| 8 | Aceite de filtro de aire |
-| 9 | Otros lubricantes |
+| subcategory_id | Subcategoría |
+|----------------|--------------|
+| 68 | Aceites y lubricantes (general) |
+| 69 | Aceite de motor |
+| 70 | Motores 2T |
+| 71 | Motores 4T |
+| 72 | Aceite de horquilla |
+| 73 | Aceite de transmisión |
+| 74 | Aceite amortiguadores |
+| 75 | Aceite de filtro de aire |
+| 76 | Otros lubricantes |
 
-## Mantenimiento
+## Mantenimiento (category_id = 4)
 
-| # | Subcategoría |
-|---|--------------|
-| 1 | Aditivos |
-| 2 | Líquido de freno |
-| 3 | Anticongelantes y líquido de embrague |
+| subcategory_id | Subcategoría | Slug El Motorista |
+|----------------|--------------|-------------------|
+| 77 | Aditivos | `lubricantes-aditivos` |
+| 78 | Líquido de freno | `hidraulicos` |
+| 79 | Anticongelantes | `lubricantes-anticongelantes` |
+| 86 | Líquido de embrague | *(pendiente de slug proveedor)* |
+
+### Mapeo de slugs de El Motorista a Mantenimiento
+
+Cuando se importen productos desde `https://www.elmotorista.es/shop-motos/lubricante-moto/categoria-...`:
+
+- `lubricantes-aditivos` → **Aditivos**
+- `hidraulicos` → **Líquido de freno**
+- `lubricantes-anticongelantes` → **Anticongelantes**
+- `lubricantes-de-embrague` / `liquido-de-embrague` → **Líquido de embrague**
 
 ## Merchandising
 

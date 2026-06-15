@@ -44,6 +44,16 @@ description: >-
 2. No mezclar filas `color_id` null y con color en la misma talla al guardar (`consolidateVariantsForSave`).
 3. Validar duplicados talla + `color_id` antes de guardar.
 
+## Imágenes de producto
+
+- **Bucket**: `products` en Supabase Storage
+- **Estructura**: `products/{categoria}/{subcategoria}/{marca}/{nombre-seo}.webp`
+- **Ejemplo**: `products/aceites-y-lubricantes/motores-4t/repsol/aceite-repsol-moto-racing-4t-15w50-1l.webp`
+- **Categoría**: `aceites-y-lubricantes` (ID 3 en DB)
+- **Subcategorías**: `motores-4t`, `motores-2t`, `aceite-de-transmision`
+- **Tamaño**: `_320.webp` es el tamaño recomendado (balance entre calidad y peso)
+- **Pendiente**: 31 imágenes de lubricantes usan hotlinks a `elmotorista.es` (ver TASKS.md). El resto (112) están en Storage.
+
 ## Archivos clave
 
 | Área | Archivo |

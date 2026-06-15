@@ -18,6 +18,7 @@ import {
 } from '@/lib/productVariants';
 import { getImagesForColor } from '@/lib/productImages';
 import { SeoHelmet } from '@/components/seo/SeoHelmet';
+import { ProductDetails } from '@/components/shop/ProductDetails';
 import {
   absoluteUrl,
   truncateDescription,
@@ -602,6 +603,9 @@ const ProductPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Description and specifications */}
+        <ProductDetails product={product} />
       </div>
 
       {/* Fullscreen Image Modal */}

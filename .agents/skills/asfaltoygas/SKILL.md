@@ -13,6 +13,11 @@ description: >-
 - **Backend datos:** Supabase (`src/lib/supabase.ts`, `src/lib/api/*`)
 - **Deploy:** Vercel (API en `api/`)
 - **Pagos:** Redsys (Tarjeta + Bizum); **envío:** Nacex (`api/nacex.ts`)
+- **Storage:** Supabase Storage (bucket `products` para imágenes de producto)
+
+## Tareas pendientes
+
+Ver [TASKS.md](../../../../TASKS.md) para tareas pendientes y contexto de trabajo incompleto.
 
 ## Estructura
 
@@ -74,6 +79,10 @@ description: >-
 ### Imágenes y logo
 - `public/logo.png` — usado en datos estructurados (`Store.logo`). Mínimo 500x500, formato PNG.
 - `public/og-image.png` — Open Graph (1200x630). Meta tags en `index.html` + `SeoHelmet`.
+- **Storage de productos:** Supabase Storage bucket `products` con carpetas SEO-friendly:
+  - `products/{categoria}/{subcategoria}/{marca}/{nombre-seo}.webp`
+  - Ejemplo: `products/aceites-y-lubricantes/motores-4t/repsol/aceite-repsol-moto-racing-4t-15w50-1l.webp`
+  - Ver TASKS.md para imágenes pendientes de subir.
 - `index.html` tiene los meta tags estáticos de fallback (OG, Twitter, favicon, canonical, google-site-verification).
 
 ### Redirecciones y DNS
