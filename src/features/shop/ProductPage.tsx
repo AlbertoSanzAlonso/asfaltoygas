@@ -627,13 +627,13 @@ const ProductPage = () => {
           {!isZoomed && product.images.length > 1 && (
             <>
               <button 
-                onClick={(e) => { e.stopPropagation(); setActiveImage(prev => prev === 0 ? product.images.length - 1 : prev - 1); }}
+                onClick={(e) => { e.stopPropagation(); setActiveImage(prev => prev === 0 ? displayImages.length - 1 : prev - 1); }}
                 className="fixed left-6 top-1/2 -translate-y-1/2 p-4 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all z-110"
               >
                 <ChevronRight className="w-8 h-8 rotate-180" />
               </button>
               <button 
-                onClick={(e) => { e.stopPropagation(); setActiveImage(prev => prev === product.images.length - 1 ? 0 : prev + 1); }}
+                onClick={(e) => { e.stopPropagation(); setActiveImage(prev => prev === displayImages.length - 1 ? 0 : prev + 1); }}
                 className="fixed right-6 top-1/2 -translate-y-1/2 p-4 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all z-110"
               >
                 <ChevronRight className="w-8 h-8" />
