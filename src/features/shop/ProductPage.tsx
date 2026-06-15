@@ -643,21 +643,23 @@ const ProductPage = () => {
 
 
           <div 
-            className="min-h-full min-w-full flex items-center justify-center"
+            className={`min-h-full flex items-center justify-center overflow-auto ${isZoomed ? 'cursor-default' : 'cursor-zoom-in'}`}
+            onClick={(e) => { e.stopPropagation(); if (!isZoomed) setIsZoomed(true); }}
           >
             <div 
-              className={`relative ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
-              onClick={(e) => { e.stopPropagation(); setIsZoomed(!isZoomed); }}
+              className="relative"
             >
               <AnimatePresence mode="wait">
                 <motion.img 
                   key={`${selectedColorId ?? 'n'}-${activeImage}`}
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  animate={{ opacity: 1, scale: isZoomed ? 2.5 : 1 }}
                   exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                   src={displayImages[activeImage]} 
                   alt={product.name}
-                  className={`transition-all duration-500 shadow-2xl rounded-sm ${isZoomed ? 'max-w-[180vh] max-h-[90vh] object-contain' : 'max-w-[90vw] max-h-[85vh] object-contain'}`}
+                  className={`transition-all duration-300 shadow-2xl rounded-sm max-w-[90vw] max-h-[85vh] object-contain ${isZoomed ? 'cursor-zoom-out' : ''}`}
+                  onClick={(e) => { e.stopPropagation(); setIsZoomed(!isZoomed); }}
                 />
               </AnimatePresence>
               {/* Watermark */}

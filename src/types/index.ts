@@ -40,6 +40,7 @@ export interface Label {
 
 export interface Product {
   product_id: string;
+  slug: string;
   name: string;
   description: string;
   price: number;
