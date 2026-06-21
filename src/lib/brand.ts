@@ -18,7 +18,7 @@ export const BRAND = {
     country: 'ES',
   },
   social: {
-    instagram: 'https://www.instagram.com/popular/asfalto-y-gas/',
+    instagram: 'https://www.instagram.com/asfaltoygas/',
     tiktok: 'https://www.tiktok.com/@asfaltoygas',
     facebook: 'https://www.facebook.com/profile.php?id=61585035781061',
   },
