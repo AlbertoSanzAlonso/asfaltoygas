@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -52,8 +52,21 @@ export const CategoryGridSection: React.FC = () => {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
+  const touchStartX = useRef(0);
+
   const prev = () => setActive((i) => (i - 1 + total) % total);
   const next = () => setActive((i) => (i + 1) % total);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? next() : prev();
+    }
+  };
 
   return (
     <section className="py-16 md:py-24 bg-white overflow-hidden">
@@ -88,8 +101,10 @@ export const CategoryGridSection: React.FC = () => {
             </button>
 
             <div
-              className="relative mx-auto h-[320px] sm:h-[380px] max-w-[1100px]"
+              className="relative mx-auto h-[320px] sm:h-[380px] max-w-[1100px] touch-pan-y"
               style={{ perspective: '1400px' }}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
             >
               <div className="absolute inset-0 flex items-center justify-center" style={{ transformStyle: 'preserve-3d' }}>
                 {HOME_CATEGORIES.map((cat, index) => {
