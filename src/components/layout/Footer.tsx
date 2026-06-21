@@ -1,6 +1,6 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MessageCircle } from 'lucide-react';
+import { Mail, Phone, MessageCircle, MapPin } from 'lucide-react';
 import { BRAND } from '@/lib/brand';
 
 export const Footer: FC = () => {
@@ -55,6 +55,12 @@ export const Footer: FC = () => {
                     <Mail className="w-4 h-4 text-white shrink-0" />
                     {BRAND.email}
                   </a>
+                </li>
+                <li className="text-white/70 text-[10px] font-bold tracking-[0.2em] uppercase leading-relaxed text-center lg:text-left">
+                  <span className="flex items-center justify-center lg:justify-start gap-4">
+                    <MapPin className="w-4 h-4 text-white shrink-0" />
+                    {BRAND.address.street}, {BRAND.address.city}, {BRAND.address.postalCode}
+                  </span>
                 </li>
               </ul>
             </div>
