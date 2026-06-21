@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -18,7 +18,16 @@ const getOffset = (index: number, active: number, total: number) => {
 
 export const CategoryGridSection: React.FC = () => {
   const [active, setActive] = useState(2);
+  const [isDesktop, setIsDesktop] = useState(false);
   const total = HOME_CATEGORIES.length;
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   const prev = () => setActive((i) => (i - 1 + total) % total);
   const next = () => setActive((i) => (i + 1) % total);
@@ -33,7 +42,7 @@ export const CategoryGridSection: React.FC = () => {
             type="button"
             onClick={prev}
             aria-label="Categoría anterior"
-            className="absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 bg-white shadow-lg border border-secondary/10 flex items-center justify-center text-secondary hover:text-primary transition-colors"
+            className="hidden md:flex absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 bg-white shadow-lg border border-secondary/10 items-center justify-center text-secondary hover:text-primary transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -41,16 +50,19 @@ export const CategoryGridSection: React.FC = () => {
             type="button"
             onClick={next}
             aria-label="Categoría siguiente"
-            className="absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 bg-white shadow-lg border border-secondary/10 flex items-center justify-center text-secondary hover:text-primary transition-colors"
+            className="hidden md:flex absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 bg-white shadow-lg border border-secondary/10 items-center justify-center text-secondary hover:text-primary transition-colors"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
 
           <div
             className="relative mx-auto h-[320px] sm:h-[380px] md:h-[420px] max-w-[1100px]"
-            style={{ perspective: '1400px' }}
+            style={isDesktop ? {} : { perspective: '1400px' }}
           >
-            <div className="absolute inset-0 flex items-center justify-center" style={{ transformStyle: 'preserve-3d' }}>
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={isDesktop ? {} : { transformStyle: 'preserve-3d' }}
+            >
               {HOME_CATEGORIES.map((cat, index) => {
                 const offset = getOffset(index, active, total);
                 const isActive = offset === 0;
@@ -65,14 +77,14 @@ export const CategoryGridSection: React.FC = () => {
                     animate={{
                       x: offset * (CARD_WIDTH * 0.55 + CARD_GAP) - CARD_WIDTH / 2,
                       y: '-50%',
-                      rotateY: offset * -38,
-                      scale: 1 - absOffset * 0.11,
+                      rotateY: isDesktop ? 0 : offset * -38,
+                      scale: isDesktop ? 1 : 1 - absOffset * 0.11,
                       opacity: hidden ? 0 : 1 - absOffset * 0.18,
                       zIndex: 20 - absOffset,
                     }}
                     transition={{ type: 'spring', stiffness: 260, damping: 28 }}
                     style={{
-                      transformStyle: 'preserve-3d',
+                      transformStyle: isDesktop ? undefined : 'preserve-3d',
                       pointerEvents: hidden ? 'none' : 'auto',
                     }}
                   >
@@ -87,7 +99,7 @@ export const CategoryGridSection: React.FC = () => {
                       className={`group relative block aspect-[3/4] overflow-hidden bg-secondary shadow-2xl ${
                         isActive ? 'ring-2 ring-primary/40' : ''
                       }`}
-                      style={{ backfaceVisibility: 'hidden' }}
+                      style={isDesktop ? {} : { backfaceVisibility: 'hidden' }}
                     >
                       <img
                         src={cat.image}
