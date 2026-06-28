@@ -37,11 +37,11 @@ const ConocenosPage: React.FC = () => {
       <section className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden flex items-center justify-center">
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1558981403-c5f9899a28dc?q=80&w=2070&auto=format&fit=crop"
+            src="/assets/images/hero-sobre-nosotros.webp"
             alt={`${BRAND.name} — Sobre nosotros`}
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-center opacity-90"
           />
-          <div className="absolute inset-0 bg-secondary/60 z-10" />
+          <div className="absolute inset-0 bg-secondary/50 z-10" />
         </div>
 
         <div className="relative z-10 text-center px-4 md:px-6 max-w-4xl mx-auto flex flex-col items-center space-y-4 md:space-y-6">
