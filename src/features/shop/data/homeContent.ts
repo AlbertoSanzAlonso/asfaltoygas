@@ -92,6 +92,7 @@ export const PROMO_BANNERS = [
 
 export const NAV_CATEGORIES = [
   { label: 'Cascos', href: '/categoria/cascos' },
+  { label: 'Equipación', href: '/categoria/equipacion' },
   { label: 'Equipaje', href: '/categoria/equipaje' },
   { label: 'Aceites y lubricantes', href: '/categoria/aceites-y-lubricantes' },
   { label: 'Mantenimiento', href: '/categoria/mantenimiento' },
@@ -99,6 +100,7 @@ export const NAV_CATEGORIES = [
 
 export const HOME_CATEGORIES = [
   { label: 'Cascos', href: '/categoria/cascos', image: '/assets/images/categories/cascos.jpg', objectPosition: 'center 28%' },
+  { label: 'Equipación', href: '/categoria/equipacion', image: '/assets/images/categories/chaquetas.jpg', objectPosition: 'center 35%' },
   { label: 'Equipaje', href: '/categoria/equipaje', image: '/assets/images/categories/chaquetas.jpg', objectPosition: 'center 35%' },
   { label: 'Aceites y lubricantes', href: '/categoria/aceites-y-lubricantes', image: '/assets/images/categories/accesorios.jpg', objectPosition: 'center 45%' },
   { label: 'Mantenimiento', href: '/categoria/mantenimiento', image: '/assets/images/categories/accesorios.jpg', objectPosition: 'center 45%' },

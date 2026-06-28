@@ -9,6 +9,19 @@ import {
 } from './images.js';
 import { slugifyBrand } from './brands.js';
 
+function buildProductDescription(scraped: ScrapedProduct, category: string): string {
+  const raw = (scraped.description || '').replace(/\s+/g, ' ').trim();
+  if (raw.length >= 40) return raw;
+
+  const brand = scraped.brand?.trim();
+  const baseName = scraped.name.trim();
+  const intro = brand
+    ? `${baseName} de ${brand} para motorista.`
+    : `${baseName} para motorista.`;
+
+  return `${intro} Producto importado en ${category} con imágenes y variantes disponibles en tienda.`;
+}
+
 async function resolveCategoryId(
   supabase: SupabaseClient,
   name: string
@@ -186,7 +199,7 @@ export async function importScrapedProduct(
     .insert([
       {
         name: scraped.name,
-        description: scraped.description || scraped.name,
+        description: buildProductDescription(scraped, options.category),
         price,
         category_id: categoryId,
         subcategory_id: subcategoryId ?? null,

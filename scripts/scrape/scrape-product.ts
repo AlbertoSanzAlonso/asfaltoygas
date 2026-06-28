@@ -52,30 +52,36 @@ function mergeScraped(primary: ScrapedProduct, fallback: ScrapedProduct): Scrape
   };
 }
 
-/** Sube resolución de miniaturas conocidas (máx. 320 en estaticos.elmotorista.es) y elimina duplicados. */
+/**
+ * Prioriza la imagen de mayor resolución disponible para un mismo recurso.
+ * Ej: foo_60.webp / foo_200.webp / foo_320.webp -> conserva foo_320.webp.
+ */
 export function normalizeImageUrls(urls: string[]): string[] {
-  const upgraded = urls.map((url) => {
-    if (url.includes('estaticos.elmotorista.es')) {
-      return url
-        .replace(/_60\.webp$/i, '_320.webp')
-        .replace(/_200\.webp$/i, '_320.webp')
-        .replace(/_800\.webp$/i, '_320.webp');
+  const preferredSizes = [800, 640, 480, 320, 200, 120, 80, 60];
+
+  const bestByKey = new Map<string, { url: string; score: number; index: number }>();
+
+  const scoreUrl = (url: string): { key: string; score: number } => {
+    const sizeMatch = url.match(/_(\d+)\.(webp|jpe?g|png)(\?|$)/i);
+    const size = sizeMatch ? parseInt(sizeMatch[1], 10) : 0;
+    const ext = (sizeMatch?.[2] || 'img').toLowerCase();
+    const key = url.replace(/_\d+\.(webp|jpe?g|png)(\?|$)/i, `.${ext}$2`);
+    const sizeRank = preferredSizes.indexOf(size);
+    const score = sizeRank === -1 ? size : preferredSizes.length - sizeRank + 1000;
+    return { key, score };
+  };
+
+  urls.forEach((url, index) => {
+    const { key, score } = scoreUrl(url);
+    const current = bestByKey.get(key);
+    if (!current || score > current.score || (score === current.score && index < current.index)) {
+      bestByKey.set(key, { url, score, index });
     }
-    return url
-      .replace(/_60\.webp$/i, '_800.webp')
-      .replace(/_200\.webp$/i, '_800.webp')
-      .replace(/_320\.webp$/i, '_800.webp');
   });
 
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const url of upgraded) {
-    const key = url.replace(/_\d+\.(webp|jpe?g|png)$/i, '.$1');
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(url);
-  }
-  return out;
+  return [...bestByKey.values()]
+    .sort((a, b) => a.index - b.index)
+    .map((entry) => entry.url);
 }
 
 export async function scrapeProductUrl(

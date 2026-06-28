@@ -16,6 +16,7 @@ interface NavbarProps {
 const MOBILE_LINKS = [
   { to: '/', label: 'Inicio' },
   { to: '/categoria/cascos', label: 'Cascos' },
+  { to: '/categoria/equipacion', label: 'Equipación' },
   { to: '/categoria/equipaje', label: 'Equipaje' },
   { to: '/categoria/aceites-y-lubricantes', label: 'Aceites y lubricantes' },
   { to: '/categoria/mantenimiento', label: 'Mantenimiento' },
