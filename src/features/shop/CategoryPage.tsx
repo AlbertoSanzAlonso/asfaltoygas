@@ -6,7 +6,7 @@ import { X, SlidersHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from "@/lib/api";
 import { ProductCard } from "@/components/shop/ProductCard";
-import type { Product, Subcategory, Brand } from '@/types';
+import type { Product, Subcategory, Brand, Label } from '@/types';
 import { SeoHelmet } from '@/components/seo/SeoHelmet';
 import { absoluteUrl, truncateDescription } from '@/lib/seo/constants';
 import { isSupabaseConfigured } from '@/lib/supabaseConfig';
@@ -25,6 +25,18 @@ const BRAND_SCALES: Record<string, number> = {
   'gas-gas': 0.75,
   'unik-racing': 0.65,
 };
+
+const STYLE_TAG_SLUGS = ['racing', 'ciudad', 'off-road', 'sport', 'touring'] as const;
+
+const STYLE_TAG_LABELS: Record<(typeof STYLE_TAG_SLUGS)[number], string> = {
+  racing: 'Racing',
+  ciudad: 'Ciudad',
+  'off-road': 'Off-road',
+  sport: 'Sport',
+  touring: 'Touring',
+};
+
+const STYLE_EXCLUDED_CATEGORY_SLUGS = ['aceites-y-lubricantes', 'mantenimiento'] as const;
 
 const BrandLogo: React.FC<{ brand: Brand; size?: 'sm' | 'md' }> = ({ brand, size = 'md' }) => {
   const baseHeight = size === 'sm' ? 34 : 50;
@@ -61,8 +73,9 @@ const CategoryPage: React.FC = () => {
   const priceMaxQuery = searchParams.get('precioMax');
   const sortQuery = searchParams.get('orden');
   const searchQuery = searchParams.get('search') || '';
+  const tagQuery = searchParams.get('tag');
 
-  const filterKey = `${searchQuery}-${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}-${sortQuery || 'null'}`;
+  const filterKey = `${searchQuery}-${tagQuery || 'null'}-${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}-${sortQuery || 'null'}`;
 
   const [selectedSub, setSelectedSub] = useState<number | null>(() =>
     subQuery ? parseInt(subQuery, 10) : null
@@ -87,11 +100,12 @@ const CategoryPage: React.FC = () => {
     return () => { document.body.style.overflow = ''; };
   }, [isFiltersOpen]);
 
-  const lastState = React.useRef<{ category?: string; subQuery: string | null; brandQuery: string | null; priceMinQuery: string | null; priceMaxQuery: string | null; sortQuery: string | null; searchQuery: string }>({ category: undefined, subQuery: null, brandQuery: null, priceMinQuery: null, priceMaxQuery: null, sortQuery: null, searchQuery: '' });
+  const lastState = React.useRef<{ category?: string; subQuery: string | null; brandQuery: string | null; priceMinQuery: string | null; priceMaxQuery: string | null; sortQuery: string | null; searchQuery: string; tagQuery: string | null }>({ category: undefined, subQuery: null, brandQuery: null, priceMinQuery: null, priceMaxQuery: null, sortQuery: null, searchQuery: '', tagQuery: null });
 
   const applyFilters = (subId: number | null, brandId: number | null, pMin?: string, pMax?: string, sort?: string) => {
     const params = new URLSearchParams();
     if (searchQuery) params.set('search', searchQuery);
+    if (tagQuery) params.set('tag', tagQuery);
     if (subId) params.set('sub', subId.toString());
     if (brandId) params.set('marca', brandId.toString());
     if (pMin) params.set('precioMin', pMin);
@@ -109,7 +123,8 @@ const CategoryPage: React.FC = () => {
       lastState.current.priceMinQuery !== priceMinQuery ||
       lastState.current.priceMaxQuery !== priceMaxQuery ||
       lastState.current.sortQuery !== sortQuery ||
-      lastState.current.searchQuery !== searchQuery
+      lastState.current.searchQuery !== searchQuery ||
+      lastState.current.tagQuery !== tagQuery
     ) {
       setSelectedSub(subQuery ? parseInt(subQuery, 10) : null);
       setSelectedBrand(brandQuery ? parseInt(brandQuery, 10) : null);
@@ -118,20 +133,20 @@ const CategoryPage: React.FC = () => {
       setSortOrder(sortQuery || '');
 
       const saved = sessionStorage.getItem(
-        `page-${category}-${searchQuery}-${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}-${sortQuery || 'null'}`
+        `page-${category}-${searchQuery}-${tagQuery || 'null'}-${subQuery || 'null'}-${brandQuery || 'null'}-${priceMinQuery || 'null'}-${priceMaxQuery || 'null'}-${sortQuery || 'null'}`
       );
       setPage(saved ? parseInt(saved, 10) : 1);
 
-      lastState.current = { category, subQuery, brandQuery, priceMinQuery, priceMaxQuery, sortQuery, searchQuery };
+      lastState.current = { category, subQuery, brandQuery, priceMinQuery, priceMaxQuery, sortQuery, searchQuery, tagQuery };
     }
-  }, [subQuery, brandQuery, category, priceMinQuery, priceMaxQuery, sortQuery, searchQuery]);
+  }, [subQuery, brandQuery, category, priceMinQuery, priceMaxQuery, sortQuery, searchQuery, tagQuery]);
 
   React.useEffect(() => {
     sessionStorage.setItem(
-      `page-${category}-${searchQuery}-${selectedSub || 'null'}-${selectedBrand || 'null'}-${priceMin || 'null'}-${priceMax || 'null'}-${sortOrder || 'null'}`,
+      `page-${category}-${searchQuery}-${tagQuery || 'null'}-${selectedSub || 'null'}-${selectedBrand || 'null'}-${priceMin || 'null'}-${priceMax || 'null'}-${sortOrder || 'null'}`,
       page.toString()
     );
-  }, [category, searchQuery, selectedSub, selectedBrand, priceMin, priceMax, sortOrder, page]);
+  }, [category, searchQuery, tagQuery, selectedSub, selectedBrand, priceMin, priceMax, sortOrder, page]);
 
   const handleSubChange = (subId: number | null) => {
     setSelectedSub(subId);
@@ -152,6 +167,19 @@ const CategoryPage: React.FC = () => {
     setSortOrder(sort);
     applyFilters(selectedSub, selectedBrand, priceMin, priceMax, sort);
     setIsFiltersOpen(false);
+  };
+
+  const handleStyleTagChange = (slug: string | null) => {
+    const params = new URLSearchParams(searchParams);
+    if (slug) {
+      params.set('tag', slug);
+    } else {
+      params.delete('tag');
+    }
+    params.delete('sub');
+    setSelectedSub(null);
+    setPage(1);
+    setSearchParams(params);
   };
 
   const pageSize = 12;
@@ -179,6 +207,25 @@ const CategoryPage: React.FC = () => {
     enabled: !!categoryId,
   });
 
+  const { data: allLabels = [] } = useQuery<Label[]>({
+    queryKey: ['labels'],
+    queryFn: () => api.labels.getAll(),
+  });
+
+  const routeCategorySlug = (category || '').toLowerCase();
+  const styleFilterAllowed = !STYLE_EXCLUDED_CATEGORY_SLUGS.includes(
+    routeCategorySlug as (typeof STYLE_EXCLUDED_CATEGORY_SLUGS)[number]
+  );
+
+  const styleLabels = allLabels.filter((label) =>
+    STYLE_TAG_SLUGS.includes(label.slug as (typeof STYLE_TAG_SLUGS)[number])
+  );
+
+  const selectedStyleLabel =
+    styleFilterAllowed && tagQuery
+      ? styleLabels.find((label) => label.slug === tagQuery) ?? null
+      : null;
+
   const {
     data: productsData,
     isLoading,
@@ -186,7 +233,7 @@ const CategoryPage: React.FC = () => {
     isError,
     error,
   } = useQuery<{ products: Product[]; total: number }>({
-    queryKey: ['products', categoryId, selectedSub, selectedBrand, priceMin, priceMax, sortOrder, searchQuery, page],
+    queryKey: ['products', categoryId, selectedSub, selectedBrand, selectedStyleLabel?.id ?? null, priceMin, priceMax, sortOrder, searchQuery, page],
     queryFn: () => {
       const catId = category?.toLowerCase() === 'todas' ? undefined : categoryId?.toString();
       return api.products.getAll(
@@ -197,7 +244,7 @@ const CategoryPage: React.FC = () => {
         true,
         searchQuery || undefined,
         undefined,
-        undefined,
+        selectedStyleLabel?.id ?? undefined,
         selectedBrand ?? undefined,
         priceMin ? parseFloat(priceMin) : undefined,
         priceMax ? parseFloat(priceMax) : undefined,
@@ -441,6 +488,39 @@ const CategoryPage: React.FC = () => {
           </aside>
 
           <div className="flex-1 min-w-0">
+        {styleFilterAllowed && (
+        <div className="mb-6 md:mb-8 bg-white rounded-2xl border border-secondary/8 p-4 md:p-5">
+          <p className="text-[9px] font-black uppercase tracking-[0.4em] text-secondary/40 mb-3">Estilo</p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => handleStyleTagChange(null)}
+              className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] border rounded-full transition-all ${
+                !selectedStyleLabel ? 'bg-primary border-primary text-white' : 'border-secondary/10 hover:border-secondary hover:translate-y-[-2px]'
+              }`}
+            >
+              Todos
+            </button>
+            {STYLE_TAG_SLUGS.map((slug) => {
+              const styleLabel = styleLabels.find((label) => label.slug === slug);
+              return (
+                <button
+                  key={slug}
+                  type="button"
+                  onClick={() => handleStyleTagChange(slug)}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] border rounded-full transition-all ${
+                    selectedStyleLabel?.slug === slug
+                      ? 'bg-primary border-primary text-white'
+                      : 'border-secondary/10 hover:border-secondary hover:translate-y-[-2px]'
+                  }`}
+                >
+                  {styleLabel?.name || STYLE_TAG_LABELS[slug]}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        )}
         {supabaseMissing ? (
           <div className="py-40 text-center">
             <p className="text-gray-500 uppercase tracking-[0.3em] font-bold">

@@ -107,11 +107,11 @@ export const HOME_CATEGORIES = [
 ] as const;
 
 export const RIDING_STYLES = [
-  { label: 'Jet', href: '/categoria/cascos', image: 'https://images.unsplash.com/photo-1611004060674-7e8864bcb4e4?q=80&w=600&auto=format&fit=crop' },
-  { label: 'Integral', href: '/categoria/cascos', image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?q=80&w=600&auto=format&fit=crop' },
-  { label: 'Modular', href: '/categoria/cascos', image: 'https://images.unsplash.com/photo-1628035514544-ebd32b766089?q=80&w=600&auto=format&fit=crop' },
-  { label: 'Alforjas', href: '/categoria/equipaje', image: 'https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?q=80&w=600&auto=format&fit=crop' },
-  { label: 'Aceites', href: '/categoria/aceites-y-lubricantes', image: 'https://images.unsplash.com/photo-1600497934947-23786a93f382?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Racing', href: '/categoria/todas?tag=racing', image: 'https://images.unsplash.com/photo-1611004060674-7e8864bcb4e4?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Ciudad', href: '/categoria/todas?tag=ciudad', image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Off-road', href: '/categoria/todas?tag=off-road', image: 'https://images.unsplash.com/photo-1628035514544-ebd32b766089?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Sport', href: '/categoria/todas?tag=sport', image: 'https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?q=80&w=600&auto=format&fit=crop' },
+  { label: 'Touring', href: '/categoria/todas?tag=touring', image: 'https://images.unsplash.com/photo-1600497934947-23786a93f382?q=80&w=600&auto=format&fit=crop' },
 ] as const;
 
 export const ACCESSORY_HIGHLIGHTS = [
