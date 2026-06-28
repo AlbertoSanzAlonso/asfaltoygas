@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 import toIco from 'to-ico';
-import { readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -22,7 +22,9 @@ async function svgToBuffer(svgPath, size) {
 }
 
 async function main() {
-  await svgToPng(join(logoDir, 'logo-asfaltoygas-square.svg'), mainLogoPng, 500, 500);
+  if (!existsSync(mainLogoPng)) {
+    throw new Error(`Logo principal no encontrado: ${mainLogoPng}`);
+  }
   await svgToPng(join(logoDir, 'logo-asfaltoygas-og.svg'), join(root, 'public/og-image.png'), 1200, 630);
 
   // Favicons desde el icono de casco
