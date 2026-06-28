@@ -1,11 +1,14 @@
-import { type FC, useState } from 'react';
+import { type FC, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Search, Menu, X, User as UserIcon, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from "@/store/useAuthStore";
 import { useCartStore } from "@/store/useCartStore";
 import { BRAND } from '@/lib/brand';
 import { NAV_CATEGORIES, INFO_BAR_ITEMS } from '@/features/shop/data/homeContent';
+import { api } from '@/lib/api';
+import type { Product } from '@/types';
 
 interface NavbarProps {
   setIsCartOpen: (open: boolean) => void;
@@ -32,6 +35,55 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
   const location = useLocation();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [isDesktopSearchFocused, setIsDesktopSearchFocused] = useState(false);
+  const [isMobileSearchFocused, setIsMobileSearchFocused] = useState(false);
+  const desktopSearchRef = useRef<HTMLDivElement | null>(null);
+  const mobileSearchRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const cleaned = searchQuery.trim();
+    const timeoutId = window.setTimeout(() => setDebouncedSearch(cleaned), 220);
+    return () => window.clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (!desktopSearchRef.current?.contains(target)) {
+        setIsDesktopSearchFocused(false);
+      }
+      if (!mobileSearchRef.current?.contains(target)) {
+        setIsMobileSearchFocused(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
+
+  useEffect(() => {
+    if (!isMenuOpen) {
+      setIsMobileSearchFocused(false);
+    }
+  }, [isMenuOpen]);
+
+  const { data: searchSuggestions = [], isFetching: isFetchingSuggestions } = useQuery<Product[]>({
+    queryKey: ['navbar-search-suggestions', debouncedSearch],
+    queryFn: async () => {
+      const result = await api.products.getAll(
+        undefined,
+        undefined,
+        1,
+        6,
+        true,
+        debouncedSearch
+      );
+      return result.products;
+    },
+    enabled: debouncedSearch.length >= 2,
+    staleTime: 1000 * 30,
+  });
 
   const handleInicioClick = (e: React.MouseEvent) => {
     if (location.pathname === '/') {
@@ -43,12 +95,26 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const q = searchQuery.trim();
+    setIsDesktopSearchFocused(false);
+    setIsMobileSearchFocused(false);
     if (q) {
-      navigate(`/categoria/cascos?search=${encodeURIComponent(q)}`);
+      navigate(`/categoria/todas?search=${encodeURIComponent(q)}`);
     } else {
-      navigate('/categoria/cascos');
+      navigate('/categoria/todas');
     }
   };
+
+  const handleSuggestionSelect = (product: Product) => {
+    setSearchQuery('');
+    setDebouncedSearch('');
+    setIsDesktopSearchFocused(false);
+    setIsMobileSearchFocused(false);
+    setIsMenuOpen(false);
+    navigate(`/producto/${product.slug}`);
+  };
+
+  const showDesktopSuggestions = isDesktopSearchFocused && searchQuery.trim().length >= 2;
+  const showMobileSuggestions = isMobileSearchFocused && searchQuery.trim().length >= 2;
 
   return (
     <>
@@ -82,11 +148,13 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
               </Link>
 
               <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl mx-auto">
+                <div ref={desktopSearchRef} className="relative w-full">
                 <div className="flex w-full border border-secondary/15 overflow-hidden">
                   <input
                     type="search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => setIsDesktopSearchFocused(true)}
                     placeholder="Buscar cascos, equipaje, marcas..."
                     className="flex-1 px-4 py-2.5 font-sans text-sm text-secondary placeholder:text-secondary/40 focus:outline-none bg-accent/50"
                   />
@@ -97,6 +165,32 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
                   >
                     <Search className="w-4 h-4" />
                   </button>
+                </div>
+                {showDesktopSuggestions && (
+                  <div className="absolute left-0 right-0 top-full mt-2 bg-white border border-secondary/10 shadow-xl z-70 max-h-80 overflow-y-auto">
+                    {isFetchingSuggestions ? (
+                      <p className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-secondary/50">
+                        Buscando...
+                      </p>
+                    ) : searchSuggestions.length === 0 ? (
+                      <p className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-secondary/50">
+                        Sin resultados
+                      </p>
+                    ) : (
+                      searchSuggestions.map((product) => (
+                        <button
+                          key={product.product_id}
+                          type="button"
+                          onClick={() => handleSuggestionSelect(product)}
+                          className="w-full text-left px-4 py-3 border-b last:border-b-0 border-secondary/6 hover:bg-accent/50 transition-colors"
+                        >
+                          <p className="text-xs font-black uppercase tracking-wider text-secondary">{product.name}</p>
+                          <p className="text-[11px] font-bold text-secondary/60">{product.price.toFixed(2)} €</p>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
                 </div>
               </form>
 
@@ -210,17 +304,45 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
               </div>
 
               <form onSubmit={(e) => { handleSearch(e); setIsMenuOpen(false); }} className="p-4 border-b border-secondary/8">
+                <div ref={mobileSearchRef} className="relative">
                 <div className="flex border border-secondary/15 overflow-hidden">
                   <input
                     type="search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => setIsMobileSearchFocused(true)}
                     placeholder="Buscar..."
                     className="flex-1 px-3 py-2.5 text-sm focus:outline-none bg-accent/30"
                   />
                   <button type="submit" className="bg-primary text-white px-4">
                     <Search className="w-4 h-4" />
                   </button>
+                </div>
+                {showMobileSuggestions && (
+                  <div className="absolute left-0 right-0 top-full mt-2 bg-white border border-secondary/10 shadow-xl z-70 max-h-72 overflow-y-auto">
+                    {isFetchingSuggestions ? (
+                      <p className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-secondary/50">
+                        Buscando...
+                      </p>
+                    ) : searchSuggestions.length === 0 ? (
+                      <p className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-secondary/50">
+                        Sin resultados
+                      </p>
+                    ) : (
+                      searchSuggestions.map((product) => (
+                        <button
+                          key={product.product_id}
+                          type="button"
+                          onClick={() => handleSuggestionSelect(product)}
+                          className="w-full text-left px-4 py-3 border-b last:border-b-0 border-secondary/6 hover:bg-accent/50 transition-colors"
+                        >
+                          <p className="text-xs font-black uppercase tracking-wider text-secondary">{product.name}</p>
+                          <p className="text-[11px] font-bold text-secondary/60">{product.price.toFixed(2)} €</p>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
                 </div>
               </form>
 

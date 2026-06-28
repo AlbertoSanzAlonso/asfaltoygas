@@ -4,6 +4,8 @@ import { api } from '@/lib/api';
 import { useCartStore } from '@/store/useCartStore';
 import { Button } from '@/components/ui/Button';
 
+const STYLE_LABEL_SLUGS = ['racing', 'ciudad', 'off-road', 'sport', 'touring'] as const;
+
 interface ProductLabelsProps {
   selectedLabels: Label[];
   availableLabels: Label[];
@@ -19,6 +21,15 @@ export const ProductLabels: React.FC<ProductLabelsProps> = ({
 }) => {
   const [newLabelName, setNewLabelName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const styleLabels = availableLabels.filter((label) =>
+    STYLE_LABEL_SLUGS.includes(label.slug as (typeof STYLE_LABEL_SLUGS)[number])
+  );
+  const nonStyleLabels = availableLabels.filter(
+    (label) => !STYLE_LABEL_SLUGS.includes(label.slug as (typeof STYLE_LABEL_SLUGS)[number])
+  );
+  const selectedStyle = selectedLabels.find((label) =>
+    STYLE_LABEL_SLUGS.includes(label.slug as (typeof STYLE_LABEL_SLUGS)[number])
+  );
 
   const handleToggle = (label: Label) => {
     const isSelected = selectedLabels.some((l) => l.id === label.id);
@@ -27,6 +38,24 @@ export const ProductLabels: React.FC<ProductLabelsProps> = ({
     } else {
       onLabelsChange([...selectedLabels, label]);
     }
+  };
+
+  const handleStyleChange = (styleId: string) => {
+    const withoutStyle = selectedLabels.filter(
+      (label) => !STYLE_LABEL_SLUGS.includes(label.slug as (typeof STYLE_LABEL_SLUGS)[number])
+    );
+    if (!styleId) {
+      onLabelsChange(withoutStyle);
+      return;
+    }
+
+    const selected = styleLabels.find((label) => label.id === parseInt(styleId, 10));
+    if (!selected) {
+      onLabelsChange(withoutStyle);
+      return;
+    }
+
+    onLabelsChange([...withoutStyle, selected]);
   };
 
   const handleCreate = async (e?: React.FormEvent | React.KeyboardEvent) => {
@@ -76,17 +105,40 @@ export const ProductLabels: React.FC<ProductLabelsProps> = ({
           Etiquetas (filtros en tienda)
         </label>
         <p className="text-[10px] text-gray-500 uppercase tracking-wider">
-          Ej: Verano, Fiesta, Básicos… La clienta podrá filtrar por ellas en el catálogo.
+          Estilo por desplegable + etiquetas libres para filtros extra.
         </p>
       </div>
 
+      <div className="bg-(--bg-card) p-6 border border-(--border-main) rounded-2xl max-w-xl space-y-3">
+        <label className="text-[8px] font-black uppercase tracking-widest text-gray-500">
+          Estilo
+        </label>
+        <select
+          value={selectedStyle?.id?.toString() || ''}
+          onChange={(e) => handleStyleChange(e.target.value)}
+          className="w-full bg-(--bg-main) border border-(--border-main) px-4 py-3 text-xs font-bold focus:border-primary outline-none rounded-xl uppercase"
+        >
+          <option value="">Sin estilo</option>
+          {styleLabels.map((label) => (
+            <option key={label.id} value={label.id}>
+              {label.name}
+            </option>
+          ))}
+        </select>
+        {styleLabels.length === 0 && (
+          <p className="text-[10px] text-gray-500 uppercase tracking-wider">
+            No hay estilos creados todavía (racing, ciudad, off-road, sport, touring).
+          </p>
+        )}
+      </div>
+
       <div className="flex flex-wrap gap-3">
-        {availableLabels.length === 0 ? (
+        {nonStyleLabels.length === 0 ? (
           <p className="text-xs text-gray-400 italic">
-            No hay etiquetas. Crea la primera abajo.
+            No hay etiquetas libres. Crea la primera abajo.
           </p>
         ) : (
-          availableLabels.map((label) => {
+          nonStyleLabels.map((label) => {
             const isSelected = selectedLabels.some((l) => l.id === label.id);
             return (
               <button

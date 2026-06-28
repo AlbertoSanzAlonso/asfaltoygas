@@ -19,7 +19,7 @@ const getOffset = (index: number, active: number, total: number) => {
 const CategoryCard: React.FC<{ cat: typeof HOME_CATEGORIES[number] }> = ({ cat }) => (
   <Link
     to={cat.href}
-    className="group relative block aspect-[3/4] overflow-hidden bg-secondary shadow-2xl"
+    className="group relative block aspect-[4/5] overflow-hidden bg-secondary shadow-2xl"
   >
     <img
       src={cat.image}
@@ -32,7 +32,7 @@ const CategoryCard: React.FC<{ cat: typeof HOME_CATEGORIES[number] }> = ({ cat }
     <div className="absolute inset-0 bg-primary/70 mix-blend-multiply group-hover:bg-primary/60 transition-colors" />
     <div className="absolute inset-0 bg-gradient-to-t from-secondary/85 via-secondary/20 to-transparent" />
     <div className="absolute inset-0 flex items-center justify-center p-4">
-      <span className="font-display text-white text-xl md:text-2xl font-bold uppercase tracking-wider text-center leading-tight drop-shadow-lg">
+      <span className="font-display text-white text-lg md:text-xl lg:text-2xl font-bold uppercase tracking-wide text-center leading-tight drop-shadow-lg">
         {cat.label}
       </span>
     </div>
@@ -75,7 +75,7 @@ export const CategoryGridSection: React.FC = () => {
 
         {isDesktop ? (
           <div className="mt-4 md:mt-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
               {HOME_CATEGORIES.map((cat) => (
                 <CategoryCard key={cat.label} cat={cat} />
               ))}
