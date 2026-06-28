@@ -77,7 +77,7 @@ Ver [TASKS.md](../../../../TASKS.md) para tareas pendientes y contexto de trabaj
 - Expuesto en `/sitemap.xml` vía rewrite en `vercel.json`.
 
 ### Imágenes y logo
-- `public/logo.png` — usado en datos estructurados (`Store.logo`). Mínimo 500x500, formato PNG.
+- `public/assets/logo/logo-asfaltoygas-main.png` — usado en datos estructurados (`Store.logo`). Mínimo 500x500, formato PNG.
 - `public/og-image.png` — Open Graph (1200x630). Meta tags en `index.html` + `SeoHelmet`.
 - **Storage de productos:** Supabase Storage bucket `products` con carpetas SEO-friendly:
   - `products/{categoria}/{subcategoria}/{marca}/{nombre-seo}.webp`

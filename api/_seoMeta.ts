@@ -289,7 +289,7 @@ export async function getSeoMetaForPath(pathname: string): Promise<SeoPageMeta |
         '@type': 'Store',
         name: SITE_NAME,
         url: SITE_URL,
-        logo: `${SITE_URL}/logo.png`,
+        logo: `${SITE_URL}/assets/logo/logo-asfaltoygas-main.png`,
         image: DEFAULT_OG_IMAGE,
         description: staticPage.description,
         priceRange: '€€',

@@ -8,6 +8,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const logoDir = join(root, 'public/assets/logo');
 const iconSvg = join(logoDir, 'logo-asfaltoygas-icon.svg');
+const mainLogoPng = join(logoDir, 'logo-asfaltoygas-main.png');
 
 async function svgToPng(svgPath, outPath, width, height) {
   const svg = readFileSync(svgPath);
@@ -21,7 +22,7 @@ async function svgToBuffer(svgPath, size) {
 }
 
 async function main() {
-  await svgToPng(join(logoDir, 'logo-asfaltoygas-square.svg'), join(root, 'public/logo.png'), 500, 500);
+  await svgToPng(join(logoDir, 'logo-asfaltoygas-square.svg'), mainLogoPng, 500, 500);
   await svgToPng(join(logoDir, 'logo-asfaltoygas-og.svg'), join(root, 'public/og-image.png'), 1200, 630);
 
   // Favicons desde el icono de casco

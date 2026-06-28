@@ -2,7 +2,7 @@ import { BRAND } from '@/lib/brand';
 
 export const SITE_URL = BRAND.url;
 export const SITE_NAME = BRAND.name;
-export const SITE_LOGO = `${SITE_URL}/logo.png`;
+export const SITE_LOGO = `${SITE_URL}/assets/logo/logo-asfaltoygas-main.png`;
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 export const GOOGLE_SITE_VERIFICATION =
   import.meta.env.VITE_GOOGLE_SITE_VERIFICATION?.trim() || '';

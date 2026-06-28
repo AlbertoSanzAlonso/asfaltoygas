@@ -9,7 +9,7 @@ import {
 
 import { getCanonicalSiteUrl } from '../../api/_siteUrl.js';
 
-const LOGO_URL = `${getCanonicalSiteUrl()}/logo.png`;
+const LOGO_URL = `${getCanonicalSiteUrl()}/assets/logo/logo-asfaltoygas-main.png`;
 
 const DEFAULT_ADMIN_ORDER_EMAIL = 'infobenalumox@gmail.com';
 
