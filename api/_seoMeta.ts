@@ -63,7 +63,7 @@ const STATIC_PAGES: Record<string, { title?: string; description: string }> = {
   },
   '/aviso-legal': {
     title: 'Aviso legal',
-    description: 'Aviso legal e información del titular del sitio web Asfalto y Gas.',
+    description: `Aviso legal e información del titular del sitio web ${BRAND.legal.holderName}.`,
   },
   '/politica-de-privacidad': {
     title: 'Política de privacidad',
@@ -295,7 +295,7 @@ export async function getSeoMetaForPath(pathname: string): Promise<SeoPageMeta |
         description: staticPage.description,
         priceRange: '€€',
         telephone: BRAND.phone,
-        email: 'info@asfaltoygas.es',
+        email: BRAND.legal.contactEmail,
         address: {
           '@type': 'PostalAddress',
           streetAddress: BRAND.address.street,

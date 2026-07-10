@@ -57,7 +57,7 @@ const STATIC_PAGES: Record<
   },
   '/aviso-legal': {
     title: 'Aviso legal',
-    description: 'Aviso legal e información del titular del sitio web Asfalto y Gas.',
+    description: `Aviso legal e información del titular del sitio web ${BRAND.legal.holderName}.`,
   },
   '/politica-de-privacidad': {
     title: 'Política de privacidad',

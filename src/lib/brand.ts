@@ -5,17 +5,17 @@ export const BRAND = {
   tagline: 'Equipamiento para motorista',
   description:
     'Tienda online especializada en cascos de moto, equipación y accesorios. Marcas líderes como HJC, AGV, Shoei y más. Envío rápido en toda España.',
-  email: 'asfaltoygasatcliente@gmail.com',
+  email: 'asfaltoygasatclient@gmail.com',
   phone: '+34 642 181 821',
   phoneDisplay: '642 181 821',
   whatsapp: '34642181821',
   url: 'https://www.asfaltoygas.es',
   /** Datos LSSI / RGPD (titular autónomo) */
   legal: {
-    holderName: 'Asfalto y Gas',
+    holderName: 'Manuel Jiménez Medrano',
     taxId: '77238951Y',
     taxIdLabel: 'DNI',
-    contactEmail: 'info@asfaltoygas.es',
+    contactEmail: 'asfaltoygasatclient@gmail.com',
   },
   address: {
     street: 'Calle Las Flores, 20',
