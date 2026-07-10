@@ -34,7 +34,7 @@ Ver [TASKS.md](../../../../TASKS.md) para tareas pendientes y contexto de trabaj
 - **Descripción:** Tienda online especializada en cascos de moto, equipación y accesorios.
 - **URL:** `https://www.asfaltoygas.es`
 - **Email:** `info@asfaltoygas.es`
-- **Config:** `src/lib/brand.ts` (fuente de verdad para nombre, teléfono, dirección, redes, categorías, marcas de casco)
+- **Config:** `src/lib/brand.ts` (fuente de verdad para nombre, teléfono, dirección, redes, categorías, marcas de casco, datos legales LSSI)
 
 ## Variables de entorno
 

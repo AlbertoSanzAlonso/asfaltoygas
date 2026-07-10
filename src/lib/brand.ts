@@ -10,6 +10,13 @@ export const BRAND = {
   phoneDisplay: '642 181 821',
   whatsapp: '34642181821',
   url: 'https://www.asfaltoygas.es',
+  /** Datos LSSI / RGPD (titular autónomo) */
+  legal: {
+    holderName: 'Asfalto y Gas',
+    taxId: '77238951Y',
+    taxIdLabel: 'DNI',
+    contactEmail: 'info@asfaltoygas.es',
+  },
   address: {
     street: 'Calle Las Flores, 20',
     city: 'Benalmádena',

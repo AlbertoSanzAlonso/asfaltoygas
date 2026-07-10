@@ -1,6 +1,9 @@
 import type { FC } from 'react';
+import { BRAND } from '@/lib/brand';
 
 const TermsPage: FC = () => {
+  const { legal } = BRAND;
+
   return (
     <div className="bg-accent min-h-screen">
       <div className="max-w-4xl mx-auto px-6 py-32">
@@ -15,20 +18,20 @@ const TermsPage: FC = () => {
           <div className="bg-white p-12 md:p-20 shadow-sm border border-secondary/3 space-y-12">
             <section className="space-y-6">
               <p className="text-secondary/80 leading-relaxed">
-                Las presentes Condiciones Generales regulan la compra de productos a través del sitio web: <a href="https://www.asfaltoygas.es" className="text-primary hover:underline">www.asfaltoygas.es</a>
+                Las presentes Condiciones Generales regulan la compra de productos a través del sitio web: <a href={BRAND.url} className="text-primary hover:underline">www.asfaltoygas.es</a>
               </p>
               <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">Titular</span>
-                  <p className="text-secondary font-medium">ASFALTO Y GAS, S.L.</p>
+                  <p className="text-secondary font-medium">{legal.holderName}</p>
                 </div>
                 <div className="space-y-2">
-                  <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">NIF</span>
-                  <p className="text-secondary font-medium">B26691014</p>
+                  <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">{legal.taxIdLabel}</span>
+                  <p className="text-secondary font-medium">{legal.taxId}</p>
                 </div>
                 <div className="space-y-2">
                   <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">Correo electrónico</span>
-                  <a href="mailto:info@asfaltoygas.es" className="text-secondary font-medium hover:text-primary transition-colors">info@asfaltoygas.es</a>
+                  <a href={`mailto:${legal.contactEmail}`} className="text-secondary font-medium hover:text-primary transition-colors">{legal.contactEmail}</a>
                 </div>
               </div>
               <p className="text-secondary/80 leading-relaxed italic border-l-2 border-primary/20 pl-4">
@@ -39,7 +42,7 @@ const TermsPage: FC = () => {
             <section className="space-y-6">
               <h2 className="text-xl font-bold tracking-widest uppercase text-secondary">1. Objeto</h2>
               <p className="text-secondary/80 leading-relaxed">
-                Las presentes condiciones regulan la venta de productos de moda ofrecidos en la tienda online.
+                Las presentes condiciones regulan la venta de cascos, equipación y accesorios para motorista ofrecidos en la tienda online.
               </p>
             </section>
 
@@ -65,7 +68,7 @@ const TermsPage: FC = () => {
                 <li>Los gastos de envío se detallarán antes de finalizar la compra.</li>
               </ul>
               <p className="text-secondary/80 leading-relaxed">
-                ASFALTO Y GAS, S.L. se reserva el derecho a modificar precios sin afectar a pedidos ya confirmados.
+                {legal.holderName} se reserva el derecho a modificar precios sin afectar a pedidos ya confirmados.
               </p>
             </section>
 
@@ -79,14 +82,14 @@ const TermsPage: FC = () => {
             <section className="space-y-6">
               <h2 className="text-xl font-bold tracking-widest uppercase text-secondary">5. Envíos</h2>
               <p className="text-secondary/80 leading-relaxed">
-                Los pedidos serán enviados a la dirección facilitada por el cliente. El plazo estimado de entrega se indica en la página de Envíos. ASFALTO Y GAS, S.L. no será responsable de retrasos debidos a causas ajenas o imputables al transportista.
+                Los pedidos serán enviados a la dirección facilitada por el cliente. El plazo estimado de entrega se indica en la página de Envíos. {legal.holderName} no será responsable de retrasos debidos a causas ajenas o imputables al transportista.
               </p>
             </section>
 
             <section className="space-y-6">
               <h2 className="text-xl font-bold tracking-widest uppercase text-secondary">6. Derecho de desistimiento</h2>
               <p className="text-secondary/80 leading-relaxed">
-                El cliente dispone de 14 días naturales desde la recepción del pedido para desistir del contrato sin necesidad de justificación. Para ejercer este derecho deberá comunicarlo por escrito a: <a href="mailto:info@asfaltoygas.es" className="text-primary hover:underline">info@asfaltoygas.es</a>.
+                El cliente dispone de 14 días naturales desde la recepción del pedido para desistir del contrato sin necesidad de justificación. Para ejercer este derecho deberá comunicarlo por escrito a: <a href={`mailto:${legal.contactEmail}`} className="text-primary hover:underline">{legal.contactEmail}</a>.
               </p>
               <p className="text-secondary/80 leading-relaxed">El producto deberá devolverse:</p>
               <ul className="list-disc pl-6 text-secondary/80 space-y-2">
@@ -113,7 +116,7 @@ const TermsPage: FC = () => {
             <section className="space-y-6">
               <h2 className="text-xl font-bold tracking-widest uppercase text-secondary">8. Productos defectuosos o error en el envío</h2>
               <p className="text-secondary/80 leading-relaxed">
-                Si el producto presenta defectos o no corresponde con el pedido, el cliente deberá comunicarlo en un plazo máximo de 48 horas desde su recepción. En estos casos, los gastos de devolución y nuevo envío correrán a cargo de ASFALTO Y GAS, S.L.
+                Si el producto presenta defectos o no corresponde con el pedido, el cliente deberá comunicarlo en un plazo máximo de 48 horas desde su recepción. En estos casos, los gastos de devolución y nuevo envío correrán a cargo de {legal.holderName}.
               </p>
             </section>
 
@@ -143,7 +146,7 @@ const TermsPage: FC = () => {
 
             <footer className="pt-12 border-t border-secondary/10">
               <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-secondary/40">
-                Última actualización: Abril 2024
+                Última actualización: Julio 2026
               </p>
             </footer>
           </div>

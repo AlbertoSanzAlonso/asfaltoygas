@@ -1,6 +1,9 @@
 import type { FC } from 'react';
+import { BRAND } from '@/lib/brand';
 
 const PrivacyPolicyPage: FC = () => {
+  const { legal } = BRAND;
+
   return (
     <div className="bg-accent min-h-screen">
       <div className="max-w-4xl mx-auto px-6 py-32">
@@ -16,7 +19,7 @@ const PrivacyPolicyPage: FC = () => {
             <section className="space-y-6">
               <h2 className="text-xl font-bold tracking-widest uppercase text-secondary">1. Información al usuario</h2>
               <p className="text-secondary/80 leading-relaxed">
-                ASFALTO Y GAS, S.L., como Responsable del Tratamiento, le informa que, según lo dispuesto en el Reglamento (UE) 2016/679 (RGPD) y la L.O. 3/2018 (LOPDGDD), trataremos sus datos tal y como reflejamos en la presente Política de Privacidad.
+                {legal.holderName}, como Responsable del Tratamiento, le informa que, según lo dispuesto en el Reglamento (UE) 2016/679 (RGPD) y la L.O. 3/2018 (LOPDGDD), trataremos sus datos tal y como reflejamos en la presente Política de Privacidad.
               </p>
             </section>
 
@@ -49,13 +52,13 @@ const PrivacyPolicyPage: FC = () => {
             <section className="space-y-6">
               <h2 className="text-xl font-bold tracking-widest uppercase text-secondary">5. Derechos</h2>
               <p className="text-secondary/80 leading-relaxed">
-                Usted puede ejercer sus derechos de acceso, rectificación, portabilidad, supresión, limitación y oposición enviando un correo electrónico a <a href="mailto:info@asfaltoygas.es" className="text-primary hover:underline">info@asfaltoygas.es</a>.
+                Usted puede ejercer sus derechos de acceso, rectificación, portabilidad, supresión, limitación y oposición enviando un correo electrónico a <a href={`mailto:${legal.contactEmail}`} className="text-primary hover:underline">{legal.contactEmail}</a>.
               </p>
             </section>
 
             <footer className="pt-12 border-t border-secondary/10">
               <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-secondary/40">
-                Última actualización: Abril 2024
+                Última actualización: Julio 2026
               </p>
             </footer>
           </div>
