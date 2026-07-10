@@ -52,7 +52,24 @@ Ver [TASKS.md](../../../../TASKS.md) para tareas pendientes y contexto de trabaj
   - Manual API: https://pda.nacex.com/nacex_ws
 - IA: `VITE_OPENAI_API_KEY`, `VITE_GROQ_API_KEY`
 
-## Convenciones
+## Envíos Nacex
+
+Integración **Web Service** (no plugin CMS). Proxy en `api/nacex.ts`; cliente en `src/lib/api/shipping.ts`.
+
+| Componente | Ubicación |
+|------------|-----------|
+| API handler | `api/nacex.ts` |
+| Guía y pruebas curl | `api/NACEX_README.md` |
+| Constantes (sin clave) | `src/constants/nacex.ts` |
+| Puntos Shop en checkout | `NacexPointSelector.tsx` |
+| Generar etiqueta admin | `AdminDashboard.tsx` → `handleGenerateLabel` |
+
+**Flujo admin:** solo pedidos pagados (`canFulfillOrder` en `src/lib/orderPayment.ts`) → `POST /api/nacex?method=crear_envio` → tracking + etiqueta PNG + email.
+
+**Pruebas seguras:** usuario `NACEX_USER_TEST`; o `isTest: true` en body (mock). En producción, `crear_envio` sin test **crea envío real** (recogida en tienda).
+
+**Agencia contacto:** 2924 Benalmádena · 952 560 161 · integraciones: integraciones.clientes@nacex.com
+
 
 - Responder al usuario en **español** si no indica otro idioma.
 - Commits/PRs: mensajes claros; no incluir secretos en git.

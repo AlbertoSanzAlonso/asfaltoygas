@@ -1,5 +1,4 @@
-// Configuración de NACEX (entorno de pruebas)
-// Cambia estos valores cuando pases a producción
+// Configuración pública de NACEX (sin contraseña — ver NACEX_PASSWORD en .env / Vercel)
 
 export const NACEX_CONFIG = {
   usuario: "ASFALTOYGASATCLIENTE@GMAIL.COM",
@@ -10,5 +9,5 @@ export const NACEX_CONFIG = {
   nombreRecogida: "Asfalto y Gas",
   direccionRecogida: "C/ Aragon, 2, L2",
   poblacionRecogida: "Benalmadena",
-  entorno: "produccion", // Cambia a "produccion" cuando corresponda
+  entorno: "produccion",
 };

@@ -1,6 +1,40 @@
 # Tareas pendientes — Asfalto y Gas
 
-## Completado: Re-scraping de cascos — descripciones e imágenes en alta
+## Completado: Integración Nacex Web Service (envíos)
+
+- **Tipo:** tienda a medida vía Web Service WS (`api/nacex.ts`) — no módulo PrestaShop/WooCommerce.
+- **Agencia:** 2924 (Benalmádena) · **Abonado:** 00485 · **Usuario WS:** `ASFALTOYGASATCLIENTE@GMAIL.COM`
+- **Usuario test Nacex:** `ASFALTOYGASATCLIENTE@GMAIL._T` (usar solo para pruebas; no genera recogidas reales).
+- **Documentación:** `api/NACEX_README.md` · credenciales sin secretos en `src/constants/nacex.ts` · clave MD5 en `.env` / Vercel (`NACEX_PASSWORD`).
+
+### Verificado en producción (10 Jul 2026)
+
+| Prueba | Resultado |
+|--------|-----------|
+| `test_connection` | `mode: real` |
+| Puntos Nacex Shop (`get_puntos_shop&cp=29631`) | 10 puntos (parser corregido: separador `\|`) |
+| Crear expedición (`putExpedicion`) | Tracking `488361849`, albarán `2924/10501771` |
+| Etiqueta PNG (`get_etiqueta`) | OK |
+
+### Flujo operativo
+
+1. Cliente paga (Redsys) → pedido `paid` / `Paid`.
+2. Admin → Pedidos → **Generar etiqueta Nacex** (`AdminDashboard` → `api.shipping.createNacexExpedition`).
+3. API guarda tracking en `orders`, envía email al cliente con enlace de seguimiento.
+4. Checkout: opción **Punto Nacex Shop** carga puntos reales por CP (`NacexPointSelector`).
+
+### Acción manual pendiente (una vez)
+
+- **Anular expedición de prueba** `488361849` con agencia 2924 (952 560 161) si aún no se hizo — se creó al validar la API; no hay paquete real.
+
+### Notas para agentes
+
+- **No llamar `crear_envio` en producción** salvo pedido real o petición explícita del usuario.
+- Pedidos con `isTest`, `TEST` en ID o `payment_method` test → modo mock (sin Nacex real).
+- Servicios/embalajes/extras se configuran con la agencia Nacex.
+
+---
+
 
 - URL: `https://www.elmotorista.es/shop-motos/casco-moto/categoria-cascos-moto/familia-cascos-jet.cascos-integrales.cascos-modulares`
 - **565 cascos** actualizados:
@@ -160,4 +194,48 @@ FROM products WHERE category_id = 3;
 ---
 
 *Creado: 14 Jun 2026*
-*Última actualización: 15 Jun 2026*
+*Última actualización: 10 Jul 2026*
+
+---
+
+## Completado: Re-scraping de cascos — descripciones e imágenes en alta
+
+### Contexto
+- Se ejecutó refresco desde:
+  - `https://www.elmotorista.es/shop-motos/maletas-equipaje/categoria-maleta-equipaje-moto`
+- Resultado del refresco:
+  - **Actualizados:** 305
+  - **No encontrados en BD:** 11 (se dejaron sin tocar, por decisión)
+  - **Fallidos:** 1 (bloqueo de imagen por 403)
+- Descripciones de Equipaje:
+  - **303/303** productos con descripción estructurada (`INFORMACION DEL PRODUCTO` + características)
+
+### Qué revisar en próxima sesión
+1. Auditar productos de Equipaje que aún se vean con imagen de baja resolución en frontend.
+2. Identificar cuáles están limitados por CDN del proveedor (403) y decidir fuente alternativa.
+3. Reintentar sustitución de imágenes en alta solo para esos casos pendientes.
+
+### Notas técnicas
+- Se añadió mejora al downloader para priorizar resoluciones altas (`_1080`, `_800`, `_640`, etc.).
+- En algunos artículos el proveedor devuelve 403 incluso con referer/user-agent, por lo que puede requerir alternativa manual o nueva fuente.
+
+### Estado actualizado (28 Jun 2026)
+- Refresco ejecutado sobre:
+  - `https://www.elmotorista.es/shop-motos/maletas-equipaje/categoria-maleta-equipaje-moto`
+- Última ejecución:
+  - **Actualizados:** 305
+  - **No encontrados en BD:** 11 (se dejaron sin tocar)
+  - **Fallidos:** 1
+- Descripciones en Equipaje:
+  - Total productos: 303
+  - Con descripción estructurada/no vacía: 303
+  - Descripciones tipo `Comprar ...`: 0
+  - Aún con plantilla genérica (`INFORMACION DEL PRODUCTO`): ~207 (pendiente de mejorar con texto real cuando el proveedor no expone bloque largo)
+
+### Pendiente próxima sesión (prioridad alta)
+1. Reducir descripciones en plantilla de Equipaje:
+   - Intentar extraer más campos del payload proveedor (`shortDescription`, `meta_dsp`, bloques alternativos) antes de usar plantilla.
+2. Auditoría de imágenes de Equipaje con baja resolución real en frontend:
+   - Listar productos afectados y rehacer imagen principal caso por caso.
+3. Resolver casos bloqueados por CDN/proveedor (403):
+   - Definir fuente alternativa o flujo manual para esos productos.

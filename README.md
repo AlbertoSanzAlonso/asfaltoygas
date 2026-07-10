@@ -6,7 +6,7 @@ Tienda online de equipamiento para motorista. Proyecto construido con React, Vit
 
 - ✨ Diseño Premium y State-of-the-art
 - 🛒 Checkout integrado con Redsys (Tarjeta y Bizum)
-- 📦 Gestión de envíos con NACEX
+- 📦 Gestión de envíos con NACEX (Web Service — ver `api/NACEX_README.md`)
 - 👤 Área de cliente personalizada
 - 📱 Totalmente responsive y optimizado para móviles
 

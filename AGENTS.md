@@ -22,3 +22,4 @@ Ver [TASKS.md](TASKS.md) para tareas pendientes y contexto de trabajo incompleto
 - SEO: la canonical siempre es `https://www.asfaltoygas.es` (con www), sin query params.
 - SEO: `public/assets/logo/logo-asfaltoygas-main.png` debe ser ≥500x500px (usado en datos estructurados `Store`).
 - **Imágenes de producto**: preferir Supabase Storage con carpetas SEO-friendly (`products/{categoria}/{subcategoria}/{marca}/{nombre-seo}.webp`). Ver TASKS.md para imágenes pendientes.
+- **Nacex:** integración Web Service en `api/nacex.ts`. No crear expediciones reales en pruebas; usar `NACEX_USER_TEST` o `isTest`. Ver `api/NACEX_README.md`.
