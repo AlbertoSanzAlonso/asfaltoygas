@@ -161,10 +161,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, cp, tracking, codExp } = req.query;
 
   // CREDENCIALES (Prioridad a Variables de Entorno)
-  const NACEX_USER = process.env.NACEX_USER || 'INFOBENALUMOX@GMAIL.COM';
+  const NACEX_USER = process.env.NACEX_USER || 'ASFALTOYGASATCLIENTE@GMAIL.COM';
   const NACEX_PASS = process.env.NACEX_PASSWORD || '';
   const NACEX_AGENCY = process.env.NACEX_AGENCIA || '2924';
-  const NACEX_CLIENT = process.env.NACEX_CLIENTE || '00472';
+  const NACEX_CLIENT = process.env.NACEX_CLIENTE || '00485';
   const NACEX_CP_RECOGIDA = process.env.NACEX_CP_RECOGIDA || '29631';
   const NACEX_NOMBRE_RECOGIDA = process.env.NACEX_NOMBRE_RECOGIDA || 'Asfalto y Gas';
   const NACEX_DIR_RECOGIDA = (process.env.NACEX_DIR_RECOGIDA || 'C/ Aragon, 2, L2').slice(0, 45);

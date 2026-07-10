@@ -12,7 +12,7 @@ description: >-
 - **Frontend:** React + Vite + TypeScript + Tailwind CSS v4 + Zustand + TanStack Query + Framer Motion
 - **Backend datos:** Supabase (`src/lib/supabase.ts`, `src/lib/api/*`)
 - **Deploy:** Vercel (API en `api/`)
-- **Pagos:** Redsys (Tarjeta + Bizum); **envío:** Nacex (`api/nacex.ts`)
+- **Pagos:** Redsys (Tarjeta + Bizum); **envío:** Nacex Web Service (`api/nacex.ts`, doc en `api/NACEX_README.md`)
 - **Storage:** Supabase Storage (bucket `products` para imágenes de producto)
 
 ## Tareas pendientes
@@ -42,7 +42,14 @@ Ver [TASKS.md](../../../../TASKS.md) para tareas pendientes y contexto de trabaj
 - **No commitear:** `.env`, `.env.preview`, `.env.production`
 - Supabase: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - Redsys: `VITE_REDSYS_SECRET_KEY`, `VITE_REDSYS_COMMERCE_NUMBER`, `VITE_REDSYS_TERMINAL_NUMBER`
-- Nacex: `NACEX_USER`, `NACEX_PASSWORD`, `NACEX_AGENCIA`, `NACEX_CLIENTE`, etc.
+- Nacex (Web Service WS, tienda a medida — no módulo PrestaShop/WooCommerce):
+  - `NACEX_USER` — producción: `ASFALTOYGASATCLIENTE@GMAIL.COM`
+  - `NACEX_USER_TEST` — pruebas: `ASFALTOYGASATCLIENTE@GMAIL._T`
+  - `NACEX_PASSWORD` — clave MD5 (solo en `.env` / Vercel, **no commitear**)
+  - `NACEX_AGENCIA=2924`, `NACEX_CLIENTE=00485`
+  - Recogida tienda: `NACEX_CP_RECOGIDA`, `NACEX_NOMBRE_RECOGIDA`, `NACEX_DIR_RECOGIDA`, `NACEX_POBLACION_RECOGIDA`, `NACEX_TEL_RECOGIDA`
+  - Referencia sin secretos: `src/constants/nacex.ts`
+  - Manual API: https://pda.nacex.com/nacex_ws
 - IA: `VITE_OPENAI_API_KEY`, `VITE_GROQ_API_KEY`
 
 ## Convenciones
