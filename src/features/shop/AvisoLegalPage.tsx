@@ -21,21 +21,31 @@ const AvisoLegalPage: FC = () => {
                 En cumplimiento con el deber de información recogido en la Ley 34/2002, de Servicios de la Sociedad de la Información y del Comercio Electrónico (LSSI-CE), se facilitan a continuación los siguientes datos:
               </p>
               <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">Titular</span>
                   <p className="text-secondary font-medium">{legal.holderName}</p>
                 </div>
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">{legal.taxIdLabel}</span>
                   <p className="text-secondary font-medium">{legal.taxId}</p>
                 </div>
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">Correo electrónico</span>
-                  <a href={`mailto:${legal.contactEmail}`} className="text-secondary font-medium hover:text-primary transition-colors">{legal.contactEmail}</a>
+                  <a
+                    href={`mailto:${legal.contactEmail}`}
+                    className="block text-secondary font-medium hover:text-primary transition-colors break-all"
+                  >
+                    {legal.contactEmail}
+                  </a>
                 </div>
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary">Sitio web</span>
-                  <a href={BRAND.url} className="text-secondary font-medium hover:text-primary transition-colors">www.asfaltoygas.es</a>
+                  <a
+                    href={BRAND.url}
+                    className="block text-secondary font-medium hover:text-primary transition-colors"
+                  >
+                    www.asfaltoygas.es
+                  </a>
                 </div>
               </div>
             </section>
