@@ -9,17 +9,88 @@ import {
 } from './images.js';
 import { slugifyBrand } from './brands.js';
 
+function slugifyProductName(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-')
+    .slice(0, 80);
+}
+
+async function resolveUniqueProductSlug(
+  supabase: SupabaseClient,
+  name: string
+): Promise<string> {
+  const baseSlug = slugifyProductName(name) || 'producto';
+  let candidate = baseSlug;
+  let suffix = 2;
+
+  while (true) {
+    const { data, error } = await supabase
+      .from('products')
+      .select('product_id')
+      .eq('slug', candidate)
+      .maybeSingle();
+
+    if (error && error.code !== 'PGRST116') {
+      throw new Error(`No se pudo validar slug "${candidate}": ${error.message}`);
+    }
+    if (!data) return candidate;
+
+    candidate = `${baseSlug}-${suffix}`;
+    suffix++;
+  }
+}
+
 function buildProductDescription(scraped: ScrapedProduct, category: string): string {
   const raw = (scraped.description || '').replace(/\s+/g, ' ').trim();
-  if (raw.length >= 40) return raw;
+  const lowQualitySource =
+    raw.length < 120 ||
+    /^comprar\s+/i.test(raw) ||
+    /en el motorista/i.test(raw) ||
+    /\bahorro\b/i.test(raw);
+  if (!lowQualitySource) return raw;
 
   const brand = scraped.brand?.trim();
   const baseName = scraped.name.trim();
-  const intro = brand
-    ? `${baseName} de ${brand} para motorista.`
-    : `${baseName} para motorista.`;
+  const lowerName = baseName.toLowerCase();
+  const lowerSubcategory = (scraped.subcategory || '').toLowerCase();
 
-  return `${intro} Producto importado en ${category} con imágenes y variantes disponibles en tienda.`;
+  let typeLabel = 'equipación para motorista';
+  if (lowerName.includes('chaqueta') || lowerSubcategory.includes('chaqueta')) {
+    typeLabel = 'chaqueta de moto';
+  } else if (lowerName.includes('guante') || lowerSubcategory.includes('guante')) {
+    typeLabel = 'guantes de moto';
+  } else if (lowerName.includes('pantal') || lowerSubcategory.includes('pantal')) {
+    typeLabel = 'pantalón de moto';
+  } else if (lowerName.includes('bota') || lowerSubcategory.includes('bota')) {
+    typeLabel = 'botas de moto';
+  }
+
+  const sizes = [...new Set((scraped.variants || []).map((v) => (v.size || '').trim()).filter(Boolean))];
+  const colors = [...new Set((scraped.variants || []).map((v) => (v.color || '').trim()).filter(Boolean))];
+  const sizeText = sizes.length ? sizes.join(', ') : 'Consultar disponibilidad';
+  const colorText = colors.length ? colors.join(', ') : 'Consultar disponibilidad';
+
+  const brandText = brand ? ` de ${brand}` : '';
+
+  return [
+    `INFORMACION DEL PRODUCTO`,
+    `${baseName}. ${typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1)}${brandText} pensada para ofrecer comodidad, proteccion y buen rendimiento en el uso diario o en ruta.`,
+    ``,
+    `Caracteristicas principales:`,
+    `- Diseno tecnico orientado a una conduccion segura y confortable.`,
+    `- Materiales seleccionados para un uso intensivo en moto.`,
+    `- Ajuste ergonomico para mayor libertad de movimiento.`,
+    `- Acabados y construccion enfocados en durabilidad.`,
+    `- Tallas disponibles: ${sizeText}.`,
+    `- Colores disponibles: ${colorText}.`,
+    ``,
+    `Categoria: ${category}.`,
+  ].join('\n');
 }
 
 async function resolveCategoryId(
@@ -108,6 +179,7 @@ export async function importScrapedProduct(
   );
   const brandName = options.brand ?? scraped.brand;
   const brandId = await resolveBrandId(supabase, brandName);
+  const productSlug = await resolveUniqueProductSlug(supabase, scraped.name);
 
   if (!options.dryRun) {
     const exists = await productExistsByName(supabase, scraped.name);
@@ -199,6 +271,7 @@ export async function importScrapedProduct(
     .insert([
       {
         name: scraped.name,
+        slug: productSlug,
         description: buildProductDescription(scraped, options.category),
         price,
         category_id: categoryId,

@@ -25,20 +25,55 @@ function slugify(text: string): string {
 }
 
 export async function downloadImage(url: string, referer?: string): Promise<{ buffer: Buffer; contentType: string }> {
-  const res = await fetch(url, {
-    headers: {
-      'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
-      ...(referer ? { Referer: referer } : {}),
-    },
-    redirect: 'follow',
+  const sizeMatch = url.match(/_(\d+)\.(webp|jpe?g|png)(\?|$)/i);
+  const candidates: string[] = [];
+  if (sizeMatch) {
+    const suffix = sizeMatch[0];
+    const ext = sizeMatch[2];
+    const tail = suffix.slice((`_${sizeMatch[1]}.${ext}`).length); // keeps optional query or end marker
+    const preferredSizes = [1080, 800, 640, 480, 320, 200, 120, 80, 60];
+    for (const size of preferredSizes) {
+      candidates.push(url.replace(/_(\d+)\.(webp|jpe?g|png)(\?|$)/i, `_${size}.${ext}${tail}`));
+    }
+  }
+  candidates.push(url);
+
+  const seen = new Set<string>();
+  const uniqueCandidates = candidates.filter((candidate) => {
+    if (seen.has(candidate)) return false;
+    seen.add(candidate);
+    return true;
   });
-  if (!res.ok) throw new Error(`Imagen HTTP ${res.status}: ${url}`);
-  const contentType = res.headers.get('content-type') || 'image/jpeg';
-  const buffer = Buffer.from(await res.arrayBuffer());
-  if (buffer.length < 500) throw new Error(`Imagen demasiado pequeña: ${url}`);
-  return { buffer, contentType };
+
+  let lastError: Error | null = null;
+  for (const candidate of uniqueCandidates) {
+    try {
+      const res = await fetch(candidate, {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+          ...(referer ? { Referer: referer } : {}),
+        },
+        redirect: 'follow',
+      });
+      if (!res.ok) {
+        lastError = new Error(`Imagen HTTP ${res.status}: ${candidate}`);
+        continue;
+      }
+      const contentType = res.headers.get('content-type') || 'image/jpeg';
+      const buffer = Buffer.from(await res.arrayBuffer());
+      if (buffer.length < 500) {
+        lastError = new Error(`Imagen demasiado pequeña: ${candidate}`);
+        continue;
+      }
+      return { buffer, contentType };
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+    }
+  }
+
+  throw lastError ?? new Error(`No se pudo descargar imagen: ${url}`);
 }
 
 export async function uploadImagesToStorage(

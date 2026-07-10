@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ProviderConfig, ScrapedProduct } from './types.js';
-import { fetchPage } from './fetch-page.js';
+import { fetchPage, resolveUrl } from './fetch-page.js';
 import { extractFromJsonLd } from './extract-jsonld.js';
 import { extractFromHtml, extractProductLinks, detectMaxListingPage, extractElmotoristaColors, extractElmotoristaColorLinks, extractImagesFromHtml } from './extract-html.js';
 import { extractHelmetTypeFromHtml } from './helmet-types.js';
@@ -84,6 +84,79 @@ export function normalizeImageUrls(urls: string[]): string[] {
     .map((entry) => entry.url);
 }
 
+function decodeJsonString(value: string): string {
+  try {
+    return JSON.parse(`"${value}"`);
+  } catch {
+    return value;
+  }
+}
+
+function htmlToPlainText(html: string): string {
+  const decodedEntities = html
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&aacute;/gi, 'á')
+    .replace(/&eacute;/gi, 'é')
+    .replace(/&iacute;/gi, 'í')
+    .replace(/&oacute;/gi, 'ó')
+    .replace(/&uacute;/gi, 'ú')
+    .replace(/&ntilde;/gi, 'ñ')
+    .replace(/&uuml;/gi, 'ü')
+    .replace(/&Aacute;/g, 'Á')
+    .replace(/&Eacute;/g, 'É')
+    .replace(/&Iacute;/g, 'Í')
+    .replace(/&Oacute;/g, 'Ó')
+    .replace(/&Uacute;/g, 'Ú')
+    .replace(/&Ntilde;/g, 'Ñ')
+    .replace(/&Uuml;/g, 'Ü')
+    .replace(/&#(\d+);/g, (_, n) => {
+      const code = parseInt(String(n), 10);
+      return Number.isFinite(code) ? String.fromCharCode(code) : '';
+    });
+
+  return decodedEntities
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>\s*<p>/gi, '\n\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim();
+}
+
+function extractElmotoristaPayloadDescription(html: string): string | null {
+  const matches = [...html.matchAll(/"description":"((?:\\.|[^"\\])*)"/g)];
+  let best = '';
+  for (const match of matches) {
+    const decoded = decodeJsonString(match[1]);
+    const plain = htmlToPlainText(decoded);
+    if (plain.length > best.length && /(caracter|material|protec|ventila|bolsill|forro|tejido|impermeable|waterproof)/i.test(plain)) {
+      best = plain;
+    }
+  }
+  return best.length >= 120 ? best : null;
+}
+
+function extractElmotoristaHighResImages(html: string, sourceUrl: string): string[] {
+  const out: string[] = [];
+  const re = /"img":"([^"]+?)","img_sizes":\[(.*?)\]/g;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(html)) !== null) {
+    const rawUrl = decodeJsonString(match[1]);
+    const sizes = (match[2].match(/\d+/g) || []).map((s) => parseInt(s, 10)).filter(Number.isFinite);
+    const maxSize = sizes.length ? Math.max(...sizes) : null;
+    let imageUrl = resolveUrl(sourceUrl, rawUrl);
+    if (maxSize) {
+      imageUrl = imageUrl.replace(/_(\d+)\.(webp|jpe?g|png)(\?|$)/i, `_${maxSize}.$2$3`);
+    }
+    out.push(imageUrl);
+  }
+  return [...new Set(out)];
+}
+
 export async function scrapeProductUrl(
   url: string,
   opts: {
@@ -125,6 +198,14 @@ export async function scrapeProductUrl(
   scraped.images = normalizeImageUrls(scraped.images);
 
   if (opts.providerId === 'elmotorista' || url.includes('elmotorista.es')) {
+    const payloadDescription = extractElmotoristaPayloadDescription(html);
+    if (payloadDescription) scraped.description = payloadDescription;
+
+    const payloadImages = extractElmotoristaHighResImages(html, url);
+    if (payloadImages.length) {
+      scraped.images = normalizeImageUrls([...payloadImages, ...scraped.images]);
+    }
+
     const helmetType = extractHelmetTypeFromHtml(html);
     if (helmetType) scraped.subcategory = helmetType;
 
