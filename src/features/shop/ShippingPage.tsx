@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { Truck, Store, MapPin, Clock } from 'lucide-react';
+import { BRAND } from '@/lib/brand';
 
 const ShippingPage: FC = () => {
   return (
@@ -54,7 +55,7 @@ const ShippingPage: FC = () => {
               </p>
               <div className="pt-4 space-y-1">
                 <p className="text-secondary font-medium text-sm uppercase tracking-wider">Asfalto y Gas</p>
-                <p className="text-secondary/60 text-xs">C/ Aragón, 2, L2 – Benalmádena</p>
+                <p className="text-secondary/60 text-xs">{BRAND.address.street} – {BRAND.address.city}</p>
               </div>
             </section>
 

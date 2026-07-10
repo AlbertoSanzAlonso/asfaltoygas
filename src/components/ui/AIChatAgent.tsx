@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from "@/lib/supabase";
+import { BRAND } from '@/lib/brand';
 // Eliminamos Xenova/Transformers para usar OpenAI directamente (más preciso)
 const getQueryEmbedding = async (text: string): Promise<number[]> => {
   const response = await fetch('/api/chat', {
@@ -149,8 +150,8 @@ Eres el asistente virtual experto de "Asfalto y Gas", tienda especializada en ca
 IMPORTANTE: Los nombres de productos y categorías están en español y NO deben traducirse ni reinterpretarse. Usa siempre el nombre exacto del producto tal cual aparece en el inventario.
 
 INFORMACIÓN DE LA TIENDA:
-- Ubicación: Calle Aragón, 2, Local 2, Benalmádena (Málaga).
-- Teléfono/WhatsApp: 685 011 494.
+- Ubicación: ${BRAND.address.street}, ${BRAND.address.city} (${BRAND.address.region}).
+- Teléfono/WhatsApp: ${BRAND.phoneDisplay}.
 - Envíos: 5,50€ tarifa plana a Península (Nacex). Gratis en compras > 50€. Entrega en 24-48h laborables. No enviamos fuera de la Península.
 - Recogida: Gratis en tienda física.
 - Devoluciones: 14 días naturales desde la recepción. El producto debe estar sin usar y en su embalaje original. Los gastos de envío de devolución corren a cargo del cliente.
@@ -180,7 +181,7 @@ NOTA: En este momento no tengo acceso al catálogo de productos en tiempo real. 
 - Mantenimiento: /categoria/mantenimiento
 - Top ventas: /#novedades
 
-Para dudas de stock, que contacte por WhatsApp (685 011 494). NUNCA escribas enlaces que no estén en esta lista. NUNCA incluyas el dominio completo (https://...) en los enlaces, usa siempre la forma relativa como se muestra arriba.`;
+Para dudas de stock, que contacte por WhatsApp (${BRAND.phoneDisplay}). NUNCA escribas enlaces que no estén en esta lista. NUNCA incluyas el dominio completo (https://...) en los enlaces, usa siempre la forma relativa como se muestra arriba.`;
 
       const systemPrompt = baseInfo + inventoryBlock;
 

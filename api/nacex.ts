@@ -2,6 +2,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import { canFulfillOrder } from '../src/lib/orderPayment.js';
+import { BRAND } from '../src/lib/brand.js';
 
 /** Versión del handler (comprobar en Network → respuesta JSON tras redeploy). */
 const NACEX_API_VERSION = '2026-05-recogida-v4';
@@ -248,11 +249,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const NACEX_PASS = process.env.NACEX_PASSWORD || '';
   const NACEX_AGENCY = process.env.NACEX_AGENCIA || '2924';
   const NACEX_CLIENT = process.env.NACEX_CLIENTE || '00485';
-  const NACEX_CP_RECOGIDA = process.env.NACEX_CP_RECOGIDA || '29631';
-  const NACEX_NOMBRE_RECOGIDA = process.env.NACEX_NOMBRE_RECOGIDA || 'Asfalto y Gas';
-  const NACEX_DIR_RECOGIDA = (process.env.NACEX_DIR_RECOGIDA || 'C/ Aragon, 2, L2').slice(0, 45);
-  const NACEX_POBLACION_RECOGIDA = process.env.NACEX_POBLACION_RECOGIDA || 'Benalmadena';
-  const NACEX_TEL_RECOGIDA = (process.env.NACEX_TEL_RECOGIDA || '951000000').replace(/\D/g, '').slice(0, 15);
+  const NACEX_CP_RECOGIDA = process.env.NACEX_CP_RECOGIDA || BRAND.address.postalCode;
+  const NACEX_NOMBRE_RECOGIDA = process.env.NACEX_NOMBRE_RECOGIDA || BRAND.name;
+  const NACEX_DIR_RECOGIDA = (process.env.NACEX_DIR_RECOGIDA || BRAND.address.street).slice(0, 45);
+  const NACEX_POBLACION_RECOGIDA = process.env.NACEX_POBLACION_RECOGIDA || BRAND.address.city;
+  const NACEX_TEL_RECOGIDA = (process.env.NACEX_TEL_RECOGIDA || BRAND.phone.replace(/\D/g, '').slice(-9))
+    .replace(/\D/g, '')
+    .slice(0, 15);
 
   const canUseRealAPI = NACEX_PASS && NACEX_PASS !== 'tu_password' && NACEX_PASS !== 'PON_AQUI_TU_CLAVE_MD5';
 

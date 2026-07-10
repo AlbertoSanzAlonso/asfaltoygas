@@ -1,5 +1,6 @@
 import React from 'react';
 import { Truck, CheckCircle2 } from 'lucide-react';
+import { BRAND } from '@/lib/brand';
 
 type ShippingOption = 'home' | 'local' | 'nacex_point';
 
@@ -47,7 +48,7 @@ export const ShippingMethodSelector: React.FC<ShippingMethodSelectorProps> = ({
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-secondary">Recogida en local</p>
-            <p className="text-[9px] text-secondary/40 uppercase tracking-tighter mt-1">C/ Aragón, 2, L2 - Benalmádena (Gratis)</p>
+            <p className="text-[9px] text-secondary/40 uppercase tracking-tighter mt-1">{BRAND.address.street} - {BRAND.address.city} (Gratis)</p>
           </div>
         </div>
 

@@ -1,6 +1,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { BRAND } from '@/lib/brand';
 
 interface Message {
   id: string;
@@ -19,7 +20,7 @@ interface ChatState {
 
 const INITIAL_MESSAGE: Message = { 
   id: '1', 
-  text: '¡Hola! Soy el asistente de Asfalto y Gas. ¿Buscas un casco o equipación? Puedo ayudarte. También puedes escribirnos por WhatsApp: https://wa.me/34685011494', 
+  text: `¡Hola! Soy el asistente de Asfalto y Gas. ¿Buscas un casco o equipación? Puedo ayudarte. También puedes escribirnos por WhatsApp: https://wa.me/${BRAND.whatsapp}`, 
   isBot: true 
 };
 

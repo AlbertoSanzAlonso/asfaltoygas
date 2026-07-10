@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { getCanonicalSiteUrl } from './_siteUrl.js';
 import { isSupabaseConfigured } from './_supabaseConfig.js';
+import { BRAND } from '../src/lib/brand.js';
 
 const SITE_URL = getCanonicalSiteUrl();
 const SITE_NAME = 'Asfalto y Gas';
@@ -293,15 +294,15 @@ export async function getSeoMetaForPath(pathname: string): Promise<SeoPageMeta |
         image: DEFAULT_OG_IMAGE,
         description: staticPage.description,
         priceRange: '€€',
-        telephone: '+34 685 011 494',
+        telephone: BRAND.phone,
         email: 'info@asfaltoygas.es',
         address: {
           '@type': 'PostalAddress',
-          streetAddress: 'Calle Aragón, 2, Local 2',
-          addressLocality: 'Benalmádena',
-          addressRegion: 'Málaga',
-          postalCode: '29631',
-          addressCountry: 'ES',
+          streetAddress: BRAND.address.street,
+          addressLocality: BRAND.address.city,
+          addressRegion: BRAND.address.region,
+          postalCode: BRAND.address.postalCode,
+          addressCountry: BRAND.address.country,
         },
       };
     }
