@@ -44,6 +44,49 @@ function encodeNacexData(pairs: string[]): string {
     .join('|');
 }
 
+/** Nacex devuelve N puntos separados por `|`, cada uno con campos `~`. */
+function parseNacexShopPoints(rawData: string): Array<{
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  zip: string;
+  phone: string;
+  hours: string;
+  lat: string;
+  lng: string;
+}> {
+  const trimmed = rawData.trim();
+  if (!trimmed || trimmed.toUpperCase().startsWith('ERROR')) return [];
+
+  const segments = trimmed.split('|').filter((segment) => segment.includes('~'));
+
+  return segments
+    .map((segment) => {
+      const p = segment.split('~');
+      const rawName = (p[1] || 'Punto Nacex').trim();
+      let cleanName = rawName.replace(/^[0-9\-]+\s+/, '').trim();
+      cleanName = cleanName.replace(/AGENCIA\s+[0-9]+/gi, '').trim();
+
+      const commaIdx = cleanName.indexOf(',');
+      const displayName = commaIdx > 0 ? cleanName.slice(0, commaIdx).trim() : cleanName;
+      const street = commaIdx > 0 ? cleanName.slice(commaIdx + 1).trim() : '';
+
+      return {
+        id: (p[0] || '').trim(),
+        name: displayName || cleanName,
+        address: street,
+        city: (p[2] || '').trim(),
+        zip: (p[3] || '').trim(),
+        phone: (p[4] || '').trim(),
+        hours: (p[5] || '').trim(),
+        lat: (p[p.length - 2] || '').trim(),
+        lng: (p[p.length - 1] || '').trim(),
+      };
+    })
+    .filter((point) => point.id && point.id !== 'null' && /^\d+$/.test(point.id));
+}
+
 /** Nacex responde en ISO-8859-1; response.text() asume UTF-8 y rompe tildes (Parmetros). */
 async function decodeNacexResponse(response: Response): Promise<string> {
   const buffer = await response.arrayBuffer();
@@ -249,28 +292,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const response = await fetch(`${NACEX_WS_URL}?method=getPuntoEntregaCP&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=${targetCP}`);
 
       const rawData = await decodeNacexResponse(response);
-
-      const lines = rawData.split('\n').filter(l => l.trim() && l.includes('~'));
-      const points = lines.map(line => {
-        const p = line.split('~');
-
-        // Limpiar el nombre: quitar códigos tipo "0800-00 " del principio
-        let cleanName = (p[1] || 'Punto Nacex').replace(/^[0-9\-]+\s+/, '').trim();
-        // Quitar también repeticiones tipo "AGENCIA 0800"
-        cleanName = cleanName.replace(/AGENCIA\s+[0-9]+/gi, '').trim();
-
-        return {
-          id: p[0],
-          name: cleanName,
-          address: p[2] || '',
-          city: p[3] || '',
-          zip: p[4] || '',
-          phone: p[5] || '',
-          hours: p[6] || '',
-          lat: p[p.length - 2] || '',
-          lng: p[p.length - 1] || ''
-        };
-      });
+      const points = parseNacexShopPoints(rawData);
 
       return res.status(200).json(points);
     } catch (err) {
