@@ -147,6 +147,46 @@ function nacexLabelPath(codExp: string): string {
   return `/api/nacex?method=get_etiqueta&codExp=${encodeURIComponent(codExp)}`;
 }
 
+/** Parsea respuesta getInfoEnvio (tipo E = envío). */
+function parseGetInfoEnvio(raw: string): {
+  tracking?: string;
+  albaran?: string;
+  numCli?: string;
+  remitente?: string;
+  dirRecogida?: string;
+  cpRecogida?: string;
+  pobRecogida?: string;
+  telRecogida?: string;
+  destinatario?: string;
+  dirEntrega?: string;
+  cpEntrega?: string;
+  raw?: string;
+} | null {
+  const text = raw.trim();
+  if (!text || text.toUpperCase().startsWith('ERROR')) return null;
+  const p = text.split('|');
+  return {
+    tracking: p[0],
+    albaran: p[1] && p[2] ? `${p[1]}/${p[2]}` : undefined,
+    numCli: p[4],
+    remitente: p[16],
+    dirRecogida: p[17],
+    cpRecogida: p[18],
+    pobRecogida: p[19],
+    telRecogida: p[22],
+    destinatario: p[25],
+    dirEntrega: p[26],
+    cpEntrega: p[27],
+    raw: text.length > 400 ? `${text.slice(0, 400)}…` : text,
+  };
+}
+
+function maskEmail(email: string): string {
+  const at = email.indexOf('@');
+  if (at <= 1) return '***';
+  return `${email.slice(0, 2)}***${email.slice(at)}`;
+}
+
 /** Guarda tracking en Supabase con service role (el admin en cliente suele fallar por RLS). */
 async function saveOrderTracking(orderId: string, tracking: string): Promise<boolean> {
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
@@ -201,7 +241,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end();
   }
 
-  const { method, cp, tracking, codExp } = req.query;
+  const { method, cp, tracking, codExp, albaran } = req.query;
 
   // CREDENCIALES (Prioridad a Variables de Entorno)
   const NACEX_USER = process.env.NACEX_USER || 'ASFALTOYGASATCLIENTE@GMAIL.COM';
@@ -215,6 +255,104 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const NACEX_TEL_RECOGIDA = (process.env.NACEX_TEL_RECOGIDA || '951000000').replace(/\D/g, '').slice(0, 15);
 
   const canUseRealAPI = NACEX_PASS && NACEX_PASS !== 'tu_password' && NACEX_PASS !== 'PON_AQUI_TU_CLAVE_MD5';
+
+  // --- DIAGNÓSTICO (sin secretos) ---
+  if (method === 'debug_config' || method === 'diagnostico') {
+    return res.status(200).json({
+      success: true,
+      mode: canUseRealAPI ? 'real' : 'mock',
+      apiVersion: NACEX_API_VERSION,
+      config: {
+        user: maskEmail(NACEX_USER),
+        agencia: NACEX_AGENCY,
+        cliente: NACEX_CLIENT,
+        nombreRecogida: NACEX_NOMBRE_RECOGIDA,
+        dirRecogida: NACEX_DIR_RECOGIDA,
+        cpRecogida: NACEX_CP_RECOGIDA,
+        pobRecogida: NACEX_POBLACION_RECOGIDA,
+        telRecogida: NACEX_TEL_RECOGIDA,
+      },
+      checks: {
+        clienteEs00485: NACEX_CLIENT === '00485',
+        nombreEsAsfaltoYGas: NACEX_NOMBRE_RECOGIDA.toLowerCase().includes('asfalto'),
+        sinReferenciasModas:
+          !NACEX_NOMBRE_RECOGIDA.toLowerCase().includes('modas') &&
+          !NACEX_USER.toLowerCase().includes('melomerezco'),
+      },
+    });
+  }
+
+  if (method === 'debug_expedition' || method === 'consultar_envio') {
+    if (!canUseRealAPI) {
+      return res.status(200).json({ success: false, mode: 'mock', error: 'Sin credenciales Nacex.' });
+    }
+
+    const codExpStr = String(codExp || tracking || '').trim();
+    let del = NACEX_AGENCY;
+    let num = '';
+
+    const albaranStr = String(albaran || '').trim();
+    if (albaranStr.includes('/')) {
+      const [d, n] = albaranStr.split('/');
+      del = d || del;
+      num = n || '';
+    } else if (codExpStr) {
+      // Resolver albarán desde código expedición
+      try {
+        const codeRes = await fetch(
+          `${NACEX_WS_URL}?method=getExpeCodigo&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=${encodeURIComponent(codExpStr)}`,
+        );
+        const codeRaw = (await decodeNacexResponse(codeRes)).trim();
+        if (!codeRaw.toUpperCase().startsWith('ERROR') && codeRaw.includes('/')) {
+          const [d, n] = codeRaw.split('/');
+          del = d || del;
+          num = n || '';
+        }
+      } catch {
+        /* fallback abajo */
+      }
+    }
+
+    if (!num) {
+      return res.status(400).json({
+        success: false,
+        error: 'Indica albaran=2924/10501771 o codExp=488361849',
+      });
+    }
+
+    try {
+      const infoData = encodeNacexData([`del=${del}`, `num=${num}`, 'tipo=E']);
+      const response = await fetch(
+        `${NACEX_WS_URL}?method=getInfoEnvio&user=${encodeURIComponent(NACEX_USER)}&pass=${encodeURIComponent(NACEX_PASS)}&data=${infoData}`,
+      );
+      const raw = await decodeNacexResponse(response);
+      const info = parseGetInfoEnvio(raw);
+
+      if (!info) {
+        return res.status(404).json({ success: false, error: formatNacexError(raw), raw });
+      }
+
+      return res.status(200).json({
+        success: true,
+        mode: 'real',
+        albaran: `${del}/${num}`,
+        envConfig: {
+          cliente: NACEX_CLIENT,
+          nombreRecogida: NACEX_NOMBRE_RECOGIDA,
+        },
+        nacex: info,
+        coincidencias: {
+          abonadoIgualQueEnv: info.numCli === NACEX_CLIENT.replace(/\D/g, '').slice(0, 5),
+          remitenteIgualQueEnv:
+            (info.remitente || '').trim().toLowerCase() === NACEX_NOMBRE_RECOGIDA.trim().toLowerCase(),
+          remitenteContieneSL: /(\bs\.?\s*l\.?\b|modas|melomerezco|26691014)/i.test(info.remitente || ''),
+        },
+        etiquetaUrl: info.tracking ? nacexLabelPath(info.tracking) : undefined,
+      });
+    } catch {
+      return res.status(500).json({ success: false, error: 'Error consultando Nacex.' });
+    }
+  }
 
   // --- ETIQUETA PNG (abrir en pestaña / imprimir) ---
   if (method === 'get_etiqueta' || method === 'get_label') {

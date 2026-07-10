@@ -34,8 +34,10 @@ Tras cambiar variables en Vercel → **redeploy obligatorio**.
 | `POST ?method=crear_envio` | Crea expedición (`putExpedicion`) |
 | `GET ?method=get_etiqueta&codExp=XXXX` | Etiqueta PNG |
 | `GET ?method=estado_envio&tracking=XXXX` | Estado conexión |
+| `GET ?method=debug_config` | Config activa (sin contraseña) |
+| `GET ?method=debug_expedition&albaran=2924/10501771` | Datos del envío en Nacex + comprobaciones |
 
-Sin `NACEX_PASSWORD` válida → respuestas **mock**.
+Sin `NACEX_PASSWORD` válida → respuestas **mock** (excepto `debug_config`).
 
 ### Parser puntos Shop
 
@@ -44,15 +46,25 @@ Nacex devuelve varios puntos en una sola cadena separada por `|`; cada punto usa
 ## Pruebas en producción
 
 ```bash
-# Credenciales
+# 1. Config que usa Vercel (abonado, nombre recogida…)
+curl -s "https://www.asfaltoygas.es/api/nacex?method=debug_config" | jq .
+
+# 2. Datos reales de un envío en Nacex (sustituir albarán)
+curl -s "https://www.asfaltoygas.es/api/nacex?method=debug_expedition&albaran=2924/10501771" | jq .
+
+# 3. Credenciales
 curl -s "https://www.asfaltoygas.es/api/nacex?method=test_connection"
 
-# Puntos Shop (debe devolver ~10 para CP 29631)
+# 4. Puntos Shop (debe devolver ~10 para CP 29631)
 curl -s "https://www.asfaltoygas.es/api/nacex?method=get_puntos_shop&cp=29631"
 
-# Etiqueta (sustituir codExp)
-curl -sI "https://www.asfaltoygas.es/api/nacex?method=get_etiqueta&codExp=NUM_EXPEDICION"
+# 5. Etiqueta (sustituir codExp)
+curl -sI "https://www.asfaltoygas.es/api/nacex?method=get_etiqueta&codExp=488361849"
 ```
+
+En `debug_expedition`, revisar `coincidencias`:
+- `abonadoIgualQueEnv: true` → Vercel y Nacex usan el mismo abonado
+- `remitenteContieneSL: false` → el remitente no contiene S.L. / Modas
 
 **⚠️ `crear_envio` sin `isTest` crea envío REAL** (Nacex puede programar recogida en tienda). Para pruebas:
 
