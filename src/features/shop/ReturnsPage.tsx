@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { RefreshCcw, ClipboardList, Package, CreditCard, AlertCircle } from 'lucide-react';
+import { BRAND } from '@/lib/brand';
 
 const ReturnsPage: FC = () => {
   return (
@@ -91,7 +92,7 @@ const ReturnsPage: FC = () => {
               <h2 className="text-xl font-bold tracking-widest uppercase text-secondary">Condiciones de los artículos</h2>
             </div>
             <p className="text-secondary/80 leading-relaxed text-sm">
-              MODAS ME LO MEREZCO se reserva el derecho de rechazar devoluciones de prendas que presenten signos de uso, manchas, olores, daños o cualquier deterioro, así como aquellas que no conserven sus etiquetas originales.
+              {BRAND.legal.holderName} se reserva el derecho de rechazar devoluciones de productos que presenten signos de uso, manchas, olores, daños o cualquier deterioro, así como aquellos que no conserven sus etiquetas originales.
             </p>
             <p className="text-secondary/80 leading-relaxed text-sm">
               En caso de rechazo, el artículo podrá ser enviado nuevamente al cliente, asumiendo este último los gastos de envío correspondientes.

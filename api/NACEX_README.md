@@ -76,3 +76,16 @@ Expedición de prueba generada en validación: `488361849` — anular con agenci
 
 - Servicios, embalajes y extras (prealerta, seguro…) → agencia Nacex 2924.
 - Seguimiento cliente: `https://www.nacex.es/seguimientoPedido.do?numExp={tracking}`
+
+## Nombre incorrecto en etiqueta (S.L. / otra empresa)
+
+El **remitente impreso** en la etiqueta lo toma Nacex de la **ficha del abonado** (`NACEX_CLIENTE`, ej. `00485`), no de las páginas legales de la web. Aunque la API envíe `nom_rec=Asfalto y Gas`, si en Nacex sigue la razón social antigua (p. ej. una S.L. de otro proyecto), la etiqueta saldrá con ese nombre.
+
+**Solución:** pedir a la agencia **2924** (952 560 161) que actualicen la ficha del abonado `00485`:
+
+- Titular: Asfalto y Gas (autónomo / persona física)
+- DNI: `77238951Y`
+- Quitar cualquier S.L. o CIF ajeno (`B26691014` era Modas Me lo Merezco)
+- Confirmar dirección y teléfono de recogida
+
+Usuario WS: `ASFALTOYGASATCLIENTE@GMAIL.COM`
