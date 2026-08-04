@@ -252,10 +252,10 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
                 Outlet
               </Link>
               <Link
-                to="/categoria/cascos"
+                to="/#novedades"
                 className="px-5 py-2 font-display text-xs font-bold tracking-[0.2em] uppercase bg-safety text-secondary hover:bg-safety-dark transition-colors"
               >
-                Oportunidades
+                Novedades
               </Link>
             </div>
           </div>
@@ -366,11 +366,11 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
                     Outlet
                   </Link>
                   <Link
-                    to="/categoria/cascos"
+                    to="/#novedades"
                     onClick={() => setIsMenuOpen(false)}
                     className="font-display text-sm font-bold uppercase tracking-wide bg-safety text-secondary text-center py-3"
                   >
-                    Oportunidades
+                    Novedades
                   </Link>
                 </div>
               </nav>
