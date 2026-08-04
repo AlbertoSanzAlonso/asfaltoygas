@@ -10,8 +10,15 @@ interface TopSalesSectionProps {
 }
 
 export const TopSalesSection: React.FC<TopSalesSectionProps> = ({ products, isLoading }) => (
-  <section id="novedades" className="py-12 md:py-16 bg-safety">
-    <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
+  <section id="novedades" className="relative overflow-hidden py-12 md:py-16 bg-safety">
+    <img
+      src="/assets/images/tire-track-novedades.webp"
+      alt=""
+      aria-hidden="true"
+      decoding="async"
+      className="pointer-events-none select-none absolute inset-0 w-full h-full object-cover object-center opacity-[0.28]"
+    />
+    <div className="relative z-10 max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-10">
         <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide text-secondary">
           Novedades
