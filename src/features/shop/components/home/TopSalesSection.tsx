@@ -16,7 +16,7 @@ export const TopSalesSection: React.FC<TopSalesSectionProps> = ({ products, isLo
       alt=""
       aria-hidden="true"
       decoding="async"
-      className="pointer-events-none select-none absolute inset-0 w-full h-full object-cover object-center opacity-[0.28]"
+      className="pointer-events-none select-none absolute inset-0 w-full h-full object-cover object-center opacity-60"
     />
     <div className="relative z-10 max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-10">
