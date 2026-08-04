@@ -17,10 +17,10 @@ export const TopSalesSection: React.FC<TopSalesSectionProps> = ({ products, isLo
           Novedades
         </h2>
         <Link
-          to="/categoria/cascos"
+          to="/novedades"
           className="inline-flex items-center gap-2 font-display text-xs font-bold tracking-[0.2em] uppercase text-secondary hover:text-primary transition-colors shrink-0"
         >
-          Ver catálogo <ChevronRight className="w-4 h-4" />
+          Ver todas las novedades <ChevronRight className="w-4 h-4" />
         </Link>
       </div>
 
@@ -31,23 +31,33 @@ export const TopSalesSection: React.FC<TopSalesSectionProps> = ({ products, isLo
           ))}
         </div>
       ) : products && products.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
-          {products.slice(0, 5).map((product) => (
-            <div key={product.product_id} className="bg-white p-3 shadow-sm">
-              <ProductCard product={product} />
-            </div>
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
+            {products.slice(0, 5).map((product) => (
+              <div key={product.product_id} className="bg-white p-3 shadow-sm">
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Link
+              to="/novedades"
+              className="inline-flex items-center gap-2 bg-primary text-white font-display font-bold text-sm tracking-[0.2em] uppercase px-8 py-3.5 hover:bg-primary-dark transition-colors"
+            >
+              Ver todas las novedades
+            </Link>
+          </div>
+        </>
       ) : (
         <div className="text-center py-12 bg-white border border-secondary/10">
           <p className="font-sans text-secondary/60 text-sm mb-6">
             Próximamente nuevas novedades en catálogo.
           </p>
           <Link
-            to="/categoria/cascos"
+            to="/novedades"
             className="inline-flex items-center gap-2 bg-primary text-white font-display font-bold text-sm tracking-[0.2em] uppercase px-8 py-3.5 hover:bg-primary-dark transition-colors"
           >
-            Explorar categorías
+            Ver todas las novedades
           </Link>
         </div>
       )}

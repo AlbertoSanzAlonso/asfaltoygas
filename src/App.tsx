@@ -30,6 +30,7 @@ const safeLazy = (importFn: () => Promise<any>) => {
 const HomePage = safeLazy(() => import("@/features/shop/HomePage"));
 const ProductPage = safeLazy(() => import("@/features/shop/ProductPage"));
 const CategoryPage = safeLazy(() => import("@/features/shop/CategoryPage"));
+const HighlightCollectionPage = safeLazy(() => import("@/features/shop/HighlightCollectionPage"));
 const CheckoutPage = safeLazy(() => import("@/features/shop/CheckoutPage"));
 const AdminDashboard = safeLazy(() => import("@/features/admin/AdminDashboard"));
 const LoginPage = safeLazy(() => import("@/features/auth/LoginPage").then(m => ({ default: m.LoginPage })));
@@ -173,6 +174,8 @@ function App() {
                   <Route index element={<HomePage />} />
                   <Route path="/producto/:slug" element={<ProductPage />} />
                   <Route path="/categoria/:category" element={<CategoryPage />} />
+                  <Route path="/novedades" element={<HighlightCollectionPage />} />
+                  <Route path="/outlet" element={<HighlightCollectionPage />} />
                   <Route path="/checkout" element={<CheckoutPage />} />
                   <Route path="/aviso-legal" element={<AvisoLegalPage />} />
                   <Route path="/politica-de-privacidad" element={<PrivacyPolicyPage />} />

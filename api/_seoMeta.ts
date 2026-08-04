@@ -23,6 +23,16 @@ export type SeoPageMeta = {
 
 const STATIC_PAGES: Record<string, { title?: string; description: string }> = {
   '/': { description: DEFAULT_DESCRIPTION },
+  '/novedades': {
+    title: 'Novedades',
+    description:
+      'Descubre las últimas novedades de Asfalto y Gas. Equipamiento para motorista con envío gratuito desde 50 €.',
+  },
+  '/outlet': {
+    title: 'Outlet',
+    description:
+      'Productos outlet de Asfalto y Gas. Oportunidades en cascos y equipación con envío gratuito desde 50 €.',
+  },
   '/categoria/cascos': {
     title: 'Cascos de moto',
     description:
