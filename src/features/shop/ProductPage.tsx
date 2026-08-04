@@ -102,11 +102,20 @@ const ProductPage = () => {
   const { user, isAuthenticated, setPendingFavorite } = useAuthStore();
   const { addItem, openModal } = useCartStore();
 
-  const isFavorite = user?.favorites?.includes(id || '') || false;
+  const { data: product, isLoading } = useQuery({
+    queryKey: ['product', slug],
+    queryFn: () => api.products.getBySlug(slug!),
+    enabled: !!slug
+  });
+
+  const productId = product?.product_id;
+  const isFavorite = user?.favorites?.includes(productId || '') || false;
 
   const toggleFavorite = async () => {
+    if (!productId) return;
+
     if (!isAuthenticated) {
-      setPendingFavorite(id || null);
+      setPendingFavorite(productId);
       openModal({
         title: 'Inicia sesión',
         message: 'Inicia sesión para guardar tus favoritos y acceder a ellos desde cualquier dispositivo.',
@@ -116,20 +125,20 @@ const ProductPage = () => {
     }
 
     const currentFavorites = user?.favorites || [];
-    const isFav = currentFavorites.includes(id || '');
-    const newFavorites = isFav 
-      ? currentFavorites.filter(favId => favId !== id)
-      : [...currentFavorites, id || ''];
+    const isFav = currentFavorites.includes(productId);
+    const newFavorites = isFav
+      ? currentFavorites.filter(favId => favId !== productId)
+      : [...currentFavorites, productId];
 
     try {
       if (isFav) {
-        await api.favorites.remove(user!.customer_id, id!);
+        await api.favorites.remove(user!.customer_id, productId);
       } else {
-        await api.favorites.add(user!.customer_id, id!);
+        await api.favorites.add(user!.customer_id, productId);
       }
-      
+
       useAuthStore.getState().updateUser({ favorites: newFavorites });
-      
+
       if (!isFav) {
         openModal({
           title: 'Añadido a favoritos',
@@ -141,12 +150,6 @@ const ProductPage = () => {
       console.error('Error updating favorites:', error);
     }
   };
-
-  const { data: product, isLoading } = useQuery({
-    queryKey: ['product', slug],
-    queryFn: () => api.products.getBySlug(slug!),
-    enabled: !!slug
-  });
 
   const { data: siblings } = useQuery({
     queryKey: ['product-siblings', slug, product?.category_id, product?.subcategory_id],
