@@ -1,11 +1,12 @@
 /**
  * Prueba local de emails tras pago (cliente + admin).
- * Uso: ADMIN_ORDER_EMAIL=albertosanzdev@gmail.com npx tsx scripts/test-order-paid-emails.ts
+ * Uso: npx tsx scripts/test-order-paid-emails.ts
+ * Requiere SMTP_HOST, SMTP_USER, SMTP_PASS en .env
  */
 import 'dotenv/config';
 import { sendOrderPaidEmails } from '../src/lib/emails/adminNewOrderNotification';
 
-const adminEmail = process.env.ADMIN_ORDER_EMAIL || 'albertosanzdev@gmail.com';
+const adminEmail = process.env.ADMIN_ORDER_EMAIL || 'info@asfaltoygas.es';
 const customerEmail = process.env.TEST_CUSTOMER_EMAIL || adminEmail;
 
 process.env.ADMIN_ORDER_EMAIL = adminEmail;
@@ -49,8 +50,8 @@ const mockItems = [
 ];
 
 async function main() {
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
-    console.error('Faltan GMAIL_USER o GMAIL_APP_PASSWORD en .env');
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !(process.env.SMTP_PASS || process.env.SMTP_PASSWORD)) {
+    console.error('Faltan SMTP_HOST, SMTP_USER o SMTP_PASS en .env');
     process.exit(1);
   }
 

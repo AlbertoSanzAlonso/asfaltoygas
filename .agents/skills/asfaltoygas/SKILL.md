@@ -42,8 +42,9 @@ Ver [TASKS.md](../../../../TASKS.md) para tareas pendientes y contexto de trabaj
 - **No commitear:** `.env`, `.env.preview`, `.env.production`
 - Supabase: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - Redsys: `VITE_REDSYS_SECRET_KEY`, `VITE_REDSYS_COMMERCE_NUMBER`, `VITE_REDSYS_TERMINAL_NUMBER`
+- Email (DonDominio SMTP): `SMTP_HOST=smtp.dondominio.com`, `SMTP_PORT=587`, `SMTP_USER=info@asfaltoygas.es`, `SMTP_PASS`, `MAIL_FROM`, `ADMIN_ORDER_EMAIL`
 - Nacex (Web Service WS, tienda a medida — no módulo PrestaShop/WooCommerce):
-  - `NACEX_USER` — producción: `ASFALTOYGASATCLIENTE@GMAIL.COM`
+  - `NACEX_USER` — producción: `ASFALTOYGASATCLIENTE@GMAIL.COM` (usuario WS Nacex, no es nuestro SMTP)
   - `NACEX_USER_TEST` — pruebas: `ASFALTOYGASATCLIENTE@GMAIL._T`
   - `NACEX_PASSWORD` — clave MD5 (solo en `.env` / Vercel, **no commitear**)
   - `NACEX_AGENCIA=2924`, `NACEX_CLIENTE=00485`

@@ -18,10 +18,6 @@ export function getAdminOrderNotifyEmail(): string {
   return configured || DEFAULT_ADMIN_ORDER_EMAIL;
 }
 
-function createGmailTransporter() {
-  return createMailTransporter();
-}
-
 export function getSiteUrl(): string {
   const url =
     process.env.SITE_URL ||
@@ -126,9 +122,9 @@ export async function sendCustomerOrderConfirmationEmail(
     return;
   }
 
-  const transporter = createGmailTransporter();
+  const transporter = createMailTransporter();
   if (!transporter) {
-    console.warn('[customer-order-email] Gmail no configurado.');
+    console.warn('[customer-order-email] SMTP no configurado (SMTP_HOST/USER/PASS).');
     return;
   }
 
@@ -179,9 +175,9 @@ export async function sendAdminNewOrderEmail(
   order: Order,
   items: OrderItem[] = [],
 ): Promise<void> {
-  const transporter = createGmailTransporter();
+  const transporter = createMailTransporter();
   if (!transporter) {
-    console.warn('[admin-order-email] Gmail no configurado; no se envía aviso al admin.');
+    console.warn('[admin-order-email] SMTP no configurado; no se envía aviso al admin.');
     return;
   }
 

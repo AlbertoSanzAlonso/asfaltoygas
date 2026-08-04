@@ -15,7 +15,7 @@ export const BRAND = {
     holderName: 'Manuel Jiménez Medrano',
     taxId: '77238951Y',
     taxIdLabel: 'DNI',
-    contactEmail: 'asfaltoygasatclient@gmail.com',
+    contactEmail: 'info@asfaltoygas.es',
   },
   address: {
     street: 'Calle Las Flores, 20',

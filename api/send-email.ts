@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!transporter) {
     return res.status(500).json({
       success: false,
-      error: 'Correo no configurado (SMTP_USER/SMTP_PASS o GMAIL_USER/GMAIL_APP_PASSWORD).',
+      error: 'Correo no configurado. Define SMTP_HOST, SMTP_USER y SMTP_PASS.',
     });
   }
 
