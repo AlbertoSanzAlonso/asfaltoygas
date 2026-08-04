@@ -37,9 +37,9 @@ export const CustomerDashboard: React.FC = () => {
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="text-4xl font-display font-black uppercase tracking-tighter mb-2">
-            Bienvenida,{' '}<span className="italic font-serif lowercase text-primary">{user?.name.split(' ')[0]}</span>
+            Bienvenid@,{' '}<span className="italic font-serif lowercase text-primary">{user?.name.split(' ')[0]}</span>
           </h1>
-          <p className="text-gray-500 font-medium">Bienvenida a tu espacio personal. Aquí puedes gestionar todo lo relacionado con tus compras.</p>
+          <p className="text-gray-500 font-medium">Bienvenid@ a tu espacio personal. Aquí puedes gestionar todo lo relacionado con tus compras.</p>
         </div>
       </header>
 

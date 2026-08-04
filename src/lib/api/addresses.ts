@@ -2,6 +2,50 @@
 import { supabase } from '../supabase';
 import type { Address } from '@/types';
 
+/** Mapea una fila de `shipping_addresses` al modelo de frontend. */
+export function mapAddressFromDb(addr: {
+  shipping_address_id?: number;
+  address_type?: string;
+  street?: string;
+  floor?: string | null;
+  door?: string | null;
+  stair?: string | null;
+  province?: string;
+  city?: string;
+  zip?: string;
+  location_id?: number | null;
+  is_default?: boolean;
+}): Address {
+  return {
+    shipping_address_id: addr.shipping_address_id,
+    type: addr.address_type || 'Principal',
+    street: addr.street || '',
+    floor: addr.floor || undefined,
+    door: addr.door || undefined,
+    stair: addr.stair || undefined,
+    province: addr.province || '',
+    city: addr.city || '',
+    zip: addr.zip || '',
+    location_id: addr.location_id ?? undefined,
+    isDefault: Boolean(addr.is_default),
+  };
+}
+
+function toDbAddress(address: Partial<Address>) {
+  const row: Record<string, unknown> = {};
+  if (address.type !== undefined) row.address_type = address.type;
+  if (address.street !== undefined) row.street = address.street;
+  if (address.floor !== undefined) row.floor = address.floor || null;
+  if (address.door !== undefined) row.door = address.door || null;
+  if (address.stair !== undefined) row.stair = address.stair || null;
+  if (address.province !== undefined) row.province = address.province;
+  if (address.city !== undefined) row.city = address.city;
+  if (address.zip !== undefined) row.zip = address.zip;
+  if (address.location_id !== undefined) row.location_id = address.location_id ?? null;
+  if (address.isDefault !== undefined) row.is_default = address.isDefault;
+  return row;
+}
+
 export const addresses = {
   getByCustomer: async (customer_id: string): Promise<Address[]> => {
     const { data, error } = await supabase
@@ -10,76 +54,37 @@ export const addresses = {
       .eq('customer_id', customer_id);
 
     if (error) throw error;
-    return (data || []).map((addr: any) => ({
-      shipping_address_id: addr.shipping_address_id,
-      type: addr.address_type,
-      street: addr.street,
-      floor: addr.floor,
-      door: addr.door,
-      stair: addr.stair,
-      province: addr.province,
-      city: addr.city,
-      zip: addr.zip,
-      location_id: addr.location_id,
-      isDefault: addr.is_default
-    }));
+    return (data || []).map(mapAddressFromDb);
   },
 
   create: async (customer_id: string, address: Omit<Address, 'shipping_address_id'>): Promise<Address> => {
-    console.log('--- API CREATE ADDRESS ---');
-    console.log('Customer ID:', customer_id);
-    console.log('Address Data:', address);
-
     const { data, error } = await supabase
       .from('shipping_addresses')
       .insert([{
         customer_id,
-        address_type: address.type,
-        street: address.street,
-        floor: address.floor,
-        door: address.door,
-        stair: address.stair,
-        province: address.province,
-        city: address.city,
-        zip: address.zip,
-        location_id: address.location_id,
-        is_default: address.isDefault
+        ...toDbAddress(address),
       }])
       .select()
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) return { ...address, shipping_address_id: Date.now() } as any;
+    if (!data) throw new Error('No se pudo crear la dirección');
 
-    return {
-      ...data,
-      type: data.address_type,
-      isDefault: data.is_default
-    };
+    return mapAddressFromDb(data);
   },
 
   update: async (shipping_address_id: number, updates: Partial<Address>): Promise<Address> => {
-    const dbUpdates: any = { ...updates };
-    if (updates.type) dbUpdates.address_type = updates.type;
-    if (updates.isDefault !== undefined) dbUpdates.is_default = updates.isDefault;
-    delete dbUpdates.type;
-    delete dbUpdates.isDefault;
-
     const { data, error } = await supabase
       .from('shipping_addresses')
-      .update(dbUpdates)
+      .update(toDbAddress(updates))
       .eq('shipping_address_id', shipping_address_id)
       .select()
       .maybeSingle();
 
     if (error) throw error;
-    if (!data) return updates as any;
+    if (!data) throw new Error('No se pudo actualizar la dirección');
 
-    return {
-      ...data,
-      type: data.address_type,
-      isDefault: data.is_default
-    };
+    return mapAddressFromDb(data);
   },
 
   delete: async (shipping_address_id: number): Promise<void> => {

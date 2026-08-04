@@ -1,6 +1,15 @@
 
 import { supabase } from '../supabase';
 import type { Customer } from '@/types';
+import { mapAddressFromDb } from './addresses';
+
+function mapCustomer(data: any): Customer {
+  const { shipping_addresses, ...rest } = data;
+  return {
+    ...rest,
+    addresses: (shipping_addresses || []).map(mapAddressFromDb),
+  };
+}
 
 export const customers = {
   getAll: async (page = 1, pageSize = 20, searchTerm?: string): Promise<{ customers: Customer[], total: number }> => {
@@ -21,7 +30,7 @@ export const customers = {
 
     if (error) throw error;
     return {
-      customers: data || [],
+      customers: (data || []).map(mapCustomer),
       total: count || 0
     };
   },
@@ -36,13 +45,7 @@ export const customers = {
     if (error) throw error;
     if (!data) return data;
 
-    return {
-      ...data,
-      addresses: (data.shipping_addresses || []).map((addr: any) => ({
-        ...addr,
-        isDefault: addr.is_default
-      }))
-    };
+    return mapCustomer(data);
   },
 
   getByEmail: async (email: string): Promise<Customer> => {
@@ -55,13 +58,7 @@ export const customers = {
     if (error) throw error;
     if (!data) return data;
 
-    return {
-      ...data,
-      addresses: (data.shipping_addresses || []).map((addr: any) => ({
-        ...addr,
-        isDefault: addr.is_default
-      }))
-    };
+    return mapCustomer(data);
   },
 
   create: async (customer: Omit<Customer, 'customer_id'>): Promise<Customer> => {

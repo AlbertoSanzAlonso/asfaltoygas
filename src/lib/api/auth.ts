@@ -2,6 +2,7 @@
 import { supabase } from '../supabase';
 import type { Customer, Admin } from '@/types';
 import { orders } from './orders';
+import { mapAddressFromDb } from './addresses';
 
 async function loadCustomerAddresses(customerId: string) {
   const { data: addrData } = await supabase
@@ -9,18 +10,7 @@ async function loadCustomerAddresses(customerId: string) {
     .select('*')
     .eq('customer_id', customerId);
 
-  return (addrData || []).map((addr: any) => ({
-    shipping_address_id: addr.shipping_address_id,
-    type: addr.address_type,
-    street: addr.street,
-    floor: addr.floor,
-    door: addr.door,
-    stair: addr.stair,
-    province: addr.province,
-    city: addr.city,
-    zip: addr.zip,
-    isDefault: addr.is_default,
-  }));
+  return (addrData || []).map(mapAddressFromDb);
 }
 
 async function loadCustomerFavorites(customerId: string): Promise<string[]> {

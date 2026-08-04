@@ -24,7 +24,7 @@ export const AddressCard: React.FC<AddressCardProps> = ({ address, onEdit, onDel
         <div className="flex justify-between items-start mb-6">
           <div className="flex flex-col gap-1">
             <span className="text-[10px] font-black uppercase tracking-widest text-primary italic">
-              {address.type}
+              {address.type || 'Sin alias'}
             </span>
             {address.isDefault && (
               <span className="flex items-center gap-1.5 text-[8px] font-bold uppercase tracking-wider text-green-600 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 shadow-sm self-start">

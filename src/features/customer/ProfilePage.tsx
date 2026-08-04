@@ -140,7 +140,10 @@ export const ProfilePage: React.FC = () => {
 
     try {
       if (isEditingAddress === 'new') {
-        await api.addresses.create(user.customer_id, newAddress);
+        const created = await api.addresses.create(user.customer_id, newAddress);
+        if (newAddress.isDefault && created.shipping_address_id) {
+          await api.addresses.setDefault(user.customer_id, created.shipping_address_id);
+        }
       } else if (typeof isEditingAddress === 'number') {
         await api.addresses.update(isEditingAddress, newAddress);
         if (newAddress.isDefault) {
