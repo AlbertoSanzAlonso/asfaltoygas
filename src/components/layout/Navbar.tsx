@@ -234,12 +234,12 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
         {/* Fila 2 — categorías en rojo */}
         <nav className="hidden lg:block bg-primary">
           <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
-            <div className="flex items-center justify-center gap-1 h-11">
+            <div className="flex items-center justify-center gap-1 h-11 text-center">
               {NAV_CATEGORIES.map((cat) => (
                 <Link
                   key={cat.label}
                   to={cat.href}
-                  className="px-5 py-2 font-display text-xs font-bold tracking-[0.2em] uppercase text-white hover:bg-primary-dark transition-colors"
+                  className="px-5 py-2 font-display text-xs font-bold tracking-[0.2em] uppercase text-white text-center hover:bg-primary-dark transition-colors"
                 >
                   {cat.label}
                 </Link>
@@ -247,13 +247,13 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
               <span className="w-px h-5 bg-white/25 mx-2" />
               <Link
                 to="/#novedades"
-                className="px-5 py-2 font-display text-xs font-bold tracking-[0.2em] uppercase bg-safety text-secondary hover:bg-safety-dark transition-colors"
+                className="px-5 py-2 font-display text-xs font-bold tracking-[0.2em] uppercase bg-safety text-secondary text-center hover:bg-safety-dark transition-colors"
               >
                 Outlet
               </Link>
               <Link
                 to="/categoria/cascos"
-                className="px-5 py-2 font-display text-xs font-bold tracking-[0.2em] uppercase bg-safety text-secondary hover:bg-safety-dark transition-colors"
+                className="px-5 py-2 font-display text-xs font-bold tracking-[0.2em] uppercase bg-safety text-secondary text-center hover:bg-safety-dark transition-colors"
               >
                 Oportunidades
               </Link>
@@ -264,11 +264,11 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
         {/* Fila 3 — barra de valor en negro */}
         <div className="hidden lg:block bg-secondary">
           <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
-            <div className="flex items-center justify-center divide-x divide-white/15 h-9">
+            <div className="flex items-center justify-center gap-0 h-9">
               {INFO_BAR_ITEMS.map((item) => (
                 <span
                   key={item}
-                  className="flex-1 text-center font-sans text-[11px] text-white/80 tracking-wide px-4"
+                  className="text-center font-sans text-[11px] text-white/80 tracking-wide px-5 border-r border-white/15 last:border-r-0"
                 >
                   {item}
                 </span>
