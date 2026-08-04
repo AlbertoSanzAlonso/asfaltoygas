@@ -52,10 +52,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       try {
         const { confirmRedsysPayment } = await import('./_redsysConfirm.js');
         const confirmed = await confirmRedsysPayment(params);
-        if (!confirmed.ok) {
+        if (confirmed.ok === false) {
           console.error('[redsys-return] confirm failed:', confirmed.message);
           // URLOK con firma inválida: dejamos success en UI; el webhook puede completar.
-          // Solo forzamos error si el hint era KO.
         } else if (confirmed.skipped) {
           payment = isKo ? 'error' : 'success';
         } else {

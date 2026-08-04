@@ -13,7 +13,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const result = await confirmRedsysPayment(body);
-    if (!result.ok) {
+    if (result.ok === false) {
       return res.status(result.status).json({ message: result.message });
     }
     return res.status(200).json({

@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 /**
  * Transporter SMTP (DonDominio u otro).
@@ -18,19 +17,13 @@ export function createMailTransporter(): nodemailer.Transporter | null {
     process.env.SMTP_SECURE === '1' ||
     port === 465;
 
-  const options: SMTPTransport.Options = {
+  return nodemailer.createTransport({
     host: smtpHost,
     port,
     secure,
     auth: { user: smtpUser, pass: smtpPass },
-  };
-
-  // Puerto 587 = STARTTLS (DonDominio)
-  if (!secure && port === 587) {
-    options.requireTLS = true;
-  }
-
-  return nodemailer.createTransport(options);
+    ...( !secure && port === 587 ? { requireTLS: true } : {}),
+  });
 }
 
 /** Dirección From (ej. info@asfaltoygas.es). */

@@ -6,7 +6,7 @@ import {
   buildOrderTotalsEmailHtml,
 } from '../orderEmailHtml.js';
 
-import { getCanonicalSiteUrl } from '../../api/_siteUrl.js';
+import { getCanonicalSiteUrl } from '../siteUrl.js';
 import { createMailTransporter, getMailFromHeader } from '../mailTransport.js';
 
 const LOGO_URL = `${getCanonicalSiteUrl()}/assets/logo/logo-asfaltoygas-main.png`;

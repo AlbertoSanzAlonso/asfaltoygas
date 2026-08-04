@@ -4,6 +4,7 @@
     "lib": ["ES2023"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "types": ["node"],
     "skipLibCheck": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -14,8 +15,12 @@
   "include": [
     "./**/*.ts",
     "../src/types/**/*.ts",
+    "../src/lib/brand.ts",
+    "../src/lib/mailTransport.ts",
+    "../src/lib/siteUrl.ts",
     "../src/lib/orderContact.ts",
     "../src/lib/orderEmailHtml.ts",
+    "../src/lib/orderPayment.ts",
     "../src/lib/orderPricing.ts",
     "../src/lib/emails/**/*.ts"
   ]
