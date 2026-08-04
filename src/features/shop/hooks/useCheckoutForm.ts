@@ -5,7 +5,7 @@ import { getDiscountedLineTotal } from '@/lib/cartDiscount';
 import { useAuthStore } from "@/store/useAuthStore";
 import { api } from "@/lib/api";
 import { CITIES_BY_PROVINCE } from "@/constants/locations";
-import { fetchRedsysParameters, REDSYS_URL_TEST, REDSYS_URL_PROD } from "@/lib/redsys";
+import { fetchRedsysParameters } from "@/lib/redsys";
 import type { Address } from '@/types';
 
 export const useCheckoutForm = () => {
@@ -300,6 +300,10 @@ export const useCheckoutForm = () => {
       const createdOrder = await api.orders.create(orderData);
       queryClient.invalidateQueries({ queryKey: ['orders', user?.email] });
       
+      if (finalTotal <= 0) {
+        throw new Error('El importe del pedido debe ser mayor que 0.');
+      }
+
       const redsysParams = await fetchRedsysParameters(
         createdOrder.order_id,
         finalTotal,
@@ -314,15 +318,16 @@ export const useCheckoutForm = () => {
 
       const form = document.createElement('form');
       form.method = 'POST';
-      form.action = import.meta.env.PROD ? REDSYS_URL_PROD : REDSYS_URL_TEST;
-      
-      Object.entries(redsysParams).forEach(([key, value]) => {
+      form.action = redsysParams.redsysUrl;
+
+      // Solo campos que Redsys espera en el POST (no redsysUrl / testMode)
+      for (const key of ['Ds_SignatureVersion', 'Ds_MerchantParameters', 'Ds_Signature'] as const) {
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = key;
-        input.value = value as string;
+        input.value = redsysParams[key];
         form.appendChild(input);
-      });
+      }
       
       document.body.appendChild(form);
       form.submit();
@@ -331,7 +336,10 @@ export const useCheckoutForm = () => {
       console.error('Error creating order:', error);
       openModal({
         title: 'Error en el pago',
-        message: 'Hubo un error al procesar el pago. Por favor, inténtalo de nuevo.',
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : 'Hubo un error al procesar el pago. Por favor, inténtalo de nuevo.',
         type: 'warning'
       });
     } finally {

@@ -9,13 +9,13 @@ const TEST_PRODUCT_SLUG = 'prueba-pago-001';
 
 /**
  * Botón flotante para ir al checkout con el producto de prueba.
- * Visible solo si `VITE_ENABLE_TEST_CHECKOUT=true` (misma flag que fuerza Nacex TEST).
+ * Visible solo si `VITE_ENABLE_TEST_CHECKOUT=true` (misma flag que fuerza Nacex TEST + Redsys sandbox).
  */
 export const TestCheckoutButton: FC = () => {
   const enabled = import.meta.env.VITE_ENABLE_TEST_CHECKOUT === 'true';
   const location = useLocation();
   const navigate = useNavigate();
-  const { clearCart, addItem, closeModal } = useCartStore();
+  const { clearCart, addItem, closeModal, openModal } = useCartStore();
   const [loading, setLoading] = useState(false);
 
   if (!enabled) return null;
@@ -26,20 +26,31 @@ export const TestCheckoutButton: FC = () => {
     setLoading(true);
     try {
       const product = await api.products.getBySlug(TEST_PRODUCT_SLUG);
+      if (!product?.product_id) {
+        throw new Error('Producto de prueba no encontrado.');
+      }
       const variant = product.variants?.[0];
-      if (!variant) {
+      if (!variant?.variant_id) {
         throw new Error('El producto de prueba no tiene variantes.');
       }
       clearCart();
       addItem(product, variant);
       closeModal();
       navigate('/checkout');
+      openModal({
+        title: 'Modo prueba',
+        message:
+          'Cesta lista con el producto de 0,01€. Completa el checkout: Redsys usará el sandbox de pruebas.',
+        type: 'info',
+      });
     } catch (err) {
       console.error('[TestCheckoutButton]', err);
-      useCartStore.getState().openModal({
+      openModal({
         title: 'Prueba de pago',
         message:
-          'No se pudo cargar el producto de prueba. Comprueba que existe /producto/prueba-pago-001.',
+          err instanceof Error && err.message
+            ? err.message
+            : 'No se pudo cargar el producto de prueba. Comprueba que existe /producto/prueba-pago-001.',
         type: 'warning',
       });
     } finally {
@@ -50,9 +61,11 @@ export const TestCheckoutButton: FC = () => {
   return (
     <button
       type="button"
-      onClick={handleClick}
+      onClick={() => {
+        void handleClick();
+      }}
       disabled={loading}
-      title="Compra de prueba (0,01€) — Nacex usa usuario TEST"
+      title="Compra de prueba (0,01€) — Redsys sandbox + Nacex TEST"
       className="fixed bottom-28 left-4 z-[60] flex items-center gap-2 rounded-full bg-amber-500 px-4 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg transition hover:bg-amber-600 disabled:opacity-70 md:bottom-6 md:left-6"
     >
       {loading ? (

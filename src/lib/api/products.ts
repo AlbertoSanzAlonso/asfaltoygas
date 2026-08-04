@@ -325,7 +325,10 @@ export const products = {
         .eq('slug', slug)
         .maybeSingle();
 
-      if (!error) return normalise(data);
+      if (!error) {
+        if (!data) throw new Error('Producto no encontrado');
+        return normalise(data);
+      }
       lastError = error;
       if (
         !isMissingRelation(error, 'product_labels') &&

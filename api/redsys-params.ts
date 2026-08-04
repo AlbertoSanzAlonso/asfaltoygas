@@ -35,10 +35,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ message: 'Missing required fields: orderId, amount' });
   }
 
-  // Use environment variables (Securely stored on Insforge/Vercel)
-  const merchantCode = process.env.VITE_REDSYS_COMMERCE_NUMBER;
-  const terminal = process.env.VITE_REDSYS_TERMINAL_NUMBER || '001';
-  const secretKey = process.env.VITE_REDSYS_SECRET_KEY;
+  const amountNumber = Number(amount);
+  if (!Number.isFinite(amountNumber) || amountNumber <= 0) {
+    return res.status(400).json({ message: 'Amount must be greater than 0' });
+  }
+
+  /**
+   * Getnet envía FUC real + clave TEST (p. ej. sq7H…) para el entorno de pruebas.
+   * Lo que cambia entre test y prod es la URL (y, al pasar a producción, la clave SHA).
+   * Con VITE_ENABLE_TEST_CHECKOUT=true → sis-t.redsys.es (nunca producción).
+   */
+  const testMode = process.env.VITE_ENABLE_TEST_CHECKOUT === 'true';
+  const REDSYS_URL_TEST = 'https://sis-t.redsys.es:25443/sis/realizarPago';
+  const REDSYS_URL_PROD = 'https://sis.redsys.es/sis/realizarPago';
+
+  const merchantCode =
+    process.env.VITE_REDSYS_COMMERCE_NUMBER_TEST ||
+    process.env.VITE_REDSYS_COMMERCE_NUMBER;
+  const terminal =
+    process.env.VITE_REDSYS_TERMINAL_NUMBER_TEST ||
+    process.env.VITE_REDSYS_TERMINAL_NUMBER ||
+    '001';
+  const secretKey =
+    process.env.VITE_REDSYS_SECRET_KEY_TEST ||
+    process.env.VITE_REDSYS_SECRET_KEY;
+  const redsysUrl = testMode ? REDSYS_URL_TEST : REDSYS_URL_PROD;
 
   if (!merchantCode || !secretKey) {
     return res.status(500).json({ message: 'Server configuration error: Redsys keys missing' });
@@ -46,10 +67,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // 1. Prepare Merchant Parameters
-    const amountCents = Math.round(amount * 100).toString();
+    const amountCents = Math.round(amountNumber * 100).toString();
     // Redsys requires the first 4 positions to be numeric.
     // We'll take only digits from the UUID and pad to 12 chars.
     const formattedOrderId = orderId.replace(/[^0-9]/g, '').slice(0, 12).padStart(12, '0');
+
+    if (formattedOrderId.length < 4 || !/^\d+$/.test(formattedOrderId)) {
+      return res.status(400).json({ message: 'Invalid order id for Redsys' });
+    }
 
     const merchantParams = {
       DS_MERCHANT_AMOUNT: amountCents,
@@ -86,7 +111,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({
       Ds_SignatureVersion: 'HMAC_SHA256_V1',
       Ds_MerchantParameters: merchantParamsB64,
-      Ds_Signature: signatureB64
+      Ds_Signature: signatureB64,
+      redsysUrl,
+      testMode,
     });
   } catch (error) {
     console.error('Error generating Redsys params:', error);

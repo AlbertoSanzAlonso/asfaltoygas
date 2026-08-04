@@ -76,6 +76,15 @@ export const generateRedsysParameters = (
   };
 };
 
+export type RedsysFormParams = {
+  Ds_SignatureVersion: string;
+  Ds_MerchantParameters: string;
+  Ds_Signature: string;
+  /** URL de la pasarela (sandbox o producción). La decide el API. */
+  redsysUrl: string;
+  testMode?: boolean;
+};
+
 export const fetchRedsysParameters = async (
   orderId: string,
   amount: number,
@@ -86,7 +95,7 @@ export const fetchRedsysParameters = async (
     productDescription?: string;
     paymentMethod?: 'card' | 'bizum';
   }
-) => {
+): Promise<RedsysFormParams> => {
   const response = await fetch('/api/redsys-params', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -94,10 +103,25 @@ export const fetchRedsysParameters = async (
   });
   
   if (!response.ok) {
-    throw new Error('Error al generar los parámetros de pago');
+    const detail = await response.json().catch(() => null);
+    const message =
+      (detail && typeof detail.message === 'string' && detail.message) ||
+      'Error al generar los parámetros de pago';
+    throw new Error(message);
   }
   
-  return response.json();
+  const data = (await response.json()) as Partial<RedsysFormParams>;
+  if (!data.Ds_MerchantParameters || !data.Ds_Signature || !data.redsysUrl) {
+    throw new Error('Respuesta de pago incompleta');
+  }
+
+  return {
+    Ds_SignatureVersion: data.Ds_SignatureVersion || 'HMAC_SHA256_V1',
+    Ds_MerchantParameters: data.Ds_MerchantParameters,
+    Ds_Signature: data.Ds_Signature,
+    redsysUrl: data.redsysUrl,
+    testMode: data.testMode,
+  };
 };
 
 export const REDSYS_URL_TEST = 'https://sis-t.redsys.es:25443/sis/realizarPago';
