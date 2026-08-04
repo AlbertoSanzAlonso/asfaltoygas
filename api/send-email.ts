@@ -1,8 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import nodemailer from 'nodemailer';
+import { createMailTransporter, getMailFromHeader } from '../src/lib/mailTransport.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Allow all origins for now to avoid CORS issues during testing
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -26,31 +25,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
-  // Restore the "Service: Gmail" configuration which worked yesterday
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-  });
+  const transporter = createMailTransporter();
+  if (!transporter) {
+    return res.status(500).json({
+      success: false,
+      error: 'Correo no configurado (SMTP_USER/SMTP_PASS o GMAIL_USER/GMAIL_APP_PASSWORD).',
+    });
+  }
 
   try {
     const info = await transporter.sendMail({
-      from: `"Asfalto y Gas" <${process.env.GMAIL_USER}>`,
+      from: getMailFromHeader(),
       to,
       subject,
       text,
       html,
-      attachments
+      attachments,
     });
 
     return res.status(200).json({ success: true, messageId: info.messageId });
   } catch (error) {
     console.error('Error sending email:', error);
-    return res.status(500).json({ 
-      success: false, 
-      error: (error as Error).message
+    return res.status(500).json({
+      success: false,
+      error: (error as Error).message,
     });
   }
 }

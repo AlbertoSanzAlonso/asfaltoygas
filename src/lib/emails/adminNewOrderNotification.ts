@@ -1,4 +1,3 @@
-import nodemailer from 'nodemailer';
 import type { Order, OrderItem } from '../../types/index.js';
 import { getOrderContact } from '../orderContact.js';
 import {
@@ -8,10 +7,11 @@ import {
 } from '../orderEmailHtml.js';
 
 import { getCanonicalSiteUrl } from '../../api/_siteUrl.js';
+import { createMailTransporter, getMailFromHeader } from '../mailTransport.js';
 
 const LOGO_URL = `${getCanonicalSiteUrl()}/assets/logo/logo-asfaltoygas-main.png`;
 
-const DEFAULT_ADMIN_ORDER_EMAIL = 'infobenalumox@gmail.com';
+const DEFAULT_ADMIN_ORDER_EMAIL = 'info@asfaltoygas.es';
 
 export function getAdminOrderNotifyEmail(): string {
   const configured = process.env.ADMIN_ORDER_EMAIL?.trim();
@@ -19,16 +19,7 @@ export function getAdminOrderNotifyEmail(): string {
 }
 
 function createGmailTransporter() {
-  const gmailUser = process.env.GMAIL_USER;
-  const gmailPass = process.env.GMAIL_APP_PASSWORD;
-  if (!gmailUser || !gmailPass) return null;
-
-  return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: { user: gmailUser, pass: gmailPass },
-  });
+  return createMailTransporter();
 }
 
 export function getSiteUrl(): string {
@@ -175,9 +166,8 @@ export async function sendCustomerOrderConfirmationEmail(
     </div>
   `;
 
-  const gmailUser = process.env.GMAIL_USER!;
   await transporter.sendMail({
-    from: `"Asfalto y Gas" <${gmailUser}>`,
+    from: getMailFromHeader(),
     to: customerEmail,
     subject: `Confirmación de pedido #${orderId} - Asfalto y Gas`,
     html,
@@ -201,10 +191,9 @@ export async function sendAdminNewOrderEmail(
   const orderId = order.order_id.split('-')[0].toUpperCase();
   const contact = getOrderContact(order);
   const html = buildAdminNewOrderEmailHtml(order, orderItems, adminBaseUrl);
-  const gmailUser = process.env.GMAIL_USER!;
 
   await transporter.sendMail({
-    from: `"Asfalto y Gas" <${gmailUser}>`,
+    from: getMailFromHeader(),
     to,
     subject: `Nuevo pedido #${orderId} — generar etiqueta Nacex`,
     html,
