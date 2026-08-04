@@ -33,24 +33,24 @@ export const HeroSliderSection: React.FC = () => {
               className="absolute inset-0"
             >
               <img src={slide.image} alt="" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-secondary/70 to-secondary/30" />
+              <div className="absolute inset-0 bg-gradient-to-b from-secondary/70 via-secondary/55 to-secondary/75" />
             </motion.div>
           </AnimatePresence>
         </div>
 
         <HeroSmokeEffect />
 
-        <div className="absolute inset-0 z-10 flex items-center px-6 sm:px-10 lg:px-16 pointer-events-none">
-          <div className="w-full max-w-[1800px] mx-auto pointer-events-auto">
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 max-w-4xl">
+        <div className="absolute inset-0 z-10 flex items-center justify-center px-6 sm:px-10 lg:px-16 pointer-events-none">
+          <div className="w-full max-w-4xl mx-auto text-center pointer-events-auto">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-center gap-2 sm:gap-6">
               <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white uppercase leading-[0.9] tracking-wide">
                 {slide.titleLeft}
               </h1>
-              <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-safety uppercase leading-[0.9] tracking-wide sm:text-right">
+              <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-safety uppercase leading-[0.9] tracking-wide">
                 {slide.titleRight}
               </h1>
             </div>
-            <p className="font-sans text-white/80 text-sm md:text-base mt-6 max-w-md">
+            <p className="font-sans text-white/80 text-sm md:text-base mt-6 mx-auto max-w-md">
               {slide.subtitle}
             </p>
             <Link
