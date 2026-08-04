@@ -5,7 +5,7 @@ export const BRAND = {
   tagline: 'Equipamiento para motorista',
   description:
     'Tienda online especializada en cascos de moto, equipación y accesorios. Marcas líderes como HJC, AGV, Shoei y más. Envío rápido en toda España.',
-  email: 'asfaltoygasatclient@gmail.com',
+  email: 'info@asfaltoygas.es',
   phone: '+34 642 181 821',
   phoneDisplay: '642 181 821',
   whatsapp: '34642181821',
