@@ -15,15 +15,21 @@ interface OrderDetailsModalProps {
   trackingInfo: { number: string; carrier: string };
   onClose: () => void;
   onGenerateLabel: (orderId: string) => void;
+  onMarkPaid?: (orderId: string) => void;
 }
 
 export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
   order,
   trackingInfo,
   onClose,
-  onGenerateLabel
+  onGenerateLabel,
+  onMarkPaid,
 }) => {
   const contact = getOrderContact(order);
+  const testCheckoutEnabled = import.meta.env.VITE_ENABLE_TEST_CHECKOUT === 'true';
+  const canMarkPaid =
+    Boolean(onMarkPaid) && testCheckoutEnabled && !canFulfillOrder(order) && order.order_status !== 'Cancelled';
+
 
   return (
     <div className="fixed inset-0 z-110 flex items-center justify-center p-6 bg-secondary/80 backdrop-blur-sm">
@@ -184,9 +190,20 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                     GENERAR ETIQUETA NACEX
                   </Button>
                 ) : (
-                  <p className="flex-1 text-center text-[10px] font-black uppercase tracking-widest text-yellow-600 py-4">
-                    Envío disponible cuando el pago esté confirmado en Redsys
-                  </p>
+                  <div className="flex-1 space-y-3">
+                    <p className="text-center text-[10px] font-black uppercase tracking-widest text-yellow-600 py-2">
+                      Envío disponible cuando el pago esté confirmado en Redsys
+                    </p>
+                    {canMarkPaid && (
+                      <Button
+                        variant="outline"
+                        className="w-full py-4 text-[10px] font-black tracking-widest italic border-amber-500/40 text-amber-700"
+                        onClick={() => onMarkPaid?.(order.order_id)}
+                      >
+                        MARCAR PAGADO (MODO TEST)
+                      </Button>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

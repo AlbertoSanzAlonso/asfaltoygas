@@ -195,6 +195,37 @@ export const AdminDashboard: React.FC = () => {
     });
   };
 
+  const handleMarkPaid = async (orderId: string) => {
+    if (import.meta.env.VITE_ENABLE_TEST_CHECKOUT !== 'true') {
+      openModal({
+        title: 'No disponible',
+        message: 'Solo se puede marcar como pagado manualmente con VITE_ENABLE_TEST_CHECKOUT=true.',
+        type: 'warning',
+      });
+      return;
+    }
+    try {
+      const updated = await api.orders.update(orderId, {
+        order_status: 'Paid',
+        payment_status: 'Paid',
+      });
+      setSelectedOrder(updated);
+      queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+      openModal({
+        title: 'Pedido marcado como pagado',
+        message: 'Ya puedes generar la etiqueta Nacex de prueba.',
+        type: 'info',
+      });
+    } catch (err) {
+      console.error(err);
+      openModal({
+        title: 'Error',
+        message: 'No se pudo marcar el pedido como pagado.',
+        type: 'warning',
+      });
+    }
+  };
+
   const handleGenerateLabel = async (orderId: string) => {
     const order = orders?.find(o => o.order_id === orderId);
     if (order && !canFulfillOrder(order)) {
@@ -476,6 +507,7 @@ export const AdminDashboard: React.FC = () => {
           trackingInfo={trackingInfo}
           onClose={() => setShowOrderDetails(false)}
           onGenerateLabel={handleGenerateLabel}
+          onMarkPaid={handleMarkPaid}
         />
       )}
     </AdminLayout>
