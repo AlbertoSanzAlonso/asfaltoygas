@@ -11,7 +11,7 @@ interface OrdersTabProps {
   pageSize: number;
   onPageChange: (page: number) => void;
   onOrderClick: (order: Order) => void;
-  onGenerateLabel: (orderId: string) => void;
+  onGenerateLabel: (orderId: string, options?: { isTest?: boolean }) => void;
 }
 
 export const OrdersTab: React.FC<OrdersTabProps> = ({

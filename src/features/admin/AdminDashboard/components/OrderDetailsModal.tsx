@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Truck, FileImage } from 'lucide-react';
+import { X, Truck, FileImage, FlaskConical } from 'lucide-react';
 import { Button } from "@/components/ui/Button";
 import type { Order } from "@/types";
 import { api } from '@/lib/api';
@@ -14,7 +14,7 @@ interface OrderDetailsModalProps {
   order: Order;
   trackingInfo: { number: string; carrier: string };
   onClose: () => void;
-  onGenerateLabel: (orderId: string) => void;
+  onGenerateLabel: (orderId: string, options?: { isTest?: boolean }) => void;
   onMarkPaid?: (orderId: string) => void;
 }
 
@@ -172,23 +172,36 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                   />
                 </div>
               )}
-              <div className="flex gap-4 pt-2">
+              <div className="flex flex-col gap-3 pt-2">
                 {order.tracking_number ? (
                   <Button
-                    className="flex-1 py-4 text-[10px] font-black tracking-widest italic"
+                    className="w-full py-4 text-[10px] font-black tracking-widest italic"
                     onClick={() => api.shipping.openNacexLabel(undefined, order.tracking_number!)}
                   >
                     <FileImage className="w-4 h-4 mr-2" />
                     VER ETIQUETA NACEX
                   </Button>
                 ) : canFulfillOrder(order) ? (
-                  <Button
-                    className="flex-1 py-4 text-[10px] font-black tracking-widest italic"
-                    onClick={() => onGenerateLabel(order.order_id)}
-                  >
-                    <Truck className="w-4 h-4 mr-2" />
-                    GENERAR ETIQUETA NACEX
-                  </Button>
+                  <>
+                    <Button
+                      className="w-full py-4 text-[10px] font-black tracking-widest italic"
+                      onClick={() => onGenerateLabel(order.order_id)}
+                    >
+                      <Truck className="w-4 h-4 mr-2" />
+                      GENERAR ETIQUETA NACEX
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full py-4 text-[10px] font-black tracking-widest italic border-amber-500/40 text-amber-700 hover:bg-amber-500 hover:text-white"
+                      onClick={() => onGenerateLabel(order.order_id, { isTest: true })}
+                    >
+                      <FlaskConical className="w-4 h-4 mr-2" />
+                      PRUEBA NACEX (SIN RECOGIDA)
+                    </Button>
+                    <p className="text-center text-[9px] text-secondary/50 font-medium leading-relaxed px-2">
+                      La opción de prueba usa el usuario Nacex TEST: no programa recogida real en tienda.
+                    </p>
+                  </>
                 ) : (
                   <div className="flex-1 space-y-3">
                     <p className="text-center text-[10px] font-black uppercase tracking-widest text-yellow-600 py-2">

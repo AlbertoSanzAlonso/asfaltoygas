@@ -243,7 +243,7 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleGenerateLabel = async (orderId: string) => {
+  const handleGenerateLabel = async (orderId: string, options?: { isTest?: boolean }) => {
     const order = orders?.find(o => o.order_id === orderId);
     if (order && !canFulfillOrder(order)) {
       openModal({
@@ -255,10 +255,14 @@ export const AdminDashboard: React.FC = () => {
       return;
     }
 
+    const forceTest =
+      options?.isTest === true ||
+      import.meta.env.VITE_ENABLE_TEST_CHECKOUT === 'true' ||
+      order?.payment_method === 'TEST_MODE';
+
     try {
       // Buscamos los detalles del pedido para pasarlos a la API de Nacex
       const contact = order ? getOrderContact(order) : null;
-      const testCheckoutEnabled = import.meta.env.VITE_ENABLE_TEST_CHECKOUT === 'true';
       const orderDetails = order ? {
         nombre: contact?.name || 'Cliente',
         direccion: order.shipping_street,
@@ -266,10 +270,10 @@ export const AdminDashboard: React.FC = () => {
         cp: order.shipping_zip,
         telefono: contact?.phone,
         orderId: order.order_id,
-        isTest: testCheckoutEnabled || order.payment_method === 'TEST_MODE',
+        isTest: forceTest,
         isNacexShop: order.carrier?.includes('Nacex Point'), // Detectar si es envío a punto
         payment_method: order.payment_method
-      } : {};
+      } : { isTest: forceTest };
 
       const res = await api.shipping.createNacexExpedition(orderId, orderDetails);
 
@@ -311,10 +315,11 @@ export const AdminDashboard: React.FC = () => {
       }
 
       const isTestStub =
+        forceTest ||
         res.trackingNumber === '9999999' ||
         res.trackingNumber?.toUpperCase().startsWith('TEST');
       openModal({
-        title: 'Expedición NACEX',
+        title: forceTest ? 'Expedición NACEX (prueba)' : 'Expedición NACEX',
         message: isTestStub
           ? `Expedición TEST creada (${res.trackingNumber}). Nacex TEST no genera etiqueta ni recogida real; al abrir verás una etiqueta de prueba.`
           : `Expedición generada y pedido actualizado: ${res.trackingNumber}`,

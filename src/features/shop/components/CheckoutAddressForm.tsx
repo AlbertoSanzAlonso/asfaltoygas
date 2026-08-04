@@ -65,54 +65,77 @@ export const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           <>
             <input
               type="email"
+              name="email"
               placeholder="EMAIL *"
               required
               autoComplete="email"
               className="col-span-2 bg-gray-50 border border-gray-200 px-6 py-4 text-sm font-bold focus:border-primary outline-none text-secondary"
               value={formData.email || ''}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
             />
             <input
               type="tel"
+              name="tel"
               placeholder="TELÉFONO *"
               required
               autoComplete="tel"
               className="col-span-2 bg-gray-50 border border-gray-200 px-6 py-4 text-sm font-bold focus:border-primary outline-none text-secondary"
               value={formData.phone || ''}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/[^\d+\s]/g, '') })}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  phone: e.target.value.replace(/[^\d+\s]/g, ''),
+                }))
+              }
             />
           </>
         )}
-        <input 
-          placeholder="NOMBRE *" 
+        <input
+          type="text"
+          name="given-name"
+          placeholder="NOMBRE *"
           required
+          autoComplete="shipping given-name"
           className="bg-gray-50 border border-gray-200 px-6 py-4 text-sm font-bold focus:border-primary outline-none text-secondary"
           value={formData.name}
-          onChange={(e) => setFormData({...formData, name: e.target.value})}
+          onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
         />
-        <input 
-          placeholder="APELLIDOS *" 
+        <input
+          type="text"
+          name="family-name"
+          placeholder="APELLIDOS *"
           required
+          autoComplete="shipping family-name"
           className="bg-gray-50 border border-gray-200 px-6 py-4 text-sm font-bold focus:border-primary outline-none text-secondary"
           value={formData.surname}
-          onChange={(e) => setFormData({...formData, surname: e.target.value})}
+          onChange={(e) => setFormData((prev) => ({ ...prev, surname: e.target.value }))}
         />
         <div className="col-span-2 relative">
-          <input 
-            placeholder="CÓDIGO POSTAL" 
+          <input
+            type="text"
+            name="postal-code"
+            placeholder="CÓDIGO POSTAL"
             required
             maxLength={5}
-            autoComplete="off"
+            inputMode="numeric"
+            autoComplete="shipping postal-code"
             className="w-full bg-gray-50 border border-gray-200 px-6 py-4 text-sm font-bold focus:border-primary outline-none text-secondary"
             value={formData.zip}
-            onChange={(e) => setFormData({...formData, zip: e.target.value.replace(/\D/g, '')})}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                zip: e.target.value.replace(/\D/g, ''),
+              }))
+            }
           />
           {isLocating && <Loader2 className="w-4 h-4 animate-spin text-primary absolute right-4 top-1/2 -translate-y-1/2" />}
         </div>
 
         <div className="relative">
           <select
+            name="address-level1"
             required
+            autoComplete="shipping address-level1"
             className="w-full bg-gray-50 border border-gray-200 px-6 py-4 text-sm font-bold focus:border-primary outline-none text-secondary appearance-none"
             value={formData.province}
             onChange={(e) => onProvinceChange(e.target.value)}
@@ -127,8 +150,9 @@ export const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         <div className="relative space-y-1">
           {useCitySelect ? (
             <select
+              name="address-level2"
               required
-              autoComplete="address-level2"
+              autoComplete="shipping address-level2"
               className="w-full bg-gray-50 border border-gray-200 px-6 py-4 text-sm font-bold focus:border-primary outline-none text-secondary appearance-none"
               value={formData.city}
               onChange={(e) => onCityChange(e.target.value)}
@@ -148,9 +172,10 @@ export const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           ) : (
             <input
               type="text"
+              name="address-level2"
               placeholder="CIUDAD / LOCALIDAD"
               required
-              autoComplete="address-level2"
+              autoComplete="shipping address-level2"
               className="w-full bg-gray-50 border border-gray-200 px-6 py-4 text-sm font-bold focus:border-primary outline-none text-secondary"
               value={formData.city}
               onChange={(e) => onCityChange(e.target.value)}
@@ -163,32 +188,43 @@ export const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           )}
         </div>
 
-        <input 
-          placeholder="DIRECCIÓN (CALLE Y NÚMERO)" 
+        <input
+          type="text"
+          name="street-address"
+          placeholder="DIRECCIÓN (CALLE Y NÚMERO)"
           required
+          autoComplete="shipping street-address"
           className="col-span-2 bg-gray-50 border border-gray-200 px-6 py-4 text-sm font-bold focus:border-primary outline-none text-secondary"
           value={formData.address}
-          onChange={(e) => setFormData({...formData, address: e.target.value})}
+          onChange={(e) => setFormData((prev) => ({ ...prev, address: e.target.value }))}
         />
 
         <div className="grid grid-cols-3 gap-4 col-span-2">
-          <input 
-            placeholder="PISO" 
+          <input
+            type="text"
+            name="address-line2"
+            placeholder="PISO"
+            autoComplete="off"
             className="bg-gray-50 border border-gray-200 px-6 py-3 text-xs font-bold focus:border-primary outline-none text-secondary"
             value={formData.floor}
-            onChange={(e) => setFormData({...formData, floor: e.target.value})}
+            onChange={(e) => setFormData((prev) => ({ ...prev, floor: e.target.value }))}
           />
-          <input 
-            placeholder="PUERTA" 
+          <input
+            type="text"
+            name="address-line3"
+            placeholder="PUERTA"
+            autoComplete="off"
             className="bg-gray-50 border border-gray-200 px-6 py-3 text-xs font-bold focus:border-primary outline-none text-secondary"
             value={formData.door}
-            onChange={(e) => setFormData({...formData, door: e.target.value})}
+            onChange={(e) => setFormData((prev) => ({ ...prev, door: e.target.value }))}
           />
-          <input 
-            placeholder="ESC." 
+          <input
+            type="text"
+            placeholder="ESC."
+            autoComplete="off"
             className="bg-gray-50 border border-gray-200 px-6 py-3 text-xs font-bold focus:border-primary outline-none text-secondary"
             value={formData.stair}
-            onChange={(e) => setFormData({...formData, stair: e.target.value})}
+            onChange={(e) => setFormData((prev) => ({ ...prev, stair: e.target.value }))}
           />
         </div>
       </div>
