@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import { getCanonicalSiteUrl } from './_siteUrl.js';
 import { isSupabaseConfigured } from './_supabaseConfig.js';
+import { getEnv } from './_env.js';
 
 const SITE_URL = getCanonicalSiteUrl();
 
@@ -64,9 +65,9 @@ function toLastmod(value?: string | null): string | undefined {
 export default async function handler(_req: VercelRequest, res: VercelResponse) {
   const entries: SitemapEntry[] = [...STATIC_PAGES];
 
-  if (isSupabaseConfigured()) {
-    const supabaseUrl = process.env.VITE_SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = getEnv('VITE_SUPABASE_URL');
+  const serviceKey = getEnv('SUPABASE_SERVICE_ROLE_KEY');
+  if (isSupabaseConfigured() && supabaseUrl && serviceKey) {
     try {
       const supabase = createClient(supabaseUrl, serviceKey);
       const { data: products } = await supabase

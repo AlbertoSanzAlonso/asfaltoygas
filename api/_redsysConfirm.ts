@@ -3,6 +3,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { Order, OrderItem } from '../src/types/index.js';
 import { sendOrderPaidEmails } from '../src/lib/emails/adminNewOrderNotification.js';
 import { isOrderPaid } from '../src/lib/orderPayment.js';
+import { getEnv } from './_env.js';
 
 export type RedsysConfirmResult =
   | { ok: true; orderId?: string; alreadyProcessed?: boolean; skipped?: boolean }
@@ -66,9 +67,9 @@ export async function confirmRedsysPayment(
     return { ok: false, status: 400, message: 'Missing parameters' };
   }
 
-  const secretKey = process.env.VITE_REDSYS_SECRET_KEY;
-  const supabaseUrl = process.env.VITE_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const secretKey = getEnv('VITE_REDSYS_SECRET_KEY');
+  const supabaseUrl = getEnv('VITE_SUPABASE_URL');
+  const supabaseServiceKey = getEnv('SUPABASE_SERVICE_ROLE_KEY');
 
   if (!secretKey || !supabaseUrl || !supabaseServiceKey) {
     return { ok: false, status: 500, message: 'Server configuration error' };

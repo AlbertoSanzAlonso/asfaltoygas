@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createMailTransporter, getMailFromAddress } from '../src/lib/mailTransport.js';
+import { getEnv } from './_env.js';
 
 function maskEmail(email: string): string {
   const at = email.indexOf('@');
@@ -18,12 +19,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const host = process.env.SMTP_HOST?.trim() || '';
-  const user = process.env.SMTP_USER?.trim() || '';
-  const pass = Boolean((process.env.SMTP_PASS || process.env.SMTP_PASSWORD || '').trim());
-  const port = process.env.SMTP_PORT || '587';
+  const host = getEnv('SMTP_HOST')?.trim() || '';
+  const user = getEnv('SMTP_USER')?.trim() || '';
+  const pass = Boolean((getEnv('SMTP_PASS') || getEnv('SMTP_PASSWORD') || '').trim());
+  const port = getEnv('SMTP_PORT') || '587';
   const from = getMailFromAddress();
-  const admin = process.env.ADMIN_ORDER_EMAIL?.trim() || '';
+  const admin = getEnv('ADMIN_ORDER_EMAIL')?.trim() || '';
   const transporter = createMailTransporter();
 
   let smtpVerify: 'ok' | 'fail' | 'skipped' = 'skipped';

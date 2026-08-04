@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import CryptoJS from 'crypto-js';
+import { getEnv } from './_env.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Add CORS headers
@@ -45,20 +46,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
    * Lo que cambia entre test y prod es la URL (y, al pasar a producción, la clave SHA).
    * Con VITE_ENABLE_TEST_CHECKOUT=true → sis-t.redsys.es (nunca producción).
    */
-  const testMode = process.env.VITE_ENABLE_TEST_CHECKOUT === 'true';
+  const testMode = getEnv('VITE_ENABLE_TEST_CHECKOUT') === 'true';
   const REDSYS_URL_TEST = 'https://sis-t.redsys.es:25443/sis/realizarPago';
   const REDSYS_URL_PROD = 'https://sis.redsys.es/sis/realizarPago';
 
   const merchantCode =
-    process.env.VITE_REDSYS_COMMERCE_NUMBER_TEST ||
-    process.env.VITE_REDSYS_COMMERCE_NUMBER;
+    getEnv('VITE_REDSYS_COMMERCE_NUMBER_TEST') ||
+    getEnv('VITE_REDSYS_COMMERCE_NUMBER');
   const terminal =
-    process.env.VITE_REDSYS_TERMINAL_NUMBER_TEST ||
-    process.env.VITE_REDSYS_TERMINAL_NUMBER ||
+    getEnv('VITE_REDSYS_TERMINAL_NUMBER_TEST') ||
+    getEnv('VITE_REDSYS_TERMINAL_NUMBER') ||
     '001';
   const secretKey =
-    process.env.VITE_REDSYS_SECRET_KEY_TEST ||
-    process.env.VITE_REDSYS_SECRET_KEY;
+    getEnv('VITE_REDSYS_SECRET_KEY_TEST') ||
+    getEnv('VITE_REDSYS_SECRET_KEY');
   const redsysUrl = testMode ? REDSYS_URL_TEST : REDSYS_URL_PROD;
 
   if (!merchantCode || !secretKey) {

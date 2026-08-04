@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import type { Order, OrderItem } from '../src/types/index.js';
 import { sendOrderPaidEmails } from '../src/lib/emails/adminNewOrderNotification.js';
+import { getEnv } from './_env.js';
 
 /**
  * Reenvía emails de pedido pagado (cliente + admin).
@@ -17,7 +18,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  if (process.env.VITE_ENABLE_TEST_CHECKOUT !== 'true') {
+  if (getEnv('VITE_ENABLE_TEST_CHECKOUT') !== 'true') {
     return res.status(403).json({
       success: false,
       error: 'Solo disponible con VITE_ENABLE_TEST_CHECKOUT=true.',
@@ -29,8 +30,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ success: false, error: 'Falta orderId' });
   }
 
-  const supabaseUrl = process.env.VITE_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = getEnv('VITE_SUPABASE_URL');
+  const serviceKey = getEnv('SUPABASE_SERVICE_ROLE_KEY');
   if (!supabaseUrl || !serviceKey) {
     return res.status(500).json({ success: false, error: 'Supabase no configurado' });
   }

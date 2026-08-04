@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { getEnv } from './_env.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -11,7 +12,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { input } = req.body as { input?: string };
     if (!input) return res.status(400).json({ error: 'Missing input' });
 
-    const apiKey = process.env.VITE_OPENAI_API_KEY;
+    const apiKey = getEnv('VITE_OPENAI_API_KEY');
     if (!apiKey) return res.status(500).json({ error: 'OpenAI API key not configured' });
 
     try {
@@ -47,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Missing messages or systemPrompt' });
     }
 
-    const apiKey = process.env.VITE_GROQ_API_KEY;
+    const apiKey = getEnv('VITE_GROQ_API_KEY');
     if (!apiKey) return res.status(500).json({ error: 'Groq API key not configured' });
 
     try {

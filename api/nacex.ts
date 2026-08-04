@@ -3,6 +3,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import { canFulfillOrder } from '../src/lib/orderPayment.js';
 import { BRAND } from '../src/lib/brand.js';
+import { getEnv } from './_env.js';
 
 /** Versión del handler (comprobar en Network → respuesta JSON tras redeploy). */
 const NACEX_API_VERSION = '2026-08-test-label-v5';
@@ -190,8 +191,8 @@ function maskEmail(email: string): string {
 
 /** Guarda tracking en Supabase con service role (el admin en cliente suele fallar por RLS). */
 async function saveOrderTracking(orderId: string, tracking: string): Promise<boolean> {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = getEnv('VITE_SUPABASE_URL');
+  const serviceKey = getEnv('SUPABASE_SERVICE_ROLE_KEY');
   if (!supabaseUrl || !serviceKey || !orderId) return false;
 
   const supabase = createClient(supabaseUrl, serviceKey);
@@ -293,24 +294,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, cp, tracking, codExp, albaran } = req.query;
 
   // CREDENCIALES (Prioridad a Variables de Entorno)
-  const NACEX_USER_PROD = process.env.NACEX_USER || 'ASFALTOYGASATCLIENTE@GMAIL.COM';
+  const NACEX_USER_PROD = getEnv('NACEX_USER') || 'ASFALTOYGASATCLIENTE@GMAIL.COM';
   const NACEX_USER_TEST =
-    process.env.NACEX_USER_TEST || 'ASFALTOYGASATCLIENTE@GMAIL._T';
-  const NACEX_PASS = process.env.NACEX_PASSWORD || '';
-  const NACEX_AGENCY = process.env.NACEX_AGENCIA || '2924';
-  const NACEX_CLIENT = process.env.NACEX_CLIENTE || '00485';
-  const NACEX_CP_RECOGIDA = process.env.NACEX_CP_RECOGIDA || BRAND.address.postalCode;
-  const NACEX_NOMBRE_RECOGIDA = process.env.NACEX_NOMBRE_RECOGIDA || BRAND.name;
-  const NACEX_DIR_RECOGIDA = (process.env.NACEX_DIR_RECOGIDA || BRAND.address.street).slice(0, 45);
-  const NACEX_POBLACION_RECOGIDA = process.env.NACEX_POBLACION_RECOGIDA || BRAND.address.city;
-  const NACEX_TEL_RECOGIDA = (process.env.NACEX_TEL_RECOGIDA || BRAND.phone.replace(/\D/g, '').slice(-9))
+    getEnv('NACEX_USER_TEST') || 'ASFALTOYGASATCLIENTE@GMAIL._T';
+  const NACEX_PASS = getEnv('NACEX_PASSWORD') || '';
+  const NACEX_AGENCY = getEnv('NACEX_AGENCIA') || '2924';
+  const NACEX_CLIENT = getEnv('NACEX_CLIENTE') || '00485';
+  const NACEX_CP_RECOGIDA = getEnv('NACEX_CP_RECOGIDA') || BRAND.address.postalCode;
+  const NACEX_NOMBRE_RECOGIDA = getEnv('NACEX_NOMBRE_RECOGIDA') || BRAND.name;
+  const NACEX_DIR_RECOGIDA = (getEnv('NACEX_DIR_RECOGIDA') || BRAND.address.street).slice(0, 45);
+  const NACEX_POBLACION_RECOGIDA = getEnv('NACEX_POBLACION_RECOGIDA') || BRAND.address.city;
+  const NACEX_TEL_RECOGIDA = (getEnv('NACEX_TEL_RECOGIDA') || BRAND.phone.replace(/\D/g, '').slice(-9))
     .replace(/\D/g, '')
     .slice(0, 15);
 
   const canUseRealAPI = NACEX_PASS && NACEX_PASS !== 'tu_password' && NACEX_PASS !== 'PON_AQUI_TU_CLAVE_MD5';
 
   /** Misma flag que el botón "Pago test": fuerza usuario Nacex de prueba. */
-  const testCheckoutEnabled = process.env.VITE_ENABLE_TEST_CHECKOUT === 'true';
+  const testCheckoutEnabled = getEnv('VITE_ENABLE_TEST_CHECKOUT') === 'true';
 
   /** Usuario WS activo: test si la flag está on o el body/query pide pruebas. */
   const paymentMethodHint = String(req.body?.payment_method || '').toUpperCase();
@@ -577,8 +578,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const orderIdStr = String(orderId || '').trim();
     if (orderIdStr) {
-      const supabaseUrl = process.env.VITE_SUPABASE_URL;
-      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      const supabaseUrl = getEnv('VITE_SUPABASE_URL');
+      const serviceKey = getEnv('SUPABASE_SERVICE_ROLE_KEY');
       if (supabaseUrl && serviceKey) {
         const supabase = createClient(supabaseUrl, serviceKey);
         const { data: orderRow, error: orderLookupError } = await supabase
