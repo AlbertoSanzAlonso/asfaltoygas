@@ -1,8 +1,10 @@
+import { getEnv } from './env.js';
+
 /** URL canónica del sitio (www). El apex sin www aún apunta al WordPress antiguo. */
 export function getCanonicalSiteUrl(): string {
   const raw = (
-    process.env.SITE_URL ||
-    process.env.VITE_SITE_URL ||
+    getEnv('SITE_URL') ||
+    getEnv('VITE_SITE_URL') ||
     'https://www.asfaltoygas.es'
   ).replace(/\/$/, '');
 

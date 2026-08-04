@@ -6,6 +6,7 @@ import {
   buildOrderTotalsEmailHtml,
 } from '../orderEmailHtml.js';
 
+import { getEnv } from '../env.js';
 import { getCanonicalSiteUrl } from '../siteUrl.js';
 import { createMailTransporter, getMailFromHeader } from '../mailTransport.js';
 
@@ -14,16 +15,12 @@ const LOGO_URL = `${getCanonicalSiteUrl()}/assets/logo/logo-asfaltoygas-main.png
 const DEFAULT_ADMIN_ORDER_EMAIL = 'info@asfaltoygas.es';
 
 export function getAdminOrderNotifyEmail(): string {
-  const configured = process.env.ADMIN_ORDER_EMAIL?.trim();
+  const configured = getEnv('ADMIN_ORDER_EMAIL')?.trim();
   return configured || DEFAULT_ADMIN_ORDER_EMAIL;
 }
 
 export function getSiteUrl(): string {
-  const url =
-    process.env.SITE_URL ||
-    process.env.VITE_SITE_URL ||
-    'https://asfaltoygas.es';
-  return url.replace(/\/$/, '');
+  return getCanonicalSiteUrl();
 }
 
 export function buildAdminNewOrderEmailHtml(

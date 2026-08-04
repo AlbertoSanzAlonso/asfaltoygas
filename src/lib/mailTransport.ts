@@ -1,20 +1,22 @@
-import nodemailer from 'nodemailer';
+import { getEnv } from './env.js';
 
 /**
  * Transporter SMTP (DonDominio u otro).
  * Requiere: SMTP_HOST, SMTP_USER, SMTP_PASS
  */
+import nodemailer from 'nodemailer';
+
 export function createMailTransporter(): nodemailer.Transporter | null {
-  const smtpHost = process.env.SMTP_HOST?.trim();
-  const smtpUser = process.env.SMTP_USER?.trim() || '';
-  const smtpPass = (process.env.SMTP_PASS || process.env.SMTP_PASSWORD || '').trim();
+  const smtpHost = getEnv('SMTP_HOST')?.trim();
+  const smtpUser = getEnv('SMTP_USER')?.trim() || '';
+  const smtpPass = (getEnv('SMTP_PASS') || getEnv('SMTP_PASSWORD') || '').trim();
 
   if (!smtpHost || !smtpUser || !smtpPass) return null;
 
-  const port = Number(process.env.SMTP_PORT || 587);
+  const port = Number(getEnv('SMTP_PORT') || 587);
   const secure =
-    process.env.SMTP_SECURE === 'true' ||
-    process.env.SMTP_SECURE === '1' ||
+    getEnv('SMTP_SECURE') === 'true' ||
+    getEnv('SMTP_SECURE') === '1' ||
     port === 465;
 
   return nodemailer.createTransport({
@@ -22,15 +24,15 @@ export function createMailTransporter(): nodemailer.Transporter | null {
     port,
     secure,
     auth: { user: smtpUser, pass: smtpPass },
-    ...( !secure && port === 587 ? { requireTLS: true } : {}),
+    ...(!secure && port === 587 ? { requireTLS: true } : {}),
   });
 }
 
 /** Dirección From (ej. info@asfaltoygas.es). */
 export function getMailFromAddress(): string {
   return (
-    process.env.MAIL_FROM?.trim() ||
-    process.env.SMTP_USER?.trim() ||
+    getEnv('MAIL_FROM')?.trim() ||
+    getEnv('SMTP_USER')?.trim() ||
     'info@asfaltoygas.es'
   );
 }

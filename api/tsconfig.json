@@ -5,17 +5,21 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "types": ["node"],
+    "typeRoots": ["../node_modules/@types"],
     "skipLibCheck": true,
     "noEmit": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": false,
-    "ignoreDeprecations": "5.0"
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "./**/*.ts",
+    "./**/*.d.ts",
+    "../process-env.d.ts",
     "../src/types/**/*.ts",
     "../src/lib/brand.ts",
+    "../src/lib/env.ts",
     "../src/lib/mailTransport.ts",
     "../src/lib/siteUrl.ts",
     "../src/lib/orderContact.ts",
