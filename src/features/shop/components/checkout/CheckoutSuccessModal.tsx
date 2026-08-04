@@ -20,13 +20,20 @@ export const CheckoutSuccessModal: React.FC<CheckoutSuccessModalProps> = ({ show
             ¡Pedido <span className="text-primary italic font-serif lowercase">confirmado</span>!
           </h2>
           <p className="text-sm text-secondary/60 font-medium leading-relaxed">
-            Tu pedido se ha procesado correctamente. Hemos enviado un correo con los detalles de tu compra.
+            Tu pago se ha completado correctamente. Si dejaste un email, recibirás la confirmación en breve.
           </p>
         </div>
-        <div className="pt-4">
+        <div className="pt-4 space-y-3">
           <Button onClick={() => onNavigate('/cuenta/pedidos')} className="w-full bg-primary hover:bg-secondary text-white py-6 text-xs font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-primary/20">
             Ver mis pedidos
           </Button>
+          <button
+            type="button"
+            onClick={() => onNavigate('/')}
+            className="w-full py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-secondary/40 hover:text-secondary transition-colors"
+          >
+            Volver a la tienda
+          </button>
         </div>
       </div>
     </div>

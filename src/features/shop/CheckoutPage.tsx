@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/Button";
+import { useCartStore } from '@/store/useCartStore';
 
 // Hooks
 import { useCheckoutForm } from './hooks/useCheckoutForm';
@@ -16,6 +17,7 @@ import { CheckoutLoginPrompt } from './components/checkout/CheckoutLoginPrompt';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
+  const clearCart = useCartStore((s) => s.clearCart);
   const {
     items,
     cartTotal,
@@ -42,6 +44,7 @@ const CheckoutPage = () => {
     saveToAccount,
     setSaveToAccount,
     showSuccessModal,
+    setShowSuccessModal,
     shippingCost,
     finalTotal,
     handleProvinceChange,
@@ -50,18 +53,23 @@ const CheckoutPage = () => {
     openModal
   } = useCheckoutForm();
 
-  // Redsys Error Notification
+  // Retorno desde Redsys (URLOK / URLKO)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('payment') === 'error') {
+    const payment = params.get('payment');
+    if (payment === 'error') {
       openModal({
         title: 'Error en el pago',
         message: 'No se pudo completar la transacción. Por favor, inténtalo de nuevo con otro método o revisa los datos.',
         type: 'warning'
       });
       window.history.replaceState({}, '', window.location.pathname);
+    } else if (payment === 'success') {
+      clearCart();
+      setShowSuccessModal(true);
+      window.history.replaceState({}, '', window.location.pathname);
     }
-  }, [openModal]);
+  }, [openModal, clearCart, setShowSuccessModal]);
 
   return (
     <div className="bg-accent min-h-screen pt-12 pb-32 text-secondary">

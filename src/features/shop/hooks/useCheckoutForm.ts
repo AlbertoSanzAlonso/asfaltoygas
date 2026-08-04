@@ -308,7 +308,8 @@ export const useCheckoutForm = () => {
         createdOrder.order_id,
         finalTotal,
         {
-          urlOk: `${window.location.origin}/cuenta/pedidos?payment=success`,
+          // URL pública: /cuenta/pedidos exige login y el retorno de Redsys falla para invitados.
+          urlOk: `${window.location.origin}/checkout?payment=success`,
           urlKo: `${window.location.origin}/checkout?payment=error`,
           urlNotification: `${window.location.origin}/api/webhooks/redsys`, 
           productDescription: `Pedido #${createdOrder.order_id.split('-')[0].toUpperCase()}`,
