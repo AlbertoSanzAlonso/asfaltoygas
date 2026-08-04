@@ -5,7 +5,7 @@ import { canFulfillOrder } from '../src/lib/orderPayment.js';
 import { BRAND } from '../src/lib/brand.js';
 
 /** Versión del handler (comprobar en Network → respuesta JSON tras redeploy). */
-const NACEX_API_VERSION = '2026-05-recogida-v4';
+const NACEX_API_VERSION = '2026-08-test-label-v5';
 const NACEX_WS_URL = 'https://pda.nacex.com/nacex_ws/ws';
 
 /** Evita romper el formato pipe-separated de Nacex. */
@@ -214,18 +214,66 @@ async function saveOrderTracking(orderId: string, tracking: string): Promise<boo
   return Boolean(data?.tracking_number);
 }
 
+/** Tracking ficticio del usuario Nacex TEST (no hay etiqueta real). */
+function isNacexTestStubTracking(codExp: string): boolean {
+  const t = codExp.trim().toUpperCase();
+  return (
+    t === '9999999' ||
+    t === '999999' ||
+    t.startsWith('TEST-') ||
+    t.startsWith('TESTNX')
+  );
+}
+
+/** Etiqueta SVG de prueba cuando Nacex TEST no emite PNG real. */
+function buildNacexTestLabelSvg(codExp: string): string {
+  const safe = nacexField(codExp).slice(0, 40);
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600">
+  <rect width="400" height="600" fill="#fff8e1"/>
+  <rect x="16" y="16" width="368" height="568" fill="none" stroke="#f59e0b" stroke-width="4"/>
+  <text x="200" y="80" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#92400e">NACEX TEST</text>
+  <text x="200" y="130" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" fill="#78350f">Etiqueta de prueba</text>
+  <text x="200" y="200" text-anchor="middle" font-family="monospace" font-size="22" fill="#111">#${safe}</text>
+  <text x="200" y="280" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" fill="#78350f">El usuario Nacex TEST no genera</text>
+  <text x="200" y="305" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" fill="#78350f">etiqueta real ni recogida en tienda.</text>
+  <text x="200" y="360" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#a16207">Expedición de prueba OK.</text>
+  <text x="200" y="520" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#a16207">Asfalto y Gas — modo test</text>
+</svg>`;
+}
+
 /** Descarga etiqueta PNG desde Nacex (respuesta en base64). */
-async function fetchNacexLabelPng(user: string, pass: string, codExp: string): Promise<Buffer | null> {
+async function fetchNacexLabelPng(
+  user: string,
+  pass: string,
+  codExp: string
+): Promise<{ png: Buffer | null; rawError?: string }> {
   const labelData = encodeNacexData([`codExp=${codExp}`, 'modelo=IMAGEN']);
   const labelRes = await fetch(
     `${NACEX_WS_URL}?method=getEtiqueta&user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}&data=${labelData}`,
   );
-  const labelRaw = (await decodeNacexResponse(labelRes)).trim().replace(/\s+/g, '');
-  if (!labelRaw || labelRaw.toUpperCase().startsWith('ERROR')) return null;
+  const decoded = (await decodeNacexResponse(labelRes)).trim();
+  if (!decoded) return { png: null, rawError: 'Respuesta vacía de getEtiqueta' };
+  if (decoded.toUpperCase().startsWith('ERROR')) {
+    return { png: null, rawError: formatNacexError(decoded) };
+  }
+
+  // A veces viene OK|base64 o solo base64 (puede traer saltos de línea)
+  let b64 = decoded;
+  if (decoded.includes('|')) {
+    const parts = decoded.split('|').map((p) => p.trim());
+    b64 = parts.find((p) => p.length > 80 && !/^(OK|ERROR|\d+)$/i.test(p)) || parts[parts.length - 1];
+  }
+  b64 = b64.replace(/\s+/g, '');
   try {
-    return Buffer.from(labelRaw, 'base64');
+    const png = Buffer.from(b64, 'base64');
+    // PNG magic bytes
+    if (png.length > 8 && png[0] === 0x89 && png[1] === 0x50) {
+      return { png };
+    }
+    return { png: null, rawError: 'La respuesta de Nacex no es una imagen PNG válida.' };
   } catch {
-    return null;
+    return { png: null, rawError: 'No se pudo decodificar la etiqueta (base64).' };
   }
 }
 
@@ -387,14 +435,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Falta codExp (código de expedición Nacex).' });
     }
 
+    // Usuario TEST de Nacex suele devolver tracking 9999999 sin etiqueta real.
+    if (isNacexTestStubTracking(expeditionCode) || (!canUseRealAPI && requestWantsNacexTest)) {
+      const svg = buildNacexTestLabelSvg(expeditionCode);
+      res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+      res.setHeader('Content-Disposition', `inline; filename="nacex-test-${expeditionCode}.svg"`);
+      res.setHeader('Cache-Control', 'no-store');
+      return res.status(200).send(svg);
+    }
+
     if (!canUseRealAPI) {
       return res.redirect(302, 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf');
     }
 
     try {
-      const png = await fetchNacexLabelPng(NACEX_USER, NACEX_PASS, expeditionCode);
+      const { png, rawError } = await fetchNacexLabelPng(NACEX_USER, NACEX_PASS, expeditionCode);
       if (!png?.length) {
-        return res.status(404).json({ error: 'No se pudo obtener la etiqueta de Nacex.' });
+        // Si falló con usuario prod pero estamos en modo test, intenta stub amigable
+        if (requestWantsNacexTest) {
+          const svg = buildNacexTestLabelSvg(expeditionCode);
+          res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+          res.setHeader('Cache-Control', 'no-store');
+          return res.status(200).send(svg);
+        }
+        return res.status(404).json({
+          error: rawError || 'No se pudo obtener la etiqueta de Nacex.',
+          codExp: expeditionCode,
+          nacexUser: maskEmail(NACEX_USER),
+        });
       }
       res.setHeader('Content-Type', 'image/png');
       res.setHeader('Content-Disposition', `inline; filename="nacex-${expeditionCode}.png"`);
@@ -603,6 +671,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const created = parsePutExpedicionResponse(rawData);
 
       if (created) {
+        const isStub = isNacexTestStubTracking(created.tracking);
         const label_url =
           created.labelUrl && !created.labelUrl.startsWith('data:')
             ? created.labelUrl
@@ -620,6 +689,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           label_url,
           orderSaved,
           mode: isTestOrder ? 'test' : 'real',
+          testStubLabel: isStub,
+          message: isStub
+            ? 'Expedición TEST OK. Nacex TEST usa tracking 9999999 y no emite etiqueta real (se muestra una de prueba).'
+            : undefined,
           nacexUser: maskEmail(NACEX_USER),
           apiVersion: NACEX_API_VERSION,
         });

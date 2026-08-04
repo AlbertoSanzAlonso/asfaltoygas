@@ -293,9 +293,14 @@ export const AdminDashboard: React.FC = () => {
         }
       }
 
+      const isTestStub =
+        res.trackingNumber === '9999999' ||
+        res.trackingNumber?.toUpperCase().startsWith('TEST');
       openModal({
         title: 'Expedición NACEX',
-        message: `Expedición generada y pedido actualizado: ${res.trackingNumber}`,
+        message: isTestStub
+          ? `Expedición TEST creada (${res.trackingNumber}). Nacex TEST no genera etiqueta ni recogida real; al abrir verás una etiqueta de prueba.`
+          : `Expedición generada y pedido actualizado: ${res.trackingNumber}`,
         type: 'success',
         actionLabel: 'Ver Etiqueta',
         onAction: () => {
