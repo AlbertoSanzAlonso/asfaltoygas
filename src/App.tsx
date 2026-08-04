@@ -10,6 +10,7 @@ import { useAdminStore } from "@/store/useAdminStore";
 import { ShopLayout } from "@/components/layout/ShopLayout";
 import { AIChatAgent } from "@/components/ui/AIChatAgent";
 import { CookieBanner } from "@/components/ui/CookieBanner";
+import { TestCheckoutButton } from "@/components/ui/TestCheckoutButton";
 
 // Helper to handle chunk load errors by forcing a reload
 const safeLazy = (importFn: () => Promise<any>) => {
@@ -133,6 +134,7 @@ function App() {
         <ScrollToTop />
         <AddToCartModal />
         <AIChatAgent />
+        <TestCheckoutButton />
         <CookieBanner />
         <Suspense fallback={<Skeleton />}>
           <Routes>

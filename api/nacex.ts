@@ -245,7 +245,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, cp, tracking, codExp, albaran } = req.query;
 
   // CREDENCIALES (Prioridad a Variables de Entorno)
-  const NACEX_USER = process.env.NACEX_USER || 'ASFALTOYGASATCLIENTE@GMAIL.COM';
+  const NACEX_USER_PROD = process.env.NACEX_USER || 'ASFALTOYGASATCLIENTE@GMAIL.COM';
+  const NACEX_USER_TEST =
+    process.env.NACEX_USER_TEST || 'ASFALTOYGASATCLIENTE@GMAIL._T';
   const NACEX_PASS = process.env.NACEX_PASSWORD || '';
   const NACEX_AGENCY = process.env.NACEX_AGENCIA || '2924';
   const NACEX_CLIENT = process.env.NACEX_CLIENTE || '00485';
@@ -259,6 +261,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const canUseRealAPI = NACEX_PASS && NACEX_PASS !== 'tu_password' && NACEX_PASS !== 'PON_AQUI_TU_CLAVE_MD5';
 
+  /** Usuario WS activo: test si el body/query pide pruebas; si no, producción. */
+  const paymentMethodHint = String(req.body?.payment_method || '').toUpperCase();
+  const requestWantsNacexTest =
+    req.body?.isTest === true ||
+    req.body?.isTest === 'true' ||
+    String(req.query?.isTest || '').toLowerCase() === 'true' ||
+    paymentMethodHint.includes('TEST') ||
+    paymentMethodHint.includes('PRUEBA') ||
+    paymentMethodHint.includes('SIN PAGO') ||
+    String(req.body?.orderId || req.query?.orderId || '')
+      .toUpperCase()
+      .includes('TEST');
+  const NACEX_USER = requestWantsNacexTest ? NACEX_USER_TEST : NACEX_USER_PROD;
+
   // --- DIAGNÓSTICO (sin secretos) ---
   if (method === 'debug_config' || method === 'diagnostico') {
     return res.status(200).json({
@@ -266,7 +282,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       mode: canUseRealAPI ? 'real' : 'mock',
       apiVersion: NACEX_API_VERSION,
       config: {
-        user: maskEmail(NACEX_USER),
+        user: maskEmail(NACEX_USER_PROD),
+        userTest: maskEmail(NACEX_USER_TEST),
         agencia: NACEX_AGENCY,
         cliente: NACEX_CLIENT,
         nombreRecogida: NACEX_NOMBRE_RECOGIDA,
@@ -466,16 +483,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       paymentMethod.includes('PRUEBA') ||
       paymentMethod.includes('SIN PAGO');
 
-    console.log(`>>> [DEBUG API] Pedido: ${orderId} | Pago: ${paymentMethod} | MODO TEST: ${isTestOrder}`);
+    console.log(`>>> [DEBUG API] Pedido: ${orderId} | Pago: ${paymentMethod} | MODO TEST: ${isTestOrder} | user: ${maskEmail(NACEX_USER)}`);
 
-    if (!canUseRealAPI || isTestOrder) {
-      console.log('>>> MODO SIMULACIÓN ACTIVADO');
+    // Sin credenciales → mock. Con isTest + password → API real con NACEX_USER_TEST (sin recogida real).
+    if (!canUseRealAPI) {
+      console.log('>>> MODO SIMULACIÓN ACTIVADO (sin NACEX_PASSWORD)');
       return res.status(200).json({ 
         success: true, 
         tracking: 'TEST-NX' + Date.now(), 
         label_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', 
         mode: 'mock' 
       });
+    }
+
+    if (isTestOrder) {
+      console.log('>>> MODO TEST NACEX: usando', maskEmail(NACEX_USER_TEST));
     }
 
     const orderIdStr = String(orderId || '').trim();
@@ -590,7 +612,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           albaran: created.albaran,
           label_url,
           orderSaved,
-          mode: 'real',
+          mode: isTestOrder ? 'test' : 'real',
+          nacexUser: maskEmail(NACEX_USER),
           apiVersion: NACEX_API_VERSION,
         });
       }

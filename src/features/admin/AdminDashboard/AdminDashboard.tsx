@@ -210,6 +210,13 @@ export const AdminDashboard: React.FC = () => {
     try {
       // Buscamos los detalles del pedido para pasarlos a la API de Nacex
       const contact = order ? getOrderContact(order) : null;
+      const isTestProductOrder = Boolean(
+        order?.items?.some(
+          (item: { name?: string; price?: number }) =>
+            (item.name || '').toUpperCase().includes('PRUEBA PAGO') ||
+            Number(item.price) <= 0.01
+        )
+      );
       const orderDetails = order ? {
         nombre: contact?.name || 'Cliente',
         direccion: order.shipping_street,
@@ -217,7 +224,10 @@ export const AdminDashboard: React.FC = () => {
         cp: order.shipping_zip,
         telefono: contact?.phone,
         orderId: order.order_id,
-        isTest: order.payment_method === 'TEST_MODE',
+        isTest:
+          order.payment_method === 'TEST_MODE' ||
+          isTestProductOrder ||
+          !import.meta.env.PROD,
         isNacexShop: order.carrier?.includes('Nacex Point'), // Detectar si es envío a punto
         payment_method: order.payment_method
       } : {};

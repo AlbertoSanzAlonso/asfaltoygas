@@ -6,8 +6,17 @@ import { BRAND } from '@/lib/brand';
 export const Footer: FC = () => {
   return (
     <>
-      <footer className="py-20 md:py-28 border-t border-secondary/3 bg-secondary text-white">
-        <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
+      <footer className="relative overflow-hidden py-20 md:py-28 border-t border-secondary/3 bg-secondary text-white">
+        <div
+          className="absolute inset-0 opacity-[0.06] bg-cover bg-center bg-no-repeat pointer-events-none"
+          aria-hidden="true"
+          style={{
+            backgroundImage: 'url(https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1200&q=80)',
+            maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
+          }}
+        />
+        <div className="relative z-10 max-w-[1800px] mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-20 mb-24">
             <div className="col-span-1 flex flex-col items-center lg:items-start text-center lg:text-left">
               <Link to="/" className="group block mb-10 w-full">
