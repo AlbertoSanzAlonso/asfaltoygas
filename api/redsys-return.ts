@@ -1,13 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { confirmRedsysPayment } from './_redsysConfirm.js';
-
-function siteOrigin(req: VercelRequest): string {
-  const fromEnv = (process.env.SITE_URL || process.env.VITE_SITE_URL || '').replace(/\/$/, '');
-  if (fromEnv) return fromEnv;
-  const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
-  const host = req.headers['x-forwarded-host'] || req.headers.host;
-  return `${proto}://${host}`;
-}
+import { getCanonicalSiteUrl } from './_siteUrl.js';
 
 function collectParams(req: VercelRequest): Record<string, unknown> {
   const body =
@@ -18,46 +10,78 @@ function collectParams(req: VercelRequest): Record<string, unknown> {
   return { ...query, ...body };
 }
 
-/**
- * Retorno de navegador Redsys (URLOK / URLKO).
- * Redsys hace POST con Ds_*; las SPA no reciben ese POST → aquí confirmamos y redirigimos por GET.
- */
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST' && req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
-
-  const origin = siteOrigin(req);
-  const params = collectParams(req);
-  const resultHint = String(params.result || params.payment || '').toLowerCase();
-  const hasDs =
-    Boolean(params.Ds_MerchantParameters || params.DS_MERCHANTPARAMETERS) &&
-    Boolean(params.Ds_Signature || params.DS_SIGNATURE);
-
-  let payment: 'success' | 'error' = resultHint === 'ko' || resultHint === 'error' ? 'error' : 'success';
-
-  if (hasDs) {
-    try {
-      const confirmed = await confirmRedsysPayment(params);
-      if (!confirmed.ok) {
-        console.error('[redsys-return] confirm failed:', confirmed.message);
-        // Si la firma falla pero el usuario viene de URLOK, igual redirigimos a success
-        // solo cuando el hint es ok; el webhook puede completar después.
-        if (resultHint === 'ko' || resultHint === 'error') payment = 'error';
-      } else if (confirmed.skipped && (resultHint === 'ko' || resultHint === 'error')) {
-        payment = 'error';
-      } else {
-        payment = 'success';
-      }
-    } catch (err) {
-      console.error('[redsys-return] error:', err);
-    }
-  } else if (resultHint === 'ko' || resultHint === 'error') {
-    payment = 'error';
-  }
-
+function redirectToCheckout(
+  res: VercelResponse,
+  payment: 'success' | 'error'
+): void {
+  const origin = getCanonicalSiteUrl();
   const target = `${origin}/checkout?payment=${payment}`;
   res.statusCode = 302;
   res.setHeader('Location', target);
+  res.setHeader('Cache-Control', 'no-store');
   res.end();
+}
+
+/**
+ * Retorno de navegador Redsys (URLOK / URLKO).
+ * Nunca debe devolver 500: si algo falla, redirige a checkout con payment=error.
+ */
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  let payment: 'success' | 'error' = 'error';
+
+  try {
+    if (req.method !== 'POST' && req.method !== 'GET') {
+      redirectToCheckout(res, 'error');
+      return;
+    }
+
+    const params = collectParams(req);
+    const resultHint = String(params.result || params.payment || '').toLowerCase();
+    const isKo = resultHint === 'ko' || resultHint === 'error';
+    payment = isKo ? 'error' : 'success';
+
+    const merchantParameters =
+      params.Ds_MerchantParameters ||
+      params.DS_MERCHANTPARAMETERS ||
+      params.ds_merchantparameters;
+    const signature =
+      params.Ds_Signature || params.DS_SIGNATURE || params.ds_signature;
+    const hasDs = Boolean(merchantParameters) && Boolean(signature);
+
+    if (hasDs && !isKo) {
+      try {
+        const { confirmRedsysPayment } = await import('./_redsysConfirm.js');
+        const confirmed = await confirmRedsysPayment(params);
+        if (!confirmed.ok) {
+          console.error('[redsys-return] confirm failed:', confirmed.message);
+          // URLOK con firma inválida: dejamos success en UI; el webhook puede completar.
+          // Solo forzamos error si el hint era KO.
+        } else if (confirmed.skipped) {
+          payment = isKo ? 'error' : 'success';
+        } else {
+          payment = 'success';
+        }
+      } catch (err) {
+        console.error('[redsys-return] confirm threw:', err);
+        // No tumbar el retorno: el usuario vuelve a la tienda.
+      }
+    }
+  } catch (err) {
+    console.error('[redsys-return] fatal:', err);
+    payment = 'error';
+  }
+
+  try {
+    redirectToCheckout(res, payment);
+  } catch (err) {
+    console.error('[redsys-return] redirect failed:', err);
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.end(
+      `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Pago</title></head><body>
+      <p>No se pudo completar la redirección. <a href="https://www.asfaltoygas.es/checkout?payment=${payment}">Volver a la tienda</a></p>
+      <script>location.replace("https://www.asfaltoygas.es/checkout?payment=${payment}");</script>
+      </body></html>`
+    );
+  }
 }

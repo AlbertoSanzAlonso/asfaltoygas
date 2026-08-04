@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/Button";
 import { useCartStore } from '@/store/useCartStore';
@@ -13,11 +13,14 @@ import { PaymentMethodSelector } from './components/PaymentMethodSelector';
 import { CheckoutAddressForm } from './components/CheckoutAddressForm';
 import { CheckoutAddressSelector } from './components/checkout/CheckoutAddressSelector';
 import { CheckoutSuccessModal } from './components/checkout/CheckoutSuccessModal';
+import { CheckoutPaymentErrorModal } from './components/checkout/CheckoutPaymentErrorModal';
 import { CheckoutLoginPrompt } from './components/checkout/CheckoutLoginPrompt';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const clearCart = useCartStore((s) => s.clearCart);
+  const setIsCartOpen = useCartStore((s) => s.setIsCartOpen);
+  const [showPaymentErrorModal, setShowPaymentErrorModal] = useState(false);
   const {
     items,
     cartTotal,
@@ -50,7 +53,6 @@ const CheckoutPage = () => {
     handleProvinceChange,
     handleCityChange,
     handleSubmit,
-    openModal
   } = useCheckoutForm();
 
   // Retorno desde Redsys (URLOK / URLKO)
@@ -58,22 +60,35 @@ const CheckoutPage = () => {
     const params = new URLSearchParams(window.location.search);
     const payment = params.get('payment');
     if (payment === 'error') {
-      openModal({
-        title: 'Error en el pago',
-        message: 'No se pudo completar la transacción. Por favor, inténtalo de nuevo con otro método o revisa los datos.',
-        type: 'warning'
-      });
+      setShowPaymentErrorModal(true);
       window.history.replaceState({}, '', window.location.pathname);
     } else if (payment === 'success') {
       clearCart();
       setShowSuccessModal(true);
       window.history.replaceState({}, '', window.location.pathname);
     }
-  }, [openModal, clearCart, setShowSuccessModal]);
+  }, [clearCart, setShowSuccessModal]);
+
+  const handleGoToCart = () => {
+    setShowPaymentErrorModal(false);
+    navigate('/');
+    setIsCartOpen(true);
+  };
+
+  const handleRetryPayment = () => {
+    setShowPaymentErrorModal(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="bg-accent min-h-screen pt-12 pb-32 text-secondary">
       <CheckoutSuccessModal show={showSuccessModal} onNavigate={navigate} />
+      <CheckoutPaymentErrorModal
+        show={showPaymentErrorModal}
+        onGoToCart={handleGoToCart}
+        onRetry={handleRetryPayment}
+        onClose={() => setShowPaymentErrorModal(false)}
+      />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <h1 className="text-5xl font-black tracking-tighter uppercase italic mb-16">Finalizar Pedido</h1>
