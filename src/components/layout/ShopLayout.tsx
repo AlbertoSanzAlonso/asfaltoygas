@@ -26,13 +26,13 @@ export const ShopLayout: FC<ShopLayoutProps> = ({ children, setIsCartOpen, isMen
       <RouteSeo />
       <div
         aria-hidden="true"
-        className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none select-none"
+        className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none select-none"
       >
         <img
           src="/assets/logo/logo-asfaltoygas-icon.svg"
           alt=""
           decoding="async"
-          className="w-[min(72vw,420px)] h-auto opacity-[0.06]"
+          className="w-[min(90vw,840px)] h-auto opacity-[0.12]"
         />
       </div>
       <Navbar
@@ -41,11 +41,13 @@ export const ShopLayout: FC<ShopLayoutProps> = ({ children, setIsCartOpen, isMen
         setIsMenuOpen={setIsMenuOpen} 
       />
       
-      <main className="grow pt-16 lg:pt-[148px]">
+      <main className="relative z-10 grow pt-16 lg:pt-[148px]">
         {children}
       </main>
 
-      <Footer />
+      <div className="relative z-10">
+        <Footer />
+      </div>
     </div>
   );
 };

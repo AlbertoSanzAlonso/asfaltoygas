@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { RIDING_STYLES } from '../../data/homeContent';
 
 export const StyleSelectorSection: React.FC = () => (
-  <section className="py-12 md:py-16 bg-white border-t border-secondary/5">
+  <section className="py-12 md:py-16 bg-white">
     <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
       <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide text-secondary text-center mb-8 md:mb-10">
         ¿Cuál es tu estilo?
