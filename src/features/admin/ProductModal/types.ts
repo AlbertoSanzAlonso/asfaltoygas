@@ -16,6 +16,7 @@ export interface ProductFormState extends Partial<Product> {
   images: string[];
   stock: number;
   is_new: boolean;
+  is_outlet: boolean;
   is_published: boolean;
   variants: any[];
 }

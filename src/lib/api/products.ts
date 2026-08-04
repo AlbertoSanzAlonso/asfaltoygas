@@ -178,6 +178,55 @@ const normalise = (p: any): Product => ({
   brand: p.brands || undefined,
 });
 
+export type ProductHighlightFlag = 'novedad' | 'outlet' | 'none';
+
+export type ProductListFilters = {
+  category?: string;
+  subcategory?: string;
+  publishedOnly?: boolean;
+  search?: string;
+  isNewOnly?: boolean;
+  isOutletOnly?: boolean;
+  labelId?: number;
+  brandId?: number;
+  priceMin?: number;
+  priceMax?: number;
+};
+
+function highlightPayload(flag: ProductHighlightFlag): { is_new: boolean; is_outlet: boolean } {
+  if (flag === 'novedad') return { is_new: true, is_outlet: false };
+  if (flag === 'outlet') return { is_new: false, is_outlet: true };
+  return { is_new: false, is_outlet: false };
+}
+
+function applyProductFilters<T extends { eq: Function; ilike: Function; gte: Function; lte: Function }>(
+  query: T,
+  filters: ProductListFilters,
+  options?: { includeLabelFilter?: boolean }
+): T {
+  let q = query;
+  if (filters.category) q = q.eq('category_id', filters.category) as T;
+  if (filters.subcategory) q = q.eq('subcategory_id', filters.subcategory) as T;
+  if (filters.search) q = q.ilike('name', `%${filters.search}%`) as T;
+  if (filters.publishedOnly !== undefined) q = q.eq('is_published', filters.publishedOnly) as T;
+  if (filters.isNewOnly !== undefined) q = q.eq('is_new', filters.isNewOnly) as T;
+  if (filters.isOutletOnly !== undefined) q = q.eq('is_outlet', filters.isOutletOnly) as T;
+  if (filters.brandId) q = q.eq('brand_id', filters.brandId) as T;
+  if (filters.priceMin !== undefined) q = q.gte('price', filters.priceMin) as T;
+  if (filters.priceMax !== undefined) q = q.lte('price', filters.priceMax) as T;
+  if (options?.includeLabelFilter && filters.labelId) {
+    q = q.eq('product_labels.label_id', filters.labelId) as T;
+  }
+  return q;
+}
+
+function normalizeHighlightFlags(updates: Partial<Product>): Partial<Product> {
+  const next = { ...updates };
+  if (next.is_new === true) next.is_outlet = false;
+  else if (next.is_outlet === true) next.is_new = false;
+  return next;
+}
+
 export const products = {
   getAll: async (
     category?: string,
@@ -192,6 +241,7 @@ export const products = {
     priceMin?: number,
     priceMax?: number,
     sortOrder?: 'asc' | 'desc' | null,
+    isOutletOnly?: boolean,
   ): Promise<{ products: Product[], total: number }> => {
     if (!isSupabaseConfigured()) return { products: [], total: 0 };
 
@@ -202,22 +252,26 @@ export const products = {
       ? [PRODUCT_SELECT_FILTER_BY_LABEL, PRODUCT_SELECT_BASE, PRODUCT_SELECT_CORE]
       : [PRODUCT_SELECT_WITH_LABELS, PRODUCT_SELECT_BASE, PRODUCT_SELECT_CORE];
 
+    const filters: ProductListFilters = {
+      category,
+      subcategory,
+      publishedOnly,
+      search,
+      isNewOnly,
+      isOutletOnly,
+      labelId,
+      brandId,
+      priceMin,
+      priceMax,
+    };
+
     let lastError: typeof selects extends never[] ? never : object | null = null;
 
     for (const select of selects) {
       let query = supabase.from('products').select(select, { count: 'exact' });
-
-      if (category) query = query.eq('category_id', category);
-      if (subcategory) query = query.eq('subcategory_id', subcategory);
-      if (search) query = query.ilike('name', `%${search}%`);
-      if (publishedOnly !== undefined) query = query.eq('is_published', publishedOnly);
-      if (isNewOnly !== undefined) query = query.eq('is_new', isNewOnly);
-      if (brandId) query = query.eq('brand_id', brandId);
-      if (priceMin !== undefined) query = query.gte('price', priceMin);
-      if (priceMax !== undefined) query = query.lte('price', priceMax);
-      if (labelId && select.includes('product_labels')) {
-        query = query.eq('product_labels.label_id', labelId);
-      }
+      query = applyProductFilters(query as any, filters, {
+        includeLabelFilter: !!(labelId && select.includes('product_labels')),
+      }) as typeof query;
 
       const { data, count, error } = await query
         .order(sortOrder ? 'price' : 'created_at', { ascending: sortOrder ? sortOrder === 'asc' : false })
@@ -358,6 +412,50 @@ export const products = {
     return [];
   },
 
+  getOutlet: async (publishedOnly = true): Promise<Product[]> => {
+    if (!isSupabaseConfigured()) return [];
+
+    for (const select of [PRODUCT_SELECT_WITH_LABELS, PRODUCT_SELECT_BASE, PRODUCT_SELECT_CORE]) {
+      let query = supabase.from('products').select(select).eq('is_outlet', true);
+      if (publishedOnly !== undefined) query = query.eq('is_published', publishedOnly);
+
+      const { data, error } = await query.order('created_at', { ascending: false });
+      if (!error) return (data || []).map(normalise);
+      if (isMissingRelation(error, 'product_labels')) continue;
+      if (isMissingRelation(error, 'brands')) continue;
+      throw error;
+    }
+    return [];
+  },
+
+  bulkUpdateFlags: async (ids: string[], flag: ProductHighlightFlag): Promise<void> => {
+    if (!isSupabaseConfigured() || ids.length === 0) return;
+    const payload = highlightPayload(flag);
+    const { error } = await supabase
+      .from('products')
+      .update(payload)
+      .in('product_id', ids);
+    if (error) throw error;
+  },
+
+  updateFlagsByFilter: async (
+    filters: ProductListFilters,
+    flag: ProductHighlightFlag
+  ): Promise<number> => {
+    if (!isSupabaseConfigured()) return 0;
+    const payload = highlightPayload(flag);
+    // Filtro siempre presente: supabase-js exige WHERE en updates
+    let query = supabase
+      .from('products')
+      .update(payload)
+      .not('product_id', 'is', null)
+      .select('product_id');
+    query = applyProductFilters(query as any, filters) as typeof query;
+    const { data, error } = await query;
+    if (error) throw error;
+    return data?.length ?? 0;
+  },
+
   syncEmbedding: async (productId: string, name: string, description: string, categoryId?: string): Promise<void> => {
     try {
       let categoryName = '';
@@ -420,7 +518,7 @@ export const products = {
   },
 
   create: async (productData: Omit<Product, 'product_id'>): Promise<Product> => {
-    const { variants, images, colors, labels, discountCodes, ...pData } = productData as any;
+    const { variants, images, colors, labels, discountCodes, ...pData } = normalizeHighlightFlags(productData as any) as any;
     
     // 1. Create product
     const { data: product, error } = await supabase
@@ -481,11 +579,11 @@ export const products = {
   },
 
   update: async (product_id: string, updates: Partial<Product>): Promise<Product> => {
-    const { variants, images, colors, labels, discountCodes, ...pUpdates } = updates as any;
+    const { variants, images, colors, labels, discountCodes, ...pUpdates } = normalizeHighlightFlags(updates as any) as any;
 
     // 1. Update product table
     const validColumns = [
-      'name', 'description', 'price', 'is_published', 'is_new', 'stock',
+      'name', 'description', 'price', 'is_published', 'is_new', 'is_outlet', 'stock',
       'category_id', 'subcategory_id', 'brand_id'
     ];
     const filteredUpdates = Object.fromEntries(

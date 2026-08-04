@@ -90,7 +90,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <Heart className={`w-4 h-4 md:w-5 md:h-5 ${isFavorite ? 'fill-current' : ''}`} />
       </button>
 
-      {((product as any).is_new || (product as any).featured) && (
+      {product.is_outlet && (
+        <span className={`absolute top-2 left-2 md:top-4 md:left-4 bg-secondary text-white text-[8px] md:text-[10px] font-bold px-2 py-0.5 md:px-3 md:py-1 uppercase tracking-widest italic transition-all duration-500 z-20 ${
+          isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'
+        }`}>
+          Outlet
+        </span>
+      )}
+      {!product.is_outlet && (product.is_new || (product as any).featured) && (
         <span className={`absolute top-2 left-2 md:top-4 md:left-4 bg-primary text-white text-[8px] md:text-[10px] font-bold px-2 py-0.5 md:px-3 md:py-1 uppercase tracking-widest italic transition-all duration-500 z-20 ${
           isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'
         }`}>

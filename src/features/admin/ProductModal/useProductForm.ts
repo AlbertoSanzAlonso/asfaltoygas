@@ -20,6 +20,7 @@ export const useProductForm = (product: Product | null | undefined, onSave: (pro
     images: [],
     stock: 0,
     is_new: false,
+    is_outlet: false,
     is_published: false,
     variants: [{ id: 'v1', size: '', color_id: null, stock: 0 }],
     colors: [],

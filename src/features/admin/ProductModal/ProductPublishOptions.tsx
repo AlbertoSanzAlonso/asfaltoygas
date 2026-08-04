@@ -3,19 +3,23 @@ import React from 'react';
 
 interface ProductPublishOptionsProps {
   isNew: boolean;
+  isOutlet: boolean;
   isPublished: boolean;
   onNewChange: (value: boolean) => void;
+  onOutletChange: (value: boolean) => void;
   onPublishedChange: (value: boolean) => void;
 }
 
 export const ProductPublishOptions: React.FC<ProductPublishOptionsProps> = ({
   isNew,
+  isOutlet,
   isPublished,
   onNewChange,
+  onOutletChange,
   onPublishedChange
 }) => {
   return (
-    <div className="flex flex-col sm:flex-row gap-8 py-6 border-y border-(--border-main)">
+    <div className="flex flex-col sm:flex-row flex-wrap gap-8 py-6 border-y border-(--border-main)">
       <div className="flex items-center gap-4">
         <input 
           type="checkbox" 
@@ -25,6 +29,17 @@ export const ProductPublishOptions: React.FC<ProductPublishOptionsProps> = ({
           onChange={(e) => onNewChange(e.target.checked)}
         />
         <label htmlFor="is_new" className="text-[10px] font-black uppercase tracking-[0.4em] cursor-pointer text-(--text-main)">Marcar como Novedad</label>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <input 
+          type="checkbox" 
+          id="is_outlet"
+          className="accent-primary w-5 h-5 rounded-md"
+          checked={!!isOutlet}
+          onChange={(e) => onOutletChange(e.target.checked)}
+        />
+        <label htmlFor="is_outlet" className="text-[10px] font-black uppercase tracking-[0.4em] cursor-pointer text-(--text-main)">Marcar como Outlet</label>
       </div>
 
       <div className="flex items-center gap-4">

@@ -7,13 +7,15 @@ export const Footer: FC = () => {
   return (
     <>
       <footer className="relative overflow-hidden py-20 md:py-28 border-t border-secondary/3 bg-secondary text-white">
-        <div
-          className="absolute inset-0 opacity-[0.06] bg-cover bg-center bg-no-repeat pointer-events-none"
+        <img
+          src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=2400&q=90"
+          alt=""
           aria-hidden="true"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover object-center opacity-[0.14] pointer-events-none select-none"
           style={{
-            backgroundImage: 'url(https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1200&q=80)',
-            maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
+            maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
           }}
         />
         <div className="relative z-10 max-w-[1800px] mx-auto px-6 lg:px-12">
@@ -34,7 +36,8 @@ export const Footer: FC = () => {
                 <li><Link to="/categoria/equipaje" className="hover:text-white transition-colors">Equipaje</Link></li>
                 <li><Link to="/categoria/aceites-y-lubricantes" className="hover:text-white transition-colors">Aceites y lubricantes</Link></li>
                 <li><Link to="/categoria/mantenimiento" className="hover:text-white transition-colors">Mantenimiento</Link></li>
-                <li><Link to="/#novedades" className="hover:text-white transition-colors">Top ventas</Link></li>
+                <li><Link to="/#novedades" className="hover:text-white transition-colors">Novedades</Link></li>
+                <li><Link to="/#outlet" className="hover:text-white transition-colors">Outlet</Link></li>
                 <li><Link to="/conocenos" className="hover:text-white transition-colors">Conócenos</Link></li>
               </ul>
             </div>

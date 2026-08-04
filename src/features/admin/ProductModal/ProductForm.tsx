@@ -104,9 +104,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       />
 
       <ProductPublishOptions 
-        isNew={formData.is_new}
-        isPublished={formData.is_published}
-        onNewChange={(val) => setFormData({ ...formData, is_new: val })}
+        isNew={!!formData.is_new}
+        isOutlet={!!formData.is_outlet}
+        isPublished={!!formData.is_published}
+        onNewChange={(val) => setFormData({ ...formData, is_new: val, is_outlet: val ? false : formData.is_outlet })}
+        onOutletChange={(val) => setFormData({ ...formData, is_outlet: val, is_new: val ? false : formData.is_new })}
         onPublishedChange={(val) => setFormData({ ...formData, is_published: val })}
       />
 

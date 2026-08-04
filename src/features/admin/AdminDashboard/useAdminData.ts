@@ -3,12 +3,51 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from "@/lib/api";
 import type { Product, Order, Customer } from "@/types";
 
-export const useAdminData = (productPage: number, orderPage: number, customerPage: number, pageSize: number, searchTerm?: string, statusFilter?: boolean, isNewFilter?: boolean, customerSearch?: string, categoryFilter?: string, subcategoryFilter?: string, brandFilter?: string) => {
+export type ProductHighlightFilter = 'novedad' | 'outlet' | 'none' | undefined;
+
+function highlightToApiFilters(highlight?: ProductHighlightFilter): {
+  isNewOnly?: boolean;
+  isOutletOnly?: boolean;
+} {
+  if (highlight === 'novedad') return { isNewOnly: true };
+  if (highlight === 'outlet') return { isOutletOnly: true };
+  if (highlight === 'none') return { isNewOnly: false, isOutletOnly: false };
+  return {};
+}
+
+export const useAdminData = (
+  productPage: number,
+  orderPage: number,
+  customerPage: number,
+  pageSize: number,
+  searchTerm?: string,
+  statusFilter?: boolean,
+  highlightFilter?: ProductHighlightFilter,
+  customerSearch?: string,
+  categoryFilter?: string,
+  subcategoryFilter?: string,
+  brandFilter?: string,
+) => {
   const queryClient = useQueryClient();
+  const { isNewOnly, isOutletOnly } = highlightToApiFilters(highlightFilter);
 
   const { data: productsData, isLoading: loadingProducts } = useQuery<{ products: Product[], total: number }>({
-    queryKey: ['admin-products', productPage, searchTerm, statusFilter, isNewFilter, categoryFilter, subcategoryFilter, brandFilter],
-    queryFn: () => api.products.getAll(categoryFilter, subcategoryFilter, productPage, pageSize, statusFilter, searchTerm, isNewFilter, undefined, brandFilter ? parseInt(brandFilter) : undefined)
+    queryKey: ['admin-products', productPage, searchTerm, statusFilter, highlightFilter, categoryFilter, subcategoryFilter, brandFilter],
+    queryFn: () => api.products.getAll(
+      categoryFilter,
+      subcategoryFilter,
+      productPage,
+      pageSize,
+      statusFilter,
+      searchTerm,
+      isNewOnly,
+      undefined,
+      brandFilter ? parseInt(brandFilter) : undefined,
+      undefined,
+      undefined,
+      null,
+      isOutletOnly,
+    )
   });
   
   const products = productsData?.products;

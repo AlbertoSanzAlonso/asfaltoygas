@@ -23,7 +23,7 @@ const MOBILE_LINKS = [
   { to: '/categoria/equipaje', label: 'Equipaje' },
   { to: '/categoria/aceites-y-lubricantes', label: 'Aceites y lubricantes' },
   { to: '/categoria/mantenimiento', label: 'Mantenimiento' },
-  { to: '/#novedades', label: 'Imprescindibles' },
+  { to: '/#novedades', label: 'Novedades' },
   { to: '/conocenos', label: 'Conócenos' },
 ];
 
@@ -246,7 +246,7 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
               ))}
               <span className="w-px h-5 bg-white/25 mx-2" />
               <Link
-                to="/#novedades"
+                to="/#outlet"
                 className="px-5 py-2 font-display text-xs font-bold tracking-[0.2em] uppercase bg-safety text-secondary hover:bg-safety-dark transition-colors"
               >
                 Outlet
@@ -359,7 +359,7 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
                 ))}
                 <div className="pt-4 border-t border-secondary/8 flex flex-col gap-3">
                   <Link
-                    to="/#novedades"
+                    to="/#outlet"
                     onClick={() => setIsMenuOpen(false)}
                     className="font-display text-sm font-bold uppercase tracking-wide bg-safety text-secondary text-center py-3"
                   >

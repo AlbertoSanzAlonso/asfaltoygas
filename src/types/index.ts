@@ -59,6 +59,7 @@ export interface Product {
   productImages?: ProductImage[];
   variants: ProductVariant[];
   is_new?: boolean;
+  is_outlet?: boolean;
   is_published?: boolean;
   stock: number;
   colors?: Color[];

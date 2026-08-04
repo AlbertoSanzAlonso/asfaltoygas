@@ -33,7 +33,7 @@ export const HeroSliderSection: React.FC = () => {
               className="absolute inset-0"
             >
               <img src={slide.image} alt="" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-b from-secondary/70 via-secondary/55 to-secondary/75" />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-secondary/70 to-secondary/30" />
             </motion.div>
           </AnimatePresence>
         </div>

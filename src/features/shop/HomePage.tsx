@@ -9,6 +9,7 @@ import { HeroSliderSection } from './components/home/HeroSliderSection';
 import { CategoryGridSection } from './components/home/CategoryGridSection';
 import { HeroWidgetSection } from './components/home/HeroWidgetSection';
 import { TopSalesSection } from './components/home/TopSalesSection';
+import { OutletSection } from './components/home/OutletSection';
 import { StyleSelectorSection } from './components/home/StyleSelectorSection';
 import { AccessoryHighlightsSection } from './components/home/AccessoryHighlightsSection';
 import { ServicesStripSection } from './components/home/ServicesStripSection';
@@ -30,10 +31,18 @@ const HomePage = () => {
     }
   });
 
+  const { data: outletProducts, isLoading: isLoadingOutlet } = useQuery({
+    queryKey: ['products', 'outlet'],
+    queryFn: async () => {
+      const outlet = await api.products.getOutlet(true);
+      return outlet.slice(0, 8);
+    }
+  });
+
   useScrollRestoration('homepage', products);
 
   React.useEffect(() => {
-    if (hash === '#novedades' || hash === '#marcas') {
+    if (hash === '#novedades' || hash === '#marcas' || hash === '#outlet') {
       const id = hash.slice(1);
       const element = document.getElementById(id);
       if (element) {
@@ -69,6 +78,7 @@ const HomePage = () => {
       <CategoryGridSection />
       <HeroWidgetSection />
       <TopSalesSection products={products} isLoading={isLoading} />
+      <OutletSection products={outletProducts} isLoading={isLoadingOutlet} />
       <StyleSelectorSection />
       <AccessoryHighlightsSection />
       <ServicesStripSection />

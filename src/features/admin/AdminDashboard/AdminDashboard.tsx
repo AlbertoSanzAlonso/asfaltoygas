@@ -10,12 +10,13 @@ import { NewsletterTab } from "@/features/admin/AdminDashboard/components/Newsle
 import { CustomersTab } from "@/features/admin/AdminDashboard/components/CustomersTab";
 import { DiscountCodesTab } from "@/features/admin/AdminDashboard/components/DiscountCodesTab";
 import { OrderDetailsModal } from "@/features/admin/AdminDashboard/components/OrderDetailsModal";
-import { useAdminData } from './useAdminData';
+import { useAdminData, type ProductHighlightFilter } from './useAdminData';
 import { getOrderContact } from '@/lib/orderContact';
 import type { Category, Brand as BrandType } from '@/types';
 import { canFulfillOrder } from '@/lib/orderPayment';
 import { useCartStore } from "@/store/useCartStore";
 import { api } from "@/lib/api";
+import type { ProductHighlightFlag } from "@/lib/api/products";
 import type { Product, Order } from "@/types";
 
 export const AdminDashboard: React.FC = () => {
@@ -33,7 +34,7 @@ export const AdminDashboard: React.FC = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [productSearch, setProductSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<boolean | undefined>(undefined);
-  const [isNewFilter, setIsNewFilter] = useState<boolean | undefined>(undefined);
+  const [highlightFilter, setHighlightFilter] = useState<ProductHighlightFilter>(undefined);
   const [categoryFilter, setCategoryFilter] = useState('');
   const [subcategoryFilter, setSubcategoryFilter] = useState('');
   const [brandFilter, setBrandFilter] = useState('');
@@ -43,7 +44,7 @@ export const AdminDashboard: React.FC = () => {
   // Reset page when filters or search change
   useEffect(() => {
     setProductPage(1);
-  }, [productSearch, statusFilter, isNewFilter, categoryFilter, subcategoryFilter, brandFilter]);
+  }, [productSearch, statusFilter, highlightFilter, categoryFilter, subcategoryFilter, brandFilter]);
 
   // Newsletter state
   const [newsletterSubject, setNewsletterSubject] = useState('');
@@ -61,7 +62,7 @@ export const AdminDashboard: React.FC = () => {
     totalOrders,
     subscriptions,
     queryClient
-  } = useAdminData(productPage, orderPage, customerPage, pageSize, productSearch, statusFilter, isNewFilter, customerSearch, categoryFilter, subcategoryFilter, brandFilter);
+  } = useAdminData(productPage, orderPage, customerPage, pageSize, productSearch, statusFilter, highlightFilter, customerSearch, categoryFilter, subcategoryFilter, brandFilter);
 
   const { data: allCategories } = useQuery<Category[]>({
     queryKey: ['admin-categories'],
@@ -93,6 +94,8 @@ export const AdminDashboard: React.FC = () => {
     onSuccess: (product: Product, variables: Partial<Product>) => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      queryClient.invalidateQueries({ queryKey: ['products', 'new-arrivals'] });
+      queryClient.invalidateQueries({ queryKey: ['products', 'outlet'] });
       queryClient.invalidateQueries({ queryKey: ['new-arrivals'] });
       queryClient.invalidateQueries({ queryKey: ['products-all-chat'] });
       setIsModalOpen(false);
@@ -173,6 +176,82 @@ export const AdminDashboard: React.FC = () => {
     } catch (err) {
       openModal({ title: 'Error', message: 'Error al actualizar el estado.', type: 'warning' });
     }
+  };
+
+  const invalidateProductQueries = () => {
+    queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+    queryClient.invalidateQueries({ queryKey: ['products'] });
+    queryClient.invalidateQueries({ queryKey: ['products', 'new-arrivals'] });
+    queryClient.invalidateQueries({ queryKey: ['products', 'outlet'] });
+    queryClient.invalidateQueries({ queryKey: ['new-arrivals'] });
+    queryClient.invalidateQueries({ queryKey: ['products-all-chat'] });
+  };
+
+  const flagLabel = (flag: ProductHighlightFlag) =>
+    flag === 'novedad' ? 'Novedad' : flag === 'outlet' ? 'Outlet' : 'sin etiqueta';
+
+  const handleBulkHighlightChange = async (flag: ProductHighlightFlag) => {
+    if (selectedIds.length === 0) return;
+    const count = selectedIds.length;
+    try {
+      await api.products.bulkUpdateFlags(selectedIds, flag);
+      invalidateProductQueries();
+      setSelectedIds([]);
+      openModal({
+        title: 'Éxito',
+        message: `${count} producto(s) marcados como ${flagLabel(flag)}.`,
+        type: 'info',
+      });
+    } catch (err) {
+      openModal({ title: 'Error', message: 'No se pudo actualizar la etiqueta.', type: 'warning' });
+    }
+  };
+
+  const buildCurrentListFilters = () => {
+    const filters: {
+      category?: string;
+      subcategory?: string;
+      publishedOnly?: boolean;
+      search?: string;
+      isNewOnly?: boolean;
+      isOutletOnly?: boolean;
+      brandId?: number;
+    } = {};
+    if (categoryFilter) filters.category = categoryFilter;
+    if (subcategoryFilter) filters.subcategory = subcategoryFilter;
+    if (statusFilter !== undefined) filters.publishedOnly = statusFilter;
+    if (productSearch) filters.search = productSearch;
+    if (brandFilter) filters.brandId = parseInt(brandFilter);
+    if (highlightFilter === 'novedad') filters.isNewOnly = true;
+    if (highlightFilter === 'outlet') filters.isOutletOnly = true;
+    if (highlightFilter === 'none') {
+      filters.isNewOnly = false;
+      filters.isOutletOnly = false;
+    }
+    return filters;
+  };
+
+  const handleBulkHighlightAllFiltered = (flag: ProductHighlightFlag) => {
+    if (totalProducts === 0) return;
+    openModal({
+      title: 'Aplicar a todos los filtrados',
+      message: `¿Marcar ${totalProducts} producto(s) filtrado(s) como ${flagLabel(flag)}?`,
+      type: 'confirm',
+      onConfirm: async () => {
+        try {
+          const updated = await api.products.updateFlagsByFilter(buildCurrentListFilters(), flag);
+          invalidateProductQueries();
+          setSelectedIds([]);
+          openModal({
+            title: 'Éxito',
+            message: `${updated} producto(s) actualizados como ${flagLabel(flag)}.`,
+            type: 'info',
+          });
+        } catch (err) {
+          openModal({ title: 'Error', message: 'No se pudo actualizar los productos filtrados.', type: 'warning' });
+        }
+      },
+    });
   };
 
   const handleBulkDelete = async () => {
@@ -435,12 +514,14 @@ export const AdminDashboard: React.FC = () => {
             onSearchChange={setProductSearch}
             onPageChange={setProductPage}
             statusFilter={statusFilter}
-            isNewFilter={isNewFilter}
+            highlightFilter={highlightFilter}
             onStatusFilterChange={setStatusFilter}
-            onIsNewFilterChange={setIsNewFilter}
+            onHighlightFilterChange={setHighlightFilter}
             onToggleSelectAll={() => setSelectedIds(selectedIds.length === products?.length ? [] : products?.map(p => p.product_id) || [])}
             onToggleSelect={(id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id])}
             onBulkStatusChange={handleBulkStatusChange}
+            onBulkHighlightChange={handleBulkHighlightChange}
+            onBulkHighlightAllFiltered={handleBulkHighlightAllFiltered}
             onBulkDelete={handleBulkDelete}
             onTogglePublish={(p) => togglePublishMutation.mutate(p)}
             onEdit={(p) => { setEditingProduct(p); setIsModalOpen(true); }}

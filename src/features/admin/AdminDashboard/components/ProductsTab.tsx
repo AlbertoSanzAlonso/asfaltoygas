@@ -8,6 +8,9 @@ import { downloadProductImagesAsZip } from '@/utils/imageDownloader';
 
 import { PRODUCT_PLACEHOLDER } from '@/lib/constants';
 
+import type { ProductHighlightFilter } from '../useAdminData';
+import type { ProductHighlightFlag } from '@/lib/api/products';
+
 interface ProductsTabProps {
   products?: Product[];
   totalProducts: number;
@@ -17,14 +20,16 @@ interface ProductsTabProps {
   pageSize: number;
   searchTerm: string;
   statusFilter?: boolean;
-  isNewFilter?: boolean;
+  highlightFilter?: ProductHighlightFilter;
   onSearchChange: (term: string) => void;
   onPageChange: (page: number) => void;
   onStatusFilterChange: (status: boolean | undefined) => void;
-  onIsNewFilterChange: (isNew: boolean | undefined) => void;
+  onHighlightFilterChange: (filter: ProductHighlightFilter) => void;
   onToggleSelectAll: () => void;
   onToggleSelect: (id: string) => void;
   onBulkStatusChange: (is_published: boolean) => void;
+  onBulkHighlightChange: (flag: ProductHighlightFlag) => void;
+  onBulkHighlightAllFiltered: (flag: ProductHighlightFlag) => void;
   onBulkDelete: () => void;
   onTogglePublish: (product: Product) => void;
   onEdit: (product: Product) => void;
@@ -55,14 +60,16 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
   pageSize,
   searchTerm,
   statusFilter,
-  isNewFilter,
+  highlightFilter,
   onSearchChange,
   onPageChange,
   onStatusFilterChange,
-  onIsNewFilterChange,
+  onHighlightFilterChange,
   onToggleSelectAll,
   onToggleSelect,
   onBulkStatusChange,
+  onBulkHighlightChange,
+  onBulkHighlightAllFiltered,
   onBulkDelete,
   onTogglePublish,
   onEdit,
@@ -79,6 +86,7 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
   onBrandFilterChange,
 }) => {
   const [isDownloading, setIsDownloading] = React.useState(false);
+  const [pendingFilteredFlag, setPendingFilteredFlag] = React.useState<ProductHighlightFlag | ''>('');
   const totalPages = Math.ceil(totalProducts / pageSize);
 
   const handleBulkDownload = async () => {
@@ -139,13 +147,19 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
           </select>
 
           <select 
-            value={isNewFilter === undefined ? '' : isNewFilter.toString()}
-            onChange={(e) => onIsNewFilterChange(e.target.value === '' ? undefined : e.target.value === 'true')}
+            value={highlightFilter || ''}
+            onChange={(e) => {
+              const value = e.target.value;
+              onHighlightFilterChange(
+                value === '' ? undefined : (value as Exclude<ProductHighlightFilter, undefined>)
+              );
+            }}
             className="px-3 py-2.5 text-[9px] sm:text-xs font-black uppercase tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:border-primary bg-white cursor-pointer"
           >
-            <option value="">Todas las Fechas</option>
-            <option value="true">Solo Novedades</option>
-            <option value="false">No Novedades</option>
+            <option value="">Todas las etiquetas</option>
+            <option value="novedad">Solo Novedades</option>
+            <option value="outlet">Solo Outlet</option>
+            <option value="none">Sin etiqueta</option>
           </select>
 
           <select 
@@ -210,31 +224,64 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
       </div>
 
       {selectedIds.length > 0 && (
-        <div className="bg-primary text-white p-6 rounded-3xl flex flex-col sm:flex-row justify-between items-center gap-4 animate-in slide-in-from-top duration-300">
-          <div className="flex items-center gap-4">
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-black text-xs">
-              {selectedIds.length}
+        <div className="bg-primary text-white p-6 rounded-3xl flex flex-col gap-4 animate-in slide-in-from-top duration-300">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-black text-xs">
+                {selectedIds.length}
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-widest">Elementos seleccionados</p>
             </div>
-            <p className="text-[10px] font-black uppercase tracking-widest">Elementos seleccionados</p>
-          </div>
-          <div className="flex gap-3 w-full sm:w-auto">
-            <button 
-              onClick={handleBulkDownload} 
-              disabled={isDownloading}
-              className="flex-1 sm:flex-none px-6 py-2.5 bg-white text-primary hover:bg-white/90 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 disabled:opacity-50"
-            >
-              {isDownloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
-              Descargar Fotos
-            </button>
-            <button onClick={() => onBulkStatusChange(true)} className="flex-1 sm:flex-none px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">Publicar</button>
-            <button onClick={() => onBulkStatusChange(false)} className="flex-1 sm:flex-none px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">Ocultar</button>
-            <button onClick={onBulkDelete} className="flex-1 sm:flex-none px-6 py-2.5 bg-red-500 hover:bg-red-600 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg">Eliminar</button>
-            <button onClick={() => onToggleSelectAll()} className="px-4 py-2.5 text-white/60 hover:text-white transition-colors">
-              <Plus className="w-4 h-4 rotate-45" />
-            </button>
+            <div className="flex flex-wrap gap-3 w-full sm:w-auto justify-center sm:justify-end">
+              <button 
+                onClick={handleBulkDownload} 
+                disabled={isDownloading}
+                className="flex-1 sm:flex-none px-6 py-2.5 bg-white text-primary hover:bg-white/90 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 disabled:opacity-50"
+              >
+                {isDownloading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                Descargar Fotos
+              </button>
+              <button onClick={() => onBulkHighlightChange('novedad')} className="flex-1 sm:flex-none px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">Novedad</button>
+              <button onClick={() => onBulkHighlightChange('outlet')} className="flex-1 sm:flex-none px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">Outlet</button>
+              <button onClick={() => onBulkHighlightChange('none')} className="flex-1 sm:flex-none px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">Quitar etiqueta</button>
+              <button onClick={() => onBulkStatusChange(true)} className="flex-1 sm:flex-none px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">Publicar</button>
+              <button onClick={() => onBulkStatusChange(false)} className="flex-1 sm:flex-none px-6 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">Ocultar</button>
+              <button onClick={onBulkDelete} className="flex-1 sm:flex-none px-6 py-2.5 bg-red-500 hover:bg-red-600 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg">Eliminar</button>
+              <button onClick={() => onToggleSelectAll()} className="px-4 py-2.5 text-white/60 hover:text-white transition-colors">
+                <Plus className="w-4 h-4 rotate-45" />
+              </button>
+            </div>
           </div>
         </div>
       )}
+
+      <div className="bg-(--bg-card) border border-(--border-main) rounded-2xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 whitespace-nowrap">
+          Todos los filtrados ({totalProducts})
+        </p>
+        <select
+          value={pendingFilteredFlag}
+          onChange={(e) => setPendingFilteredFlag(e.target.value as ProductHighlightFlag | '')}
+          className="flex-1 px-3 py-2.5 text-[9px] sm:text-xs font-black uppercase tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:border-primary bg-white cursor-pointer"
+        >
+          <option value="">Elegir etiqueta…</option>
+          <option value="novedad">Marcar como Novedad</option>
+          <option value="outlet">Marcar como Outlet</option>
+          <option value="none">Quitar etiqueta</option>
+        </select>
+        <Button
+          size="sm"
+          disabled={!pendingFilteredFlag || totalProducts === 0}
+          className="font-black tracking-widest text-[10px] px-6 py-3 h-auto"
+          onClick={() => {
+            if (!pendingFilteredFlag) return;
+            onBulkHighlightAllFiltered(pendingFilteredFlag);
+            setPendingFilteredFlag('');
+          }}
+        >
+          Aplicar a filtrados
+        </Button>
+      </div>
 
       {/* Desktop View (tablet ancho y desktop) */}
       <div className="hidden md:block bg-(--bg-card) border border-(--border-main) rounded-[2.5rem] shadow-sm relative min-w-0">
@@ -322,6 +369,9 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                       </button>
                       {product.is_new && (
                         <span className="text-[9px] font-black uppercase px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full whitespace-nowrap">Novedad</span>
+                      )}
+                      {product.is_outlet && (
+                        <span className="text-[9px] font-black uppercase px-3 py-1 bg-amber-500/10 text-amber-700 border border-amber-500/20 rounded-full whitespace-nowrap">Outlet</span>
                       )}
                     </div>
                   </td>
@@ -462,7 +512,10 @@ export const ProductsTab: React.FC<ProductsTabProps> = ({
                    <h4 className="text-xs font-black uppercase italic truncate leading-tight text-(--text-main)">{product.name}</h4>
                    <div className="shrink-0 flex gap-2">
                       {product.is_new && (
-                        <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                        <div className="w-2 h-2 rounded-full bg-primary animate-pulse" title="Novedad"></div>
+                      )}
+                      {product.is_outlet && (
+                        <div className="w-2 h-2 rounded-full bg-amber-500" title="Outlet"></div>
                       )}
                       {product.is_published ? (
                         <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
