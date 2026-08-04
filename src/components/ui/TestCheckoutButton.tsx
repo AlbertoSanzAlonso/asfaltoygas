@@ -9,11 +9,10 @@ const TEST_PRODUCT_SLUG = 'prueba-pago-001';
 
 /**
  * Botón flotante para ir al checkout con el producto de prueba.
- * Visible por defecto. Para ocultarlo: `VITE_ENABLE_TEST_CHECKOUT=false` + redeploy.
+ * Visible solo si `VITE_ENABLE_TEST_CHECKOUT=true` (misma flag que fuerza Nacex TEST).
  */
 export const TestCheckoutButton: FC = () => {
-  // Opt-out: solo se oculta si la variable es explícitamente "false"
-  const enabled = import.meta.env.VITE_ENABLE_TEST_CHECKOUT !== 'false';
+  const enabled = import.meta.env.VITE_ENABLE_TEST_CHECKOUT === 'true';
   const location = useLocation();
   const navigate = useNavigate();
   const { clearCart, addItem, closeModal } = useCartStore();
@@ -53,7 +52,7 @@ export const TestCheckoutButton: FC = () => {
       type="button"
       onClick={handleClick}
       disabled={loading}
-      title="Compra de prueba (0,01€) — ocultar con VITE_ENABLE_TEST_CHECKOUT=false"
+      title="Compra de prueba (0,01€) — Nacex usa usuario TEST"
       className="fixed bottom-28 left-4 z-[60] flex items-center gap-2 rounded-full bg-amber-500 px-4 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg transition hover:bg-amber-600 disabled:opacity-70 md:bottom-6 md:left-6"
     >
       {loading ? (

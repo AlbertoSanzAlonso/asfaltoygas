@@ -261,9 +261,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const canUseRealAPI = NACEX_PASS && NACEX_PASS !== 'tu_password' && NACEX_PASS !== 'PON_AQUI_TU_CLAVE_MD5';
 
-  /** Usuario WS activo: test si el body/query pide pruebas; si no, producción. */
+  /** Misma flag que el botón "Pago test": fuerza usuario Nacex de prueba. */
+  const testCheckoutEnabled = process.env.VITE_ENABLE_TEST_CHECKOUT === 'true';
+
+  /** Usuario WS activo: test si la flag está on o el body/query pide pruebas. */
   const paymentMethodHint = String(req.body?.payment_method || '').toUpperCase();
   const requestWantsNacexTest =
+    testCheckoutEnabled ||
     req.body?.isTest === true ||
     req.body?.isTest === 'true' ||
     String(req.query?.isTest || '').toLowerCase() === 'true' ||
@@ -284,6 +288,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       config: {
         user: maskEmail(NACEX_USER_PROD),
         userTest: maskEmail(NACEX_USER_TEST),
+        activeUser: maskEmail(NACEX_USER),
+        testCheckoutEnabled,
         agencia: NACEX_AGENCY,
         cliente: NACEX_CLIENT,
         nombreRecogida: NACEX_NOMBRE_RECOGIDA,
@@ -473,11 +479,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Nacex: num_cli = máximo 5 dígitos (conservar ceros a la izquierda si caben)
     const cleanCliente = NACEX_CLIENT.trim().replace(/\D/g, '').slice(0, 5);
     
-    // MODO PRUEBA: Detección ultra-robusta
+    // MODO PRUEBA: flag VITE_ENABLE_TEST_CHECKOUT o señales en el pedido
     const paymentMethod = (body.payment_method || '').toString().toUpperCase();
-    const isTestOrder = 
-      (orderId || '').toString().toUpperCase().includes('TEST') || 
-      body.isTest === true || 
+    const isTestOrder =
+      testCheckoutEnabled ||
+      (orderId || '').toString().toUpperCase().includes('TEST') ||
+      body.isTest === true ||
       body.isTest === 'true' ||
       paymentMethod.includes('TEST') ||
       paymentMethod.includes('PRUEBA') ||
