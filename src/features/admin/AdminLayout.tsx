@@ -6,12 +6,32 @@ import { useAdminStore } from "@/store/useAdminStore";
 import { useThemeStore } from "@/store/useThemeStore";
 import { useNavigate } from 'react-router-dom';
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BRAND } from '@/lib/brand';
+import { BRAND_LOGO_ICON } from '@/lib/constants';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
   activeTab: 'dashboard' | 'products' | 'orders' | 'customers' | 'newsletter' | 'discounts';
   onTabChange: (tab: 'dashboard' | 'products' | 'orders' | 'customers' | 'newsletter' | 'discounts') => void;
 }
+
+const AdminBrandMark: React.FC<{ size?: 'sm' | 'lg' }> = ({ size = 'lg' }) => (
+  <Link to="/" className="flex items-center gap-3 group">
+    <img
+      src={BRAND_LOGO_ICON}
+      alt={BRAND.name}
+      className={`${size === 'lg' ? 'h-16 w-16' : 'h-10 w-10'} object-contain transition-transform group-hover:scale-105`}
+    />
+    <div className="leading-tight">
+      <span className={`font-display font-bold uppercase tracking-wide block ${size === 'lg' ? 'text-base' : 'text-sm'}`}>
+        {BRAND.name}
+      </span>
+      <span className="font-sans text-[10px] text-(--text-main)/50 uppercase tracking-[0.2em]">
+        {BRAND.tagline}
+      </span>
+    </div>
+  </Link>
+);
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, onTabChange }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -29,13 +49,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, o
     <div className={`flex h-screen ${theme === 'dark' ? 'dark' : ''} bg-(--bg-main) text-(--text-main) overflow-hidden relative transition-colors duration-300`}>
       {/* Cabecera con menú: visible por debajo de 1350px (móvil + tablet) */}
       <div className="flex min-[1350px]:hidden items-center justify-between p-4 border-b border-(--border-main) bg-(--bg-main) fixed top-0 left-0 w-full z-50">
-        <Link to="/" className="flex items-center">
-          <img 
-            src={theme === 'dark' ? "/assets/logo/logo-asfaltoygas-blanco.svg" : "/assets/logo/logo-asfaltoygas-negro.svg"} 
-            alt="Asfalto y Gas" 
-            className="h-16 w-auto object-contain"
-          />
-        </Link>
+        <AdminBrandMark size="sm" />
         <div className="flex items-center gap-4">
           <ThemeToggle />
           <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-(--text-main) p-2">
@@ -47,14 +61,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, o
       {/* Sidebar: fija y oculta por defecto hasta 1350px; visible en desktop ancho */}
       <aside className={`fixed min-[1350px]:static inset-y-0 left-0 w-72 border-r border-(--border-main) flex flex-col bg-(--bg-main) z-40 transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full min-[1350px]:translate-x-0'}`}>
         <div className="p-10 grow overflow-y-auto">
-          <div className="flex flex-col mb-16 items-center">
-            <Link to="/" className="flex items-center">
-              <img 
-                src={theme === 'dark' ? "/assets/logo/logo-asfaltoygas-blanco.svg" : "/assets/logo/logo-asfaltoygas-negro.svg"} 
-                alt="Asfalto y Gas" 
-                className="h-56 w-auto object-contain"
-              />
-            </Link>
+          <div className="flex flex-col mb-16 items-start">
+            <AdminBrandMark size="lg" />
           </div>
           
           <nav className="space-y-4">

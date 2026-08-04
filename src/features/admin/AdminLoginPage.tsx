@@ -1,12 +1,13 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, User, Shield, Terminal, Loader2, Eye, EyeOff } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Lock, User, Shield, Loader2, Eye, EyeOff } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAdminStore } from "@/store/useAdminStore";
 import { api } from "@/lib/api";
 import { useCartStore } from "@/store/useCartStore";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BRAND } from '@/lib/brand';
+import { BRAND_LOGO_ICON } from '@/lib/constants';
 
 export const AdminLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -44,7 +45,6 @@ export const AdminLoginPage: React.FC = () => {
       <div className="absolute top-8 right-8 z-50">
         <ThemeToggle />
       </div>
-      {/* Matrix-like background effect */}
       <div className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,0,0.1),transparent_70%)]" />
       </div>
@@ -54,9 +54,22 @@ export const AdminLoginPage: React.FC = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-md bg-(--bg-card) backdrop-blur-xl border border-(--border-main) p-10 relative z-10 shadow-2xl transition-colors duration-300"
       >
-        <div className="flex items-center gap-3 mb-12 text-primary">
-          <Terminal className="w-6 h-6" />
-          <h1 className="text-xl font-black uppercase tracking-[0.3em]">System Admin</h1>
+        <div className="flex flex-col items-center gap-4 mb-12">
+          <Link to="/" className="flex flex-col items-center gap-3 group">
+            <img
+              src={BRAND_LOGO_ICON}
+              alt={BRAND.name}
+              className="h-20 w-20 object-contain transition-transform group-hover:scale-105"
+            />
+            <div className="text-center leading-tight">
+              <span className="font-display font-bold text-(--text-main) text-lg uppercase tracking-wide block">
+                {BRAND.name}
+              </span>
+              <span className="font-sans text-[10px] text-(--text-main)/50 uppercase tracking-[0.2em]">
+                Panel de administración
+              </span>
+            </div>
+          </Link>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">

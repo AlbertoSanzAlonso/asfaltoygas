@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/Button";
+import { BRAND } from '@/lib/brand';
+import { BRAND_LOGO_ICON } from '@/lib/constants';
 
 interface NewsletterTabProps {
   subscriptions?: any[];
@@ -77,7 +79,7 @@ export const NewsletterTab: React.FC<NewsletterTabProps> = ({
             <h3 className="text-xs font-black uppercase tracking-widest text-primary italic">Vista Previa</h3>
             <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-inner overflow-hidden max-h-[500px] overflow-y-auto">
               <div className="text-center mb-6">
-                <img src="/assets/logo/logo-asfaltoygas-blanco.svg" alt="Logo" className="w-32 mx-auto" />
+                <img src={BRAND_LOGO_ICON} alt={BRAND.name} className="w-32 mx-auto" />
               </div>
               <div className="text-xs text-gray-800 space-y-4 leading-relaxed whitespace-pre-wrap">
                 {newsletterContent || 'El contenido de tu newsletter aparecerá aquí...'}
