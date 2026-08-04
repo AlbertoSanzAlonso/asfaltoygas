@@ -10,7 +10,7 @@ const TRUST_ITEMS = [
 ];
 
 export const AboutStripSection: React.FC = () => (
-  <section className="py-16 md:py-24 bg-white">
+  <section className="py-16 md:py-24">
     <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
         <div>

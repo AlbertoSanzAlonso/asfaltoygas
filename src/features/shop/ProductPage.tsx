@@ -85,6 +85,20 @@ const ProductPage = () => {
     }
   }, [showFullscreen, isZoomed]);
 
+  const closeFullscreen = () => {
+    setShowFullscreen(false);
+    setIsZoomed(false);
+  };
+
+  useEffect(() => {
+    if (!showFullscreen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeFullscreen();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showFullscreen]);
+
   const { user, isAuthenticated, setPendingFavorite } = useAuthStore();
   const { addItem, openModal } = useCartStore();
 
@@ -612,64 +626,68 @@ const ProductPage = () => {
       {showFullscreen && (
         <div 
           ref={scrollRef}
-          className="fixed inset-0 z-100 bg-black/95 overflow-auto cursor-default"
-          onClick={() => { setShowFullscreen(false); setIsZoomed(false); }}
+          className="fixed inset-0 z-[200] bg-black/95 overflow-auto"
+          onClick={closeFullscreen}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Vista ampliada de la imagen"
         >
-          {/* Close Button */}
           <button 
-            onClick={() => { setShowFullscreen(false); setIsZoomed(false); }}
-            className="fixed top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors z-120"
+            type="button"
+            aria-label="Cerrar"
+            onClick={(e) => { e.stopPropagation(); closeFullscreen(); }}
+            className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[210] flex items-center justify-center w-12 h-12 rounded-full bg-white text-secondary shadow-lg hover:bg-safety transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X className="w-6 h-6" strokeWidth={2.5} />
           </button>
 
           {/* Navigation Arrows (Desktop) */}
           {!isZoomed && product.images.length > 1 && (
             <>
               <button 
+                type="button"
+                aria-label="Imagen anterior"
                 onClick={(e) => { e.stopPropagation(); setActiveImage(prev => prev === 0 ? displayImages.length - 1 : prev - 1); }}
-                className="fixed left-6 top-1/2 -translate-y-1/2 p-4 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all z-110"
+                className="fixed left-4 sm:left-6 top-1/2 -translate-y-1/2 z-[210] p-3 sm:p-4 bg-white/15 hover:bg-white/25 rounded-full text-white transition-all"
               >
                 <ChevronRight className="w-8 h-8 rotate-180" />
               </button>
               <button 
+                type="button"
+                aria-label="Imagen siguiente"
                 onClick={(e) => { e.stopPropagation(); setActiveImage(prev => prev === displayImages.length - 1 ? 0 : prev + 1); }}
-                className="fixed right-6 top-1/2 -translate-y-1/2 p-4 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all z-110"
+                className="fixed right-4 sm:right-6 top-1/2 -translate-y-1/2 z-[210] p-3 sm:p-4 bg-white/15 hover:bg-white/25 rounded-full text-white transition-all"
               >
                 <ChevronRight className="w-8 h-8" />
               </button>
             </>
           )}
 
-
-          <div 
-            className={`min-h-full flex items-center justify-center overflow-auto ${isZoomed ? 'cursor-default' : 'cursor-zoom-in'}`}
-            onClick={(e) => { e.stopPropagation(); if (!isZoomed) setIsZoomed(true); }}
-          >
-            <div 
-              className="relative"
-            >
-              <AnimatePresence mode="wait">
-                <motion.img 
-                  key={`${selectedColorId ?? 'n'}-${activeImage}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, scale: isZoomed ? 2.5 : 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  src={displayImages[activeImage]} 
-                  alt={product.name}
-                  className={`transition-all duration-300 shadow-2xl rounded-sm max-w-[90vw] max-h-[85vh] object-contain ${isZoomed ? 'cursor-zoom-out' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); setIsZoomed(!isZoomed); }}
-                />
-              </AnimatePresence>
-            </div>
+          <div className="min-h-full flex items-center justify-center p-4 pt-20 pb-28">
+            <AnimatePresence mode="wait">
+              <motion.img 
+                key={`${selectedColorId ?? 'n'}-${activeImage}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, scale: isZoomed ? 2.5 : 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                src={displayImages[activeImage]} 
+                alt={product.name}
+                className={`transition-all duration-300 shadow-2xl rounded-sm max-w-[90vw] max-h-[75vh] object-contain ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
+                onClick={(e) => { e.stopPropagation(); setIsZoomed(!isZoomed); }}
+              />
+            </AnimatePresence>
           </div>
 
           {/* Thumbnails row */}
           {!isZoomed && displayImages.length > 1 && (
-            <div className="fixed bottom-12 left-1/2 -translate-x-1/2 flex gap-3 px-6 py-4 bg-black/40 backdrop-blur-md rounded-2xl z-120">
+            <div
+              className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[210] flex gap-3 px-6 py-4 bg-black/40 backdrop-blur-md rounded-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               {displayImages.map((img: string, idx: number) => (
                 <button
+                  type="button"
                   key={idx}
                   onClick={(e) => { e.stopPropagation(); setActiveImage(idx); }}
                   className={`w-12 h-16 rounded-lg overflow-hidden border-2 transition-all ${activeImage === idx ? 'border-primary scale-110 shadow-lg' : 'border-transparent opacity-40 hover:opacity-100'}`}

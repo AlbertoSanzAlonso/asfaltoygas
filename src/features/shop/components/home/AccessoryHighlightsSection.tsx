@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ACCESSORY_HIGHLIGHTS } from '../../data/homeContent';
 
 export const AccessoryHighlightsSection: React.FC = () => (
-  <section className="py-12 md:py-16 bg-white">
+  <section className="py-12 md:py-16">
     <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
       <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide text-secondary text-center mb-8 md:mb-10">
         Viaja sin límites

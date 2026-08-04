@@ -2,7 +2,7 @@ import React from 'react';
 import { BRAND } from '@/lib/brand';
 
 export const SeoAboutSection: React.FC = () => (
-  <section className="py-12 md:py-16 bg-accent">
+  <section className="py-12 md:py-16">
     <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="font-display text-xl md:text-2xl font-bold uppercase tracking-wide text-secondary mb-6">

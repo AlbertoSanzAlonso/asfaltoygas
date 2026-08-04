@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { SERVICES } from '../../data/homeContent';
 
 export const ServicesStripSection: React.FC = () => (
-  <section className="bg-white">
+  <section>
     <div className="max-w-[1800px] mx-auto">
       <h2 className="font-display text-xl md:text-2xl font-bold uppercase tracking-wide text-secondary text-center py-8 md:py-10 px-4">
         Servicios y asistencia

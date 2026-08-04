@@ -10,7 +10,7 @@ interface OutletSectionProps {
 }
 
 export const OutletSection: React.FC<OutletSectionProps> = ({ products, isLoading }) => (
-  <section id="outlet" className="py-12 md:py-16 bg-white">
+  <section id="outlet" className="py-12 md:py-16">
     <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-10">
         <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide text-secondary">

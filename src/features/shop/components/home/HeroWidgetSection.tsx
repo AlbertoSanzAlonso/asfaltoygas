@@ -19,7 +19,7 @@ export const HeroWidgetSection: React.FC = () => {
   const slide = WIDGET_SLIDES[active];
 
   return (
-    <section className="py-12 md:py-16 bg-white">
+    <section className="py-12 md:py-16">
       <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5">
           <div className="lg:col-span-8 relative aspect-[16/9] lg:aspect-auto lg:min-h-[420px] overflow-hidden bg-secondary group">

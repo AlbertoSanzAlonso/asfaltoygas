@@ -41,7 +41,7 @@ export const ShopLayout: FC<ShopLayoutProps> = ({ children, setIsCartOpen, isMen
         setIsMenuOpen={setIsMenuOpen} 
       />
       
-      <main className="relative z-10 grow pt-16 lg:pt-[148px]">
+      <main className="relative z-10 grow pt-16 lg:pt-36">
         {children}
       </main>
 

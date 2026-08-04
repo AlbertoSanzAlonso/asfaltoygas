@@ -99,11 +99,11 @@ export const NAV_CATEGORIES = [
 ] as const;
 
 export const HOME_CATEGORIES = [
-  { label: 'Cascos', href: '/categoria/cascos', image: '/assets/images/categories/cascos.jpg', objectPosition: 'center 28%' },
+  { label: 'Cascos', href: '/categoria/cascos', image: '/assets/images/categories/cascos.webp', objectPosition: 'center 28%' },
   { label: 'Equipación', href: '/categoria/equipacion', image: '/assets/images/categories/chaquetas.jpg', objectPosition: 'center 35%' },
-  { label: 'Equipaje', href: '/categoria/equipaje', image: '/assets/images/categories/chaquetas.jpg', objectPosition: 'center 35%' },
+  { label: 'Equipaje', href: '/categoria/equipaje', image: '/assets/images/categories/equipaje.webp', objectPosition: 'center 35%' },
   { label: 'Aceites y lubricantes', href: '/categoria/aceites-y-lubricantes', image: '/assets/images/categories/accesorios.jpg', objectPosition: 'center 45%' },
-  { label: 'Mantenimiento', href: '/categoria/mantenimiento', image: '/assets/images/categories/accesorios.jpg', objectPosition: 'center 45%' },
+  { label: 'Mantenimiento', href: '/categoria/mantenimiento', image: '/assets/images/categories/mantenimiento.webp', objectPosition: 'center 45%' },
 ] as const;
 
 export const RIDING_STYLES = [

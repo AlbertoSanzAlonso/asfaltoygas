@@ -73,7 +73,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="bg-white overflow-x-hidden">
+    <div className="overflow-x-hidden">
       <HeroSliderSection />
       <CategoryGridSection />
       <HeroWidgetSection />
