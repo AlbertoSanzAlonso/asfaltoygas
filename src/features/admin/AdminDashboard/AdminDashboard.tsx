@@ -211,9 +211,26 @@ export const AdminDashboard: React.FC = () => {
       });
       setSelectedOrder(updated);
       queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+
+      // En modo test, reenviar confirmaciones (el webhook a veces no dispara emails).
+      let emailNote = '';
+      try {
+        const emailRes = await fetch('/api/resend-order-emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId }),
+        });
+        const emailData = await emailRes.json().catch(() => ({}));
+        emailNote = emailData.success
+          ? ' Correos de confirmación reenviados.'
+          : ' No se pudieron enviar los correos (revisa SMTP en Vercel).';
+      } catch {
+        emailNote = ' No se pudieron enviar los correos.';
+      }
+
       openModal({
         title: 'Pedido marcado como pagado',
-        message: 'Ya puedes generar la etiqueta Nacex de prueba.',
+        message: `Ya puedes generar la etiqueta Nacex de prueba.${emailNote}`,
         type: 'info',
       });
     } catch (err) {
