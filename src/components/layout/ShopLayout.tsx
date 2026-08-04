@@ -29,10 +29,10 @@ export const ShopLayout: FC<ShopLayoutProps> = ({ children, setIsCartOpen, isMen
         className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none select-none"
       >
         <img
-          src="/assets/logo/logo-asfaltoygas-negro.svg"
+          src="/assets/logo/logo-asfaltoygas-icon.svg"
           alt=""
           decoding="async"
-          className="w-[min(72vw,560px)] h-auto opacity-[0.06]"
+          className="w-[min(72vw,420px)] h-auto opacity-[0.06]"
         />
       </div>
       <Navbar
