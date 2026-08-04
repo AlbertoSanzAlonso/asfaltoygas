@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from "@/lib/api";
-import { useCartStore } from "@/store/useCartStore";
 import { useScrollRestoration } from "@/lib/useScrollRestoration";
 
 import { HeroSliderSection } from './components/home/HeroSliderSection';
@@ -15,12 +14,8 @@ import { AccessoryHighlightsSection } from './components/home/AccessoryHighlight
 import { ServicesStripSection } from './components/home/ServicesStripSection';
 import { BrandLogosSection } from './components/home/BrandLogosSection';
 import { SeoAboutSection } from './components/home/SeoAboutSection';
-import { NewsletterSection } from './components/NewsletterSection';
 
 const HomePage = () => {
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
   const { hash } = useLocation();
 
   const { data: products, isLoading } = useQuery({
@@ -51,27 +46,6 @@ const HomePage = () => {
     }
   }, [hash]);
 
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      await api.subscriptions.create(email, 'pending', token);
-      await api.mail.sendConfirmationEmail(email, token, window.location.origin);
-      setIsSubscribed(true);
-      setEmail('');
-    } catch (error) {
-      console.error('Subscription error:', error);
-      useCartStore.getState().openModal({
-        title: 'Error de Suscripción',
-        message: error instanceof Error ? error.message : 'No se pudo procesar tu suscripción. Por favor, inténtalo más tarde.',
-        type: 'info'
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <div className="overflow-x-hidden">
       <HeroSliderSection />
@@ -84,13 +58,6 @@ const HomePage = () => {
       <ServicesStripSection />
       <BrandLogosSection />
       <SeoAboutSection />
-      <NewsletterSection
-        email={email}
-        setEmail={setEmail}
-        isSubmitting={isSubmitting}
-        isSubscribed={isSubscribed}
-        onSubscribe={handleSubscribe}
-      />
     </div>
   );
 };
