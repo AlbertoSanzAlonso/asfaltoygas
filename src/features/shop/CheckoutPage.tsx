@@ -81,7 +81,7 @@ const CheckoutPage = () => {
   };
 
   return (
-    <div className="bg-accent min-h-screen pt-12 pb-32 text-secondary">
+    <div className="min-h-screen pt-12 pb-32 text-secondary">
       <CheckoutSuccessModal show={showSuccessModal} onNavigate={navigate} />
       <CheckoutPaymentErrorModal
         show={showPaymentErrorModal}

@@ -259,7 +259,7 @@ const ProductPage = () => {
   const availabilitySchema = totalStock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
 
   return (
-    <div className="bg-accent min-h-screen pt-12 pb-32 text-secondary">
+    <div className="min-h-screen pt-12 pb-32 text-secondary">
       <SeoHelmet
         title={product.name}
         description={productDescription}

@@ -33,7 +33,7 @@ const ConocenosPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-accent/20">
+    <div className="min-h-screen">
       <section className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden flex items-center justify-center">
         <div className="absolute inset-0 z-0">
           <img

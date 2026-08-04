@@ -34,7 +34,7 @@ const UnsubscribePage: React.FC = () => {
   }, [email]);
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-6 py-20 bg-accent">
+    <div className="min-h-[70vh] flex items-center justify-center px-6 py-20">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

@@ -8,6 +8,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useAdminStore } from "@/store/useAdminStore";
 import { useCartStore } from "@/store/useCartStore";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BrandWatermark } from "@/components/layout/BrandWatermark";
 
 export const ResetPasswordPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -87,6 +88,7 @@ export const ResetPasswordPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-(--bg-main) flex items-center justify-center p-6 relative overflow-hidden transition-colors duration-300">
+      <BrandWatermark />
       <div className="absolute top-8 right-8 z-50">
         <ThemeToggle />
       </div>

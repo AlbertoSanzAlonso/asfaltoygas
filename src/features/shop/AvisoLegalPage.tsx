@@ -5,7 +5,7 @@ const AvisoLegalPage: FC = () => {
   const { legal } = BRAND;
 
   return (
-    <div className="bg-accent min-h-screen">
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-6 py-32">
         <header className="mb-20 text-center">
           <h1 className="text-4xl md:text-5xl font-light tracking-[0.2em] uppercase mb-6 text-secondary">

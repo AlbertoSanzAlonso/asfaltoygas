@@ -5,6 +5,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from "@/lib/api";
 import { useCartStore } from "@/store/useCartStore";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BrandWatermark } from "@/components/layout/BrandWatermark";
 import { Button } from "@/components/ui/Button";
 
 interface ForgotPasswordPageProps {
@@ -79,6 +80,7 @@ export const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({ isAdmin 
 
   return (
     <div className="min-h-screen bg-(--bg-main) flex items-center justify-center p-6 relative overflow-hidden transition-colors duration-300">
+      <BrandWatermark />
       <div className="absolute top-8 right-8 z-50">
         <ThemeToggle />
       </div>

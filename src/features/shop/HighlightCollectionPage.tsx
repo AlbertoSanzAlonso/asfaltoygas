@@ -93,7 +93,7 @@ const HighlightCollectionPage: React.FC = () => {
   const showEmpty = !isLoading && !isFetching && !isError && total === 0;
 
   return (
-    <div className="bg-accent min-h-screen pt-6 pb-32 text-secondary">
+    <div className="min-h-screen pt-6 pb-32 text-secondary">
       <SeoHelmet
         title={config.title}
         description={truncateDescription(config.description)}

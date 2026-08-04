@@ -15,6 +15,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from "@/store/useAuthStore";
 import { useThemeStore } from "@/store/useThemeStore";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BrandWatermark } from "@/components/layout/BrandWatermark";
 
 interface CustomerLayoutProps {
   children: React.ReactNode;
@@ -41,9 +42,10 @@ export const CustomerLayout: React.FC<CustomerLayoutProps> = ({ children }) => {
   const theme = useThemeStore((state) => state.theme);
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''} bg-(--bg-main) text-(--text-main) flex flex-col md:flex-row transition-colors duration-300`}>
+    <div className={`relative min-h-screen ${theme === 'dark' ? 'dark' : ''} bg-(--bg-main) text-(--text-main) flex flex-col md:flex-row transition-colors duration-300`}>
+      <BrandWatermark />
       {/* Sidebar */}
-      <aside className="w-full md:w-80 border-b md:border-r border-(--border-main) bg-(--bg-main) p-6 md:p-8 flex flex-col transition-colors duration-300">
+      <aside className="relative z-10 w-full md:w-80 border-b md:border-r border-(--border-main) bg-(--bg-main) p-6 md:p-8 flex flex-col transition-colors duration-300">
         <div className="flex justify-between items-center md:mb-12">
           <div>
             <p className="text-[10px] text-primary font-black uppercase tracking-[0.3em] mb-1">Panel de Usuario</p>
@@ -113,7 +115,7 @@ export const CustomerLayout: React.FC<CustomerLayoutProps> = ({ children }) => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 md:p-16 overflow-y-auto">
+      <main className="relative z-10 flex-1 p-8 md:p-16 overflow-y-auto">
         <motion.div
           key={location.pathname}
           initial={{ opacity: 0, y: 10 }}

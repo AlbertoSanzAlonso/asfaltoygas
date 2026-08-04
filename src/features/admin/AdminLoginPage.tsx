@@ -6,6 +6,7 @@ import { useAdminStore } from "@/store/useAdminStore";
 import { api } from "@/lib/api";
 import { useCartStore } from "@/store/useCartStore";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BrandWatermark } from '@/components/layout/BrandWatermark';
 import { BRAND } from '@/lib/brand';
 import { BRAND_LOGO_ICON } from '@/lib/constants';
 
@@ -41,7 +42,8 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-(--bg-main) flex items-center justify-center p-6 font-mono transition-colors duration-300">
+    <div className="relative min-h-screen bg-(--bg-main) flex items-center justify-center p-6 font-mono transition-colors duration-300">
+      <BrandWatermark />
       <div className="absolute top-8 right-8 z-50">
         <ThemeToggle />
       </div>

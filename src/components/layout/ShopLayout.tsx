@@ -1,6 +1,7 @@
 import { type FC, type ReactNode, useEffect } from 'react';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
+import { BrandWatermark } from './BrandWatermark';
 import { RouteSeo } from '@/components/seo/RouteSeo';
 
 interface ShopLayoutProps {
@@ -24,17 +25,7 @@ export const ShopLayout: FC<ShopLayoutProps> = ({ children, setIsCartOpen, isMen
   return (
     <div className="relative min-h-screen bg-accent text-secondary selection:bg-primary selection:text-white flex flex-col overflow-x-hidden">
       <RouteSeo />
-      <div
-        aria-hidden="true"
-        className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none select-none"
-      >
-        <img
-          src="/assets/logo/logo-team-asfaltoygas-bg.webp"
-          alt=""
-          decoding="async"
-          className="w-[min(92vw,960px)] h-auto opacity-[0.10]"
-        />
-      </div>
+      <BrandWatermark />
       <Navbar
         setIsCartOpen={setIsCartOpen} 
         isMenuOpen={isMenuOpen} 

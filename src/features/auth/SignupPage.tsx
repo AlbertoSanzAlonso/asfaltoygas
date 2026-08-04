@@ -6,6 +6,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useCartStore } from "@/store/useCartStore";
 import { api } from "@/lib/api";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BrandWatermark } from "@/components/layout/BrandWatermark";
 import { CITIES_BY_PROVINCE } from "@/constants/locations";
 
 // Sub-components
@@ -191,6 +192,7 @@ export const SignupPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-(--bg-main) flex items-center justify-center p-6 relative overflow-hidden transition-colors duration-300">
+      <BrandWatermark />
       <div className="absolute top-8 right-8 z-50">
         <ThemeToggle />
       </div>
@@ -201,7 +203,7 @@ export const SignupPage: React.FC = () => {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+        className="relative z-10 w-full max-w-md"
       >
         <div className="text-center mb-10">
           <motion.div
