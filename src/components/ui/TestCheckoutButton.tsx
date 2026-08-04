@@ -9,11 +9,11 @@ const TEST_PRODUCT_SLUG = 'prueba-pago-001';
 
 /**
  * Botón flotante para ir al checkout con el producto de prueba.
- * Visible solo si `VITE_ENABLE_TEST_CHECKOUT=true`.
- * Para ocultarlo: quita la variable o ponla en `false` y reinicia Vite.
+ * Visible por defecto. Para ocultarlo: `VITE_ENABLE_TEST_CHECKOUT=false` + redeploy.
  */
 export const TestCheckoutButton: FC = () => {
-  const enabled = import.meta.env.VITE_ENABLE_TEST_CHECKOUT === 'true';
+  // Opt-out: solo se oculta si la variable es explícitamente "false"
+  const enabled = import.meta.env.VITE_ENABLE_TEST_CHECKOUT !== 'false';
   const location = useLocation();
   const navigate = useNavigate();
   const { clearCart, addItem, closeModal } = useCartStore();
@@ -53,15 +53,15 @@ export const TestCheckoutButton: FC = () => {
       type="button"
       onClick={handleClick}
       disabled={loading}
-      title="Compra de prueba (0,01€) — ocultar con VITE_ENABLE_TEST_CHECKOUT"
-      className="fixed bottom-6 left-6 z-50 flex items-center gap-2 rounded-full bg-amber-500 px-4 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg transition hover:bg-amber-600 disabled:opacity-70"
+      title="Compra de prueba (0,01€) — ocultar con VITE_ENABLE_TEST_CHECKOUT=false"
+      className="fixed bottom-28 left-4 z-[60] flex items-center gap-2 rounded-full bg-amber-500 px-4 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg transition hover:bg-amber-600 disabled:opacity-70 md:bottom-6 md:left-6"
     >
       {loading ? (
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
       ) : (
         <FlaskConical className="h-4 w-4" aria-hidden />
       )}
-      Compra prueba
+      Pago test
     </button>
   );
 };
