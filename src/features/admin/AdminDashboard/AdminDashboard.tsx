@@ -215,7 +215,7 @@ export const AdminDashboard: React.FC = () => {
       // En modo test, reenviar confirmaciones (el webhook a veces no dispara emails).
       let emailNote = '';
       try {
-        const emailRes = await fetch('/api/resend-order-emails', {
+        const emailRes = await fetch('/api/mail?op=resend-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ orderId }),

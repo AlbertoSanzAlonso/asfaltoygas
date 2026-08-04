@@ -21,7 +21,7 @@ export const subscriptions = {
   },
 
   create: async (email: string, status: 'pending' | 'active' = 'pending', confirmation_token?: string): Promise<Subscription> => {
-    const response = await fetch('/api/subscribe', {
+    const response = await fetch('/api/newsletter?op=subscribe', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ export const subscriptions = {
   },
 
   confirm: async (token: string): Promise<boolean> => {
-    const response = await fetch('/api/confirm-subscription', {
+    const response = await fetch('/api/newsletter?op=confirm', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ export const subscriptions = {
     return true;
   },
   unsubscribe: async (email: string): Promise<boolean> => {
-    const response = await fetch('/api/unsubscribe', {
+    const response = await fetch('/api/newsletter?op=unsubscribe', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

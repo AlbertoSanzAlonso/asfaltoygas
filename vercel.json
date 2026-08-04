@@ -31,6 +31,34 @@
   ],
   "rewrites": [
     {
+      "source": "/api/send-email",
+      "destination": "/api/mail?op=send"
+    },
+    {
+      "source": "/api/mail-status",
+      "destination": "/api/mail?op=status"
+    },
+    {
+      "source": "/api/notify-admin-order",
+      "destination": "/api/mail?op=notify-admin"
+    },
+    {
+      "source": "/api/resend-order-emails",
+      "destination": "/api/mail?op=resend-order"
+    },
+    {
+      "source": "/api/subscribe",
+      "destination": "/api/newsletter?op=subscribe"
+    },
+    {
+      "source": "/api/confirm-subscription",
+      "destination": "/api/newsletter?op=confirm"
+    },
+    {
+      "source": "/api/unsubscribe",
+      "destination": "/api/newsletter?op=unsubscribe"
+    },
+    {
       "source": "/api/:path*",
       "destination": "/api/:path*"
     },

@@ -19,7 +19,7 @@ export interface SendEmailParams {
 export const mailApi = {
   send: async (params: SendEmailParams) => {
     try {
-      const response = await fetch('/api/send-email', {
+      const response = await fetch('/api/mail?op=send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

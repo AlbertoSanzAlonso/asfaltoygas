@@ -17,7 +17,24 @@ function vercelDevPlugin() {
         try {
           const parsedUrl = url.parse(req.url, true)
           const apiPath = parsedUrl.pathname || ''
-          const baseName = apiPath.substring(5) // Remove '/api/'
+          let baseName = apiPath.substring(5) // Remove '/api/'
+          const query = { ...(parsedUrl.query || {}) } as Record<string, any>
+
+          // Alias URLs antiguas → handlers consolidados (límite Hobby 12 funciones)
+          const apiAliases: Record<string, { file: string; op: string }> = {
+            'send-email': { file: 'mail', op: 'send' },
+            'mail-status': { file: 'mail', op: 'status' },
+            'notify-admin-order': { file: 'mail', op: 'notify-admin' },
+            'resend-order-emails': { file: 'mail', op: 'resend-order' },
+            subscribe: { file: 'newsletter', op: 'subscribe' },
+            'confirm-subscription': { file: 'newsletter', op: 'confirm' },
+            unsubscribe: { file: 'newsletter', op: 'unsubscribe' },
+          }
+          const alias = apiAliases[baseName]
+          if (alias) {
+            baseName = alias.file
+            if (!query.op) query.op = alias.op
+          }
 
           // Resolve backend API files (supporting .ts, .js, or index files)
           let filePath = ''
@@ -85,7 +102,7 @@ function vercelDevPlugin() {
           // Build VercelRequest and VercelResponse mocks
           const originalEnd = res.end.bind(res)
           const vercelReq = Object.assign(req, {
-            query: parsedUrl.query || {},
+            query,
             body: body,
             cookies: {},
           })
