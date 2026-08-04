@@ -29,7 +29,7 @@ export const OrderHistory: React.FC = () => {
     window.history.replaceState({}, '', window.location.pathname);
 
     const confirmPaymentReturn = async () => {
-      const customerKey = user?.customer_id || user?.email || '';
+      const customerKey = user?.email || user?.customer_id || '';
       if (!customerKey) return;
 
       const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

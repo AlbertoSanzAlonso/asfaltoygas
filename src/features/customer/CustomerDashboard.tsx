@@ -14,8 +14,8 @@ export const CustomerDashboard: React.FC = () => {
   const [showDetails, setShowDetails] = useState(false);
 
   const { data: orders = [], isLoading, error } = useQuery({
-    queryKey: ['orders', user?.customer_id],
-    queryFn: () => api.orders.getByCustomer(user?.customer_id || user?.email || ''),
+    queryKey: ['orders', user?.email || user?.customer_id],
+    queryFn: () => api.orders.getByCustomer(user?.email || user?.customer_id || ''),
     enabled: !!(user?.customer_id || user?.email)
   });
 

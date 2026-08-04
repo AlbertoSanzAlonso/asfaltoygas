@@ -6,6 +6,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Add CORS headers
   const allowedOrigins = [
     'https://asfaltoygas.es',
+    'https://www.asfaltoygas.es',
     'https://asfaltoygas.vercel.app',
     'http://localhost:5173',
     'http://localhost:3000'
@@ -42,28 +43,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   /**
-   * Getnet envía FUC real + clave TEST (p. ej. sq7H…) para el entorno de pruebas.
-   * Lo que cambia entre test y prod es la URL (y, al pasar a producción, la clave SHA).
-   * Con VITE_ENABLE_TEST_CHECKOUT=true → sis-t.redsys.es (nunca producción).
+   * Getnet: FUC real en test y prod; la clave SHA cambia al pasar a producción.
+   * testMode → sis-t + clave TEST. Producción → sis.redsys.es + clave de producción
+   * (nunca usar VITE_REDSYS_*_TEST en prod: provoca SIS0042 / importe 0).
    */
   const testMode = getEnv('VITE_ENABLE_TEST_CHECKOUT') === 'true';
   const REDSYS_URL_TEST = 'https://sis-t.redsys.es:25443/sis/realizarPago';
   const REDSYS_URL_PROD = 'https://sis.redsys.es/sis/realizarPago';
 
-  const merchantCode =
-    getEnv('VITE_REDSYS_COMMERCE_NUMBER_TEST') ||
-    getEnv('VITE_REDSYS_COMMERCE_NUMBER');
-  const terminal =
-    getEnv('VITE_REDSYS_TERMINAL_NUMBER_TEST') ||
-    getEnv('VITE_REDSYS_TERMINAL_NUMBER') ||
-    '001';
-  const secretKey =
-    getEnv('VITE_REDSYS_SECRET_KEY_TEST') ||
-    getEnv('VITE_REDSYS_SECRET_KEY');
+  const merchantCode = testMode
+    ? getEnv('VITE_REDSYS_COMMERCE_NUMBER_TEST') || getEnv('VITE_REDSYS_COMMERCE_NUMBER')
+    : getEnv('VITE_REDSYS_COMMERCE_NUMBER');
+  const terminal = testMode
+    ? getEnv('VITE_REDSYS_TERMINAL_NUMBER_TEST') ||
+      getEnv('VITE_REDSYS_TERMINAL_NUMBER') ||
+      '001'
+    : getEnv('VITE_REDSYS_TERMINAL_NUMBER') || '001';
+  const secretKey = testMode
+    ? getEnv('VITE_REDSYS_SECRET_KEY_TEST') || getEnv('VITE_REDSYS_SECRET_KEY')
+    : getEnv('VITE_REDSYS_SECRET_KEY');
   const redsysUrl = testMode ? REDSYS_URL_TEST : REDSYS_URL_PROD;
 
   if (!merchantCode || !secretKey) {
-    return res.status(500).json({ message: 'Server configuration error: Redsys keys missing' });
+    return res.status(500).json({
+      message: testMode
+        ? 'Server configuration error: Redsys TEST keys missing'
+        : 'Server configuration error: faltan claves Redsys de producción (VITE_REDSYS_SECRET_KEY / COMMERCE_NUMBER). La clave TEST (sq7H…) no sirve en sis.redsys.es.',
+    });
+  }
+
+  // La clave de sandbox conocida no firma en producción
+  if (!testMode && secretKey.startsWith('sq7H')) {
+    return res.status(500).json({
+      message:
+        'Estás en modo real (VITE_ENABLE_TEST_CHECKOUT=false) con la clave TEST de Getnet. Pon la clave SHA de producción o vuelve a VITE_ENABLE_TEST_CHECKOUT=true.',
+    });
   }
 
   try {
