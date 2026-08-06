@@ -23,6 +23,8 @@ export const BRAND = {
     region: 'Málaga',
     postalCode: '29631',
     country: 'ES',
+    mapsUrl:
+      'https://www.google.com/maps/place//data=!4m2!3m1!1s0xd72fd07e8113ea9:0x2768c5d6ac11fe1f?sa=X&ved=1t:8290&ictx=111',
   },
   social: {
     instagram: 'https://www.instagram.com/asfaltoygas/',
