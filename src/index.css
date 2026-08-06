@@ -89,6 +89,27 @@ button {
     animation: float 6s ease-in-out infinite;
   }
 
+  @keyframes brand-marquee {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-50%, 0, 0); }
+  }
+
+  .animate-brand-marquee {
+    animation: brand-marquee 140s linear infinite;
+    will-change: transform;
+  }
+
+  .animate-brand-marquee:hover,
+  .animate-brand-marquee:focus-within {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-brand-marquee {
+      animation: none;
+    }
+  }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none !important;
   }

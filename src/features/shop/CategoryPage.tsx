@@ -10,33 +10,7 @@ import type { Product, Subcategory, Brand, Label } from '@/types';
 import { SeoHelmet } from '@/components/seo/SeoHelmet';
 import { absoluteUrl, truncateDescription } from '@/lib/seo/constants';
 import { isSupabaseConfigured } from '@/lib/supabaseConfig';
-
-const BRAND_SCALES: Record<string, number> = {
-  'acerbis': 2.15,
-  'airoh': 1.3,
-  'alpinestars': 2.05,
-  'five': 2.35,
-  'givi': 0.7,
-  'hjc': 1.3,
-  'husqvarna': 1.55,
-  'ixon': 1.55,
-  'ktm': 1.55,
-  'ls2': 1.3,
-  'motul': 0.7,
-  'mt-helmets': 1.3,
-  'nolan': 1.3,
-  'piaggio': 1.65,
-  'repsol': 1.55,
-  'revit': 0.7,
-  'shoei': 1.3,
-  'suomy': 1.3,
-  'thor': 0.7,
-  'tucano-urbano': 1.55,
-  'arai': 0.5,
-  'caberg': 0.55,
-  'gas-gas': 0.75,
-  'unik-racing': 0.65,
-};
+import { getBrandLogoSize } from '@/lib/brandLogos';
 
 const STYLE_TAG_SLUGS = ['racing', 'ciudad', 'off-road', 'sport', 'touring'] as const;
 
@@ -51,11 +25,7 @@ const STYLE_TAG_LABELS: Record<(typeof STYLE_TAG_SLUGS)[number], string> = {
 const STYLE_EXCLUDED_CATEGORY_SLUGS = ['aceites-y-lubricantes', 'mantenimiento'] as const;
 
 const BrandLogo: React.FC<{ brand: Brand; size?: 'sm' | 'md' }> = ({ brand, size = 'md' }) => {
-  const baseHeight = size === 'sm' ? 34 : 50;
-  const baseMaxWidth = size === 'sm' ? 110 : 160;
-  const scale = BRAND_SCALES[brand.slug] ?? 1;
-  const height = Math.round(baseHeight * scale);
-  const maxWidth = Math.round(baseMaxWidth * scale);
+  const { height, maxWidth } = getBrandLogoSize(brand.slug, size);
 
   if (brand.logo_url) {
     return (
