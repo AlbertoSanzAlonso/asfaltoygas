@@ -12,7 +12,7 @@ import { createMailTransporter, getMailFromHeader } from '../mailTransport.js';
 
 const LOGO_URL = `${getCanonicalSiteUrl()}/assets/logo/logo-asfaltoygas-main.png`;
 
-const DEFAULT_ADMIN_ORDER_EMAIL = 'info@asfaltoygas.es';
+const DEFAULT_ADMIN_ORDER_EMAIL = 'asfaltoygasatcliente@gmail.com';
 
 export function getAdminOrderNotifyEmail(): string {
   const configured = getEnv('ADMIN_ORDER_EMAIL')?.trim();

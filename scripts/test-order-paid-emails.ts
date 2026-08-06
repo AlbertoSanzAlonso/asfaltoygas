@@ -6,7 +6,7 @@
 import 'dotenv/config';
 import { sendOrderPaidEmails } from '../src/lib/emails/adminNewOrderNotification';
 
-const adminEmail = process.env.ADMIN_ORDER_EMAIL || 'info@asfaltoygas.es';
+const adminEmail = process.env.ADMIN_ORDER_EMAIL || 'asfaltoygasatcliente@gmail.com';
 const customerEmail = process.env.TEST_CUSTOMER_EMAIL || adminEmail;
 
 process.env.ADMIN_ORDER_EMAIL = adminEmail;
