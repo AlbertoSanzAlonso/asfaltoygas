@@ -12,16 +12,28 @@ import { absoluteUrl, truncateDescription } from '@/lib/seo/constants';
 import { isSupabaseConfigured } from '@/lib/supabaseConfig';
 
 const BRAND_SCALES: Record<string, number> = {
-  'acerbis': 1.3,
+  'acerbis': 2.15,
   'airoh': 1.3,
+  'alpinestars': 2.05,
+  'five': 2.35,
+  'givi': 0.7,
   'hjc': 1.3,
+  'husqvarna': 1.55,
+  'ixon': 1.55,
+  'ktm': 1.55,
   'ls2': 1.3,
+  'motul': 0.7,
   'mt-helmets': 1.3,
   'nolan': 1.3,
-  'piaggio': 1.45,
+  'piaggio': 1.65,
+  'repsol': 1.55,
+  'revit': 0.7,
   'shoei': 1.3,
   'suomy': 1.3,
-  'arai': 0.75,
+  'thor': 0.7,
+  'tucano-urbano': 1.55,
+  'arai': 0.5,
+  'caberg': 0.55,
   'gas-gas': 0.75,
   'unik-racing': 0.65,
 };
@@ -297,7 +309,7 @@ const CategoryPage: React.FC = () => {
     return (
       <div>
         <p className="text-[9px] font-black uppercase tracking-[0.4em] text-secondary/40 mb-3">Marca</p>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           <button type="button" onClick={() => handleBrandChange(null)}
             className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] border rounded-full transition-all ${!selectedBrand ? 'bg-secondary border-secondary text-white' : 'border-secondary/10 hover:border-secondary'}`}>
             Todas

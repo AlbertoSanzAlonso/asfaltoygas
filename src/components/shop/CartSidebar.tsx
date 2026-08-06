@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, Trash2, Plus, Minus } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -24,7 +25,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => 
     appliedDiscount,
   } = useCartStore();
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -34,7 +35,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-100"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
           />
 
           {/* Sidebar */}
@@ -43,7 +44,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => 
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 h-full w-full max-w-md bg-accent z-101 shadow-2xl flex flex-col text-secondary"
+            className="fixed right-0 top-0 h-full w-full max-w-md bg-accent z-[110] shadow-2xl flex flex-col text-secondary"
           >
             <div className="p-8 border-b border-secondary/5 flex justify-between items-center">
               <div className="flex items-center gap-3">
@@ -164,6 +165,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => 
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

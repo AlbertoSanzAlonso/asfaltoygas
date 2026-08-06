@@ -120,8 +120,13 @@ export const Navbar: FC<NavbarProps> = ({ setIsCartOpen, isMenuOpen, setIsMenuOp
     <>
       <header className="fixed top-0 w-full z-50">
         {/* Fila 1 — logo + búsqueda + iconos */}
-        <div className="bg-white border-b border-secondary/8 shadow-sm">
-          <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
+        <div className="relative bg-white border-b border-secondary/8 shadow-sm overflow-hidden">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-cover bg-center grayscale opacity-30"
+            style={{ backgroundImage: "url('/assets/images/pistas-de-carreras.webp')" }}
+          />
+          <div className="relative max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10">
             <div className="flex items-center gap-4 h-16">
               <button
                 onClick={() => setIsMenuOpen(true)}

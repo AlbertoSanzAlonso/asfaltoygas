@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronRight, ChevronLeft, Share2, Heart, ShoppingBag, X } from 'lucide-react';
@@ -626,7 +627,7 @@ const ProductPage = () => {
       </div>
 
       {/* Fullscreen Image Modal */}
-      {showFullscreen && (
+      {showFullscreen && createPortal(
         <div 
           ref={scrollRef}
           className="fixed inset-0 z-[200] bg-black/95 overflow-auto"
@@ -700,7 +701,8 @@ const ProductPage = () => {
               ))}
             </div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

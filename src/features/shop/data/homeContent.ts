@@ -129,7 +129,16 @@ export const SERVICES = [
 ] as const;
 
 export const BRAND_LOGOS = [
-  'HJC', 'AGV', 'Shoei', 'Nolan', 'Airoh', 'Alpinestars', "Rev'it!", 'Shark', 'MT Helmets', 'Caberg',
+  { name: 'HJC', logo: '/assets/brands/hjc.png' },
+  { name: 'AGV', logo: '/assets/brands/agv.png' },
+  { name: 'Shoei', logo: '/assets/brands/shoei.png' },
+  { name: 'Nolan', logo: '/assets/brands/nolan.png' },
+  { name: 'Airoh', logo: '/assets/brands/airoh.png' },
+  { name: 'Shark', logo: '/assets/brands/shark.png' },
+  { name: 'MT Helmets', logo: '/assets/brands/mt-helmets.png' },
+  { name: 'Caberg', logo: '/assets/brands/caberg.png', scale: 0.7 },
+  { name: 'LS2', logo: '/assets/brands/ls2.png' },
+  { name: 'Arai', logo: '/assets/brands/arai.png', scale: 0.7 },
 ] as const;
 
 export const INFO_BAR_ITEMS = [
