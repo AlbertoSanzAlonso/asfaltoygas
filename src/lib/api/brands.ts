@@ -24,6 +24,19 @@ export const brands = {
     return data || [];
   },
 
+  getBySlug: async (slug: string): Promise<Brand | null> => {
+    if (!isSupabaseConfigured() || !slug) return null;
+
+    const { data, error } = await supabase
+      .from('brands')
+      .select(BRAND_SELECT)
+      .eq('slug', slug)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  },
+
   /** Marcas con al menos un producto publicado en la categoría (opcionalmente subcategoría). */
   getByCategory: async (
     categoryId: number,

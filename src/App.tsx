@@ -8,7 +8,6 @@ import { useCartStore } from "@/store/useCartStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useAdminStore } from "@/store/useAdminStore";
 import { ShopLayout } from "@/components/layout/ShopLayout";
-import { AIChatAgent } from "@/components/ui/AIChatAgent";
 import { CookieBanner } from "@/components/ui/CookieBanner";
 import { TestCheckoutButton } from "@/components/ui/TestCheckoutButton";
 
@@ -31,6 +30,7 @@ const HomePage = safeLazy(() => import("@/features/shop/HomePage"));
 const ProductPage = safeLazy(() => import("@/features/shop/ProductPage"));
 const CategoryPage = safeLazy(() => import("@/features/shop/CategoryPage"));
 const HighlightCollectionPage = safeLazy(() => import("@/features/shop/HighlightCollectionPage"));
+const BrandPage = safeLazy(() => import("@/features/shop/BrandPage"));
 const CheckoutPage = safeLazy(() => import("@/features/shop/CheckoutPage"));
 const AdminDashboard = safeLazy(() => import("@/features/admin/AdminDashboard"));
 const LoginPage = safeLazy(() => import("@/features/auth/LoginPage").then(m => ({ default: m.LoginPage })));
@@ -134,7 +134,6 @@ function App() {
       <Router>
         <ScrollToTop />
         <AddToCartModal />
-        <AIChatAgent />
         <TestCheckoutButton />
         <CookieBanner />
         <Suspense fallback={<Skeleton />}>
@@ -176,6 +175,7 @@ function App() {
                   <Route path="/categoria/:category" element={<CategoryPage />} />
                   <Route path="/novedades" element={<HighlightCollectionPage />} />
                   <Route path="/outlet" element={<HighlightCollectionPage />} />
+                  <Route path="/marca/:slug" element={<BrandPage />} />
                   <Route path="/checkout" element={<CheckoutPage />} />
                   <Route path="/aviso-legal" element={<AvisoLegalPage />} />
                   <Route path="/politica-de-privacidad" element={<PrivacyPolicyPage />} />

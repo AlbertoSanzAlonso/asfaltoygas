@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { BRAND_LOGOS } from '../../data/homeContent';
 import { getBrandLogoSize } from '@/lib/brandLogos';
 
@@ -10,7 +11,11 @@ const BrandMark: React.FC<{
   const { height, maxWidth } = getBrandLogoSize(slug, 'sm', 1.3);
 
   return (
-    <div className="group relative flex shrink-0 cursor-pointer flex-col items-center px-3 md:px-5 pb-4">
+    <Link
+      to={`/marca/${slug}`}
+      className="group relative flex shrink-0 cursor-pointer flex-col items-center px-3 md:px-5 pb-4"
+      aria-label={`Ver productos de ${name}`}
+    >
       <div className="relative z-10 flex items-center justify-center" style={{ height: 104, minWidth: maxWidth }}>
         <img
           src={logo}
@@ -30,7 +35,7 @@ const BrandMark: React.FC<{
             'radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.2) 40%, transparent 70%)',
         }}
       />
-    </div>
+    </Link>
   );
 };
 
