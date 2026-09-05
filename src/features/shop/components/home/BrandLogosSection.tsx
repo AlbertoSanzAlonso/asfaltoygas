@@ -13,10 +13,10 @@ const BrandMark: React.FC<{
   return (
     <Link
       to={`/marca/${slug}`}
-      className="group relative flex shrink-0 cursor-pointer flex-col items-center px-3 md:px-5 pb-4"
+      className="group relative flex shrink-0 cursor-pointer flex-col items-center pb-4"
       aria-label={`Ver productos de ${name}`}
     >
-      <div className="relative z-10 flex items-center justify-center" style={{ height: 104, minWidth: maxWidth }}>
+      <div className="relative z-10 flex h-[104px] items-center justify-center">
         <img
           src={logo}
           alt={name}
@@ -48,7 +48,7 @@ export const BrandLogosSection: React.FC = () => {
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 md:w-24 bg-gradient-to-r from-accent to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 md:w-24 bg-gradient-to-l from-accent to-transparent" />
 
-        <div className="flex w-max animate-brand-marquee">
+        <div className="flex w-max animate-brand-marquee items-center gap-10 md:gap-14">
           {loop.map((brand, index) => (
             <BrandMark
               key={`${brand.slug}-${index}`}
