@@ -3,6 +3,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import { canFulfillOrder } from '../src/lib/orderPayment.js';
 import { BRAND } from '../src/lib/brand.js';
+import { sendAdminLabelCreatedEmail } from '../src/lib/emails/adminNewOrderNotification.js';
 import { getEnv } from './_env.js';
 
 /** Versión del handler (comprobar en Network → respuesta JSON tras redeploy). */
@@ -710,12 +711,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           ? await saveOrderTracking(orderIdToSave, created.tracking)
           : false;
 
+        let adminLabelEmailSent = false;
+        if (orderIdToSave && !isStub) {
+          try {
+            const supabaseUrl = getEnv('VITE_SUPABASE_URL');
+            const serviceKey = getEnv('SUPABASE_SERVICE_ROLE_KEY');
+            if (supabaseUrl && serviceKey) {
+              const supabase = createClient(supabaseUrl, serviceKey);
+              const { data: orderRow } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('order_id', orderIdToSave)
+                .maybeSingle();
+              if (orderRow) {
+                await sendAdminLabelCreatedEmail(orderRow, {
+                  tracking: created.tracking,
+                  labelUrl: label_url,
+                  albaran: created.albaran,
+                });
+                adminLabelEmailSent = true;
+              }
+            }
+          } catch (emailErr) {
+            console.error('[nacex] Error enviando email de etiqueta al admin:', emailErr);
+          }
+        }
+
         return res.status(200).json({
           success: true,
           tracking: created.tracking,
           albaran: created.albaran,
           label_url,
           orderSaved,
+          adminLabelEmailSent,
           mode: isTestOrder ? 'test' : 'real',
           testStubLabel: isStub,
           message: isStub

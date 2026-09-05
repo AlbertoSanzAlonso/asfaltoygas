@@ -211,6 +211,125 @@ export async function sendAdminNewOrderEmail(
   });
 }
 
+/** URL absoluta de la etiqueta Nacex (PNG vía API). */
+export function resolveNacexLabelAbsoluteUrl(
+  tracking: string,
+  labelUrl?: string,
+  siteUrl: string = getSiteUrl(),
+): string {
+  let url = (labelUrl || '').trim();
+  if (!url || url.startsWith('data:')) {
+    url = `/api/nacex?method=get_etiqueta&codExp=${encodeURIComponent(tracking)}`;
+  }
+  if (url.startsWith('/')) {
+    return `${siteUrl.replace(/\/$/, '')}${url}`;
+  }
+  return url;
+}
+
+export function buildAdminLabelCreatedEmailHtml(
+  order: Order,
+  opts: { tracking: string; labelUrl: string; albaran?: string },
+): string {
+  const orderId = order.order_id.split('-')[0].toUpperCase();
+  const contact = getOrderContact(order);
+  const adminUrl = `${getSiteUrl()}/admin`;
+  const trackingUrl = `https://www.nacex.es/seguimientoPedido.do?numExp=${encodeURIComponent(opts.tracking)}`;
+  const addressLine = [
+    order.shipping_street,
+    [order.shipping_zip, order.shipping_city, order.shipping_province].filter(Boolean).join(' '),
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  return `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 40px; border-radius: 10px;">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <img src="${LOGO_URL}" alt="Asfalto y Gas" style="width: 180px; height: auto;">
+      </div>
+      <h1 style="color: #000; text-transform: uppercase; font-style: italic; border-bottom: 2px solid #ff3366; padding-bottom: 16px; text-align: center; font-size: 22px;">
+        Etiqueta Nacex lista <span style="color: #ff3366;">#${orderId}</span>
+      </h1>
+      <p style="text-align: center; font-size: 15px; color: #333;">
+        Se ha creado la expedición. Abre la etiqueta para imprimirla y preparar el paquete.
+      </p>
+
+      <div style="text-align: center; margin: 28px 0;">
+        <a href="${opts.labelUrl}" style="background: #ff3366; color: #fff; padding: 16px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; text-transform: uppercase; letter-spacing: 1px; font-size: 12px;">
+          Abrir etiqueta
+        </a>
+      </div>
+
+      <div style="background: #fff5f7; border: 1px solid #ffd6e0; padding: 20px; border-radius: 8px; margin: 24px 0; font-size: 14px;">
+        <h3 style="margin: 0 0 12px 0; text-transform: uppercase; font-size: 11px; color: #ff3366; letter-spacing: 0.1em;">Expedición</h3>
+        <p style="margin: 4px 0;"><strong>Tracking:</strong> ${opts.tracking}</p>
+        ${opts.albaran ? `<p style="margin: 4px 0;"><strong>Albarán:</strong> ${opts.albaran}</p>` : ''}
+        <p style="margin: 4px 0;"><strong>Seguimiento Nacex:</strong> <a href="${trackingUrl}">${trackingUrl}</a></p>
+        <p style="margin: 4px 0;"><strong>Etiqueta:</strong> <a href="${opts.labelUrl}">${opts.labelUrl}</a></p>
+      </div>
+
+      <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0; font-size: 13px;">
+        <h4 style="margin: 0 0 10px 0; text-transform: uppercase; font-size: 11px; color: #888;">Destinatario</h4>
+        <p style="margin: 4px 0;"><strong>${contact.name || '—'}</strong></p>
+        <p style="margin: 4px 0;">${contact.email || '—'} · ${contact.phone || '—'}</p>
+        <p style="margin: 4px 0;">${addressLine || 'Sin dirección'}</p>
+      </div>
+
+      <p style="font-size: 12px; color: #666; text-align: center; margin-top: 24px;">
+        Pedido: <code style="background: #f0f0f0; padding: 2px 6px;">${order.order_id}</code>
+      </p>
+      <hr style="border: 0; border-top: 1px solid #eee; margin: 24px 0;" />
+      <p style="font-size: 11px; color: #999; text-align: center;">
+        Panel admin: <a href="${adminUrl}">${adminUrl}</a>
+      </p>
+    </div>
+  `;
+}
+
+/** Aviso al admin cuando ya existe etiqueta Nacex (tras crear expedición). */
+export async function sendAdminLabelCreatedEmail(
+  order: Order,
+  opts: { tracking: string; labelUrl?: string; albaran?: string },
+): Promise<void> {
+  const tracking = String(opts.tracking || '').trim();
+  if (!tracking) {
+    console.warn('[admin-label-email] Sin tracking; no se envía.');
+    return;
+  }
+
+  const transporter = createMailTransporter();
+  if (!transporter) {
+    console.warn('[admin-label-email] SMTP no configurado; no se envía aviso de etiqueta.');
+    return;
+  }
+
+  const to = getAdminOrderNotifyEmail();
+  const labelUrl = resolveNacexLabelAbsoluteUrl(tracking, opts.labelUrl);
+  const orderId = order.order_id.split('-')[0].toUpperCase();
+  const contact = getOrderContact(order);
+  const html = buildAdminLabelCreatedEmailHtml(order, {
+    tracking,
+    labelUrl,
+    albaran: opts.albaran,
+  });
+
+  await transporter.sendMail({
+    from: getMailFromHeader(),
+    to,
+    subject: `Etiqueta Nacex #${orderId} — ${tracking}`,
+    html,
+    text: [
+      `Etiqueta Nacex lista para el pedido #${orderId}.`,
+      `Tracking: ${tracking}`,
+      opts.albaran ? `Albarán: ${opts.albaran}` : '',
+      `Etiqueta: ${labelUrl}`,
+      `Cliente: ${contact.name || '—'} | ${contact.email || '—'}`,
+    ]
+      .filter(Boolean)
+      .join('\n'),
+  });
+}
+
 /** Cliente + admin a la vez tras confirmar el pago. */
 export async function sendOrderPaidEmails(
   order: Order,

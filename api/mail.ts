@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 import type { Order, OrderItem } from '../src/types/index.js';
 import {
   getAdminOrderNotifyEmail,
+  resolveNacexLabelAbsoluteUrl,
+  sendAdminLabelCreatedEmail,
   sendAdminNewOrderEmail,
   sendOrderPaidEmails,
 } from '../src/lib/emails/adminNewOrderNotification.js';
@@ -14,6 +16,7 @@ import { getEnv } from './_env.js';
  * GET  ?op=status → diagnóstico SMTP
  * POST ?op=send | body sin op → enviar email
  * POST ?op=notify-admin → aviso admin de pedido
+ * POST ?op=notify-label → aviso admin con enlace de etiqueta Nacex
  * POST ?op=resend-order → reenviar emails pedido (solo test checkout)
  */
 
@@ -163,6 +166,66 @@ async function handleNotifyAdmin(req: VercelRequest, res: VercelResponse) {
   }
 }
 
+async function handleNotifyLabel(req: VercelRequest, res: VercelResponse) {
+  const orderId = String(req.body?.orderId || '').trim();
+  if (!orderId) {
+    return res.status(400).json({ message: 'Falta orderId' });
+  }
+
+  const supabaseUrl = getEnv('VITE_SUPABASE_URL');
+  const serviceKey = getEnv('SUPABASE_SERVICE_ROLE_KEY');
+  if (!supabaseUrl || !serviceKey) {
+    return res.status(500).json({ message: 'Supabase no configurado' });
+  }
+
+  const trackingOverride = String(req.body?.tracking || '').trim();
+  const labelUrlOverride = String(req.body?.labelUrl || '').trim();
+  const albaran = String(req.body?.albaran || '').trim() || undefined;
+
+  try {
+    const supabase = createClient(supabaseUrl, serviceKey);
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('order_id', orderId)
+      .maybeSingle();
+
+    if (orderError || !order) {
+      return res.status(404).json({ message: 'Pedido no encontrado' });
+    }
+
+    const tracking = trackingOverride || String(order.tracking_number || '').trim();
+    if (!tracking) {
+      return res.status(400).json({
+        message: 'El pedido no tiene tracking Nacex. Genera la etiqueta primero.',
+      });
+    }
+
+    const labelUrl =
+      labelUrlOverride ||
+      resolveNacexLabelAbsoluteUrl(tracking);
+
+    await sendAdminLabelCreatedEmail(order as Order, {
+      tracking,
+      labelUrl,
+      albaran,
+    });
+
+    return res.status(200).json({
+      success: true,
+      to: getAdminOrderNotifyEmail(),
+      tracking,
+      labelUrl,
+    });
+  } catch (error) {
+    console.error('[mail/notify-label]', error);
+    return res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Error al enviar aviso de etiqueta',
+    });
+  }
+}
+
 async function handleResendOrder(req: VercelRequest, res: VercelResponse) {
   if (getEnv('VITE_ENABLE_TEST_CHECKOUT') !== 'true') {
     return res.status(403).json({
@@ -242,6 +305,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (op === 'notify-admin') return handleNotifyAdmin(req, res);
+  if (op === 'notify-label') return handleNotifyLabel(req, res);
   if (op === 'resend-order') return handleResendOrder(req, res);
   if (op === 'send') return handleSend(req, res);
 
