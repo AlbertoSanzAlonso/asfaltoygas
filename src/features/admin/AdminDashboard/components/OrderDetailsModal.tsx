@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/Button";
 import type { Order } from "@/types";
 import { api } from '@/lib/api';
 import { getOrderContact } from '@/lib/orderContact';
-import { canFulfillOrder } from '@/lib/orderPayment';
+import {
+  ADMIN_ORDER_LIST_STATUS_UI,
+  canFulfillOrder,
+  getAdminOrderListStatus,
+} from '@/lib/orderPayment';
 import { OrderLinePricing } from '@/components/orders/OrderLinePricing';
 import { OrderItemVariantInfo } from '@/components/orders/OrderItemVariantInfo';
 import { OrderTotalsSummary } from '@/components/orders/OrderTotalsSummary';
@@ -26,6 +30,8 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
   onMarkPaid,
 }) => {
   const contact = getOrderContact(order);
+  const listStatus = getAdminOrderListStatus(order);
+  const statusUi = ADMIN_ORDER_LIST_STATUS_UI[listStatus];
   const testCheckoutEnabled = import.meta.env.VITE_ENABLE_TEST_CHECKOUT === 'true';
   const canMarkPaid =
     Boolean(onMarkPaid) && testCheckoutEnabled && !canFulfillOrder(order) && order.order_status !== 'Cancelled';
@@ -39,7 +45,16 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
             <h2 className="text-2xl font-display font-black uppercase tracking-tighter italic text-(--text-main)">
               Detalle del Pedido
             </h2>
-            <p className="text-[10px] font-black uppercase tracking-widest text-primary mt-1">#{order.order_id.toUpperCase()}</p>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <p className="text-[10px] font-black uppercase tracking-widest text-primary">
+                #{order.order_id.split('-')[0].toUpperCase()}
+              </p>
+              <span
+                className={`inline-flex text-[10px] font-black uppercase tracking-wide px-3 py-1 border rounded-lg ${statusUi.className}`}
+              >
+                {statusUi.label}
+              </span>
+            </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-primary/10 rounded-full transition-all text-(--text-main)">
             <X className="w-6 h-6" />

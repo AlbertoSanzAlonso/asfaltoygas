@@ -3,7 +3,12 @@ import React from 'react';
 import { Button } from "@/components/ui/Button";
 import type { Order } from "@/types";
 import { api } from '@/lib/api';
-import { canFulfillOrder } from '@/lib/orderPayment';
+import { getOrderContact } from '@/lib/orderContact';
+import {
+  ADMIN_ORDER_LIST_STATUS_UI,
+  canFulfillOrder,
+  getAdminOrderListStatus,
+} from '@/lib/orderPayment';
 
 interface OrdersTabProps {
   orders?: Order[];
@@ -44,19 +49,27 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-(--border-main)">
-              {orders?.map((order) => (
+              {orders?.map((order) => {
+                const contact = getOrderContact(order);
+                const status = getAdminOrderListStatus(order);
+                const statusUi = ADMIN_ORDER_LIST_STATUS_UI[status];
+                return (
                 <tr key={order.order_id} 
                     onClick={() => onOrderClick(order)}
                     className="hover:bg-primary/5 transition-colors group cursor-pointer">
                   <td className="px-8 py-6 text-sm font-black italic text-(--text-main)">#{order.order_id.split('-')[0].toUpperCase()}</td>
                   <td className="px-8 py-6">
-                    <p className="text-sm font-bold uppercase italic text-(--text-main)">{order.customer?.name} {order.customer?.surname}</p>
+                    <p className="text-sm font-bold uppercase italic text-(--text-main)">
+                      {contact.name || 'Cliente'}
+                    </p>
                     <p className="text-[10px] text-gray-500 uppercase tracking-widest">{new Date(order.order_date).toLocaleDateString()}</p>
                   </td>
                   <td className="px-8 py-6 text-sm font-black italic text-(--text-main)">{order.total_amount.toFixed(2)}€</td>
                   <td className="px-8 py-6">
-                    <span className={`text-[10px] font-black uppercase px-3 py-1 border rounded-lg ${order.order_status === 'Paid' ? 'border-green-500/30 bg-green-500/5 text-green-500' : 'border-yellow-500/30 bg-yellow-500/5 text-yellow-500'}`}>
-                      {(order.order_status || '').toUpperCase()}
+                    <span
+                      className={`inline-flex text-[10px] font-black uppercase tracking-wide px-3 py-1.5 border rounded-lg whitespace-nowrap ${statusUi.className}`}
+                    >
+                      {statusUi.label}
                     </span>
                   </td>
                   <td className="px-8 py-6 text-right">
@@ -85,13 +98,14 @@ export const OrdersTab: React.FC<OrdersTabProps> = ({
                         GENERAR NACEX
                       </Button>
                     ) : (
-                      <span className="text-[9px] font-black uppercase tracking-widest text-yellow-600 px-2">
-                        Pago pendiente
+                      <span className="text-[9px] font-black uppercase tracking-widest text-amber-600 px-2">
+                        Esperando pago
                       </span>
                     )}
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
