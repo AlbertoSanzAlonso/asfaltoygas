@@ -48,6 +48,17 @@ export const orders = {
     return data || [];
   },
 
+  getById: async (orderId: string): Promise<Order | null> => {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*, customer:customers(name, surname, email, phone)')
+      .eq('order_id', orderId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  },
+
   create: async (order: Omit<Order, 'order_id'>): Promise<Order> => {
     const payload = {
       ...order,

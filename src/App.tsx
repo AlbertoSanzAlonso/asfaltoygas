@@ -102,8 +102,10 @@ const ProtectedRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
 
 const AdminProtectedRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
   const isAdminAuthenticated = useAdminStore((state) => state.isAdminAuthenticated);
+  const location = useLocation();
   if (!isAdminAuthenticated) {
-    return <Navigate to="/admin/login" replace />;
+    const next = `${location.pathname}${location.search}`;
+    return <Navigate to={`/admin/login?next=${encodeURIComponent(next)}`} replace />;
   }
   return <>{children}</>;
 };

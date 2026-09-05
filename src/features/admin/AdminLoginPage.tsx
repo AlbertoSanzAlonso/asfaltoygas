@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, User, Shield, Loader2, Eye, EyeOff } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAdminStore } from "@/store/useAdminStore";
 import { api } from "@/lib/api";
 import { useCartStore } from "@/store/useCartStore";
@@ -15,6 +15,7 @@ export const AdminLoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const adminLogin = useAdminStore((state) => state.adminLogin);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -25,7 +26,10 @@ export const AdminLoginPage: React.FC = () => {
     try {
       const { admin, token } = await api.auth.adminLogin(email, password);
       adminLogin(admin, token);
-      navigate('/admin');
+      const next = searchParams.get('next') || '';
+      const safeNext =
+        next.startsWith('/admin') && !next.startsWith('//') ? next : '/admin';
+      navigate(safeNext);
     } catch (err) {
       useCartStore.getState().openModal({
         title: 'Acceso denegado',

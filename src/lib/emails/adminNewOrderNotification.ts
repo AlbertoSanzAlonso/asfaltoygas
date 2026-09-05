@@ -46,6 +46,7 @@ export function buildAdminNewOrderEmailHtml(
   const tableHead = buildOrderItemsEmailTableHead(items);
   const totalsHtml = buildOrderTotalsEmailHtml({ ...order, items });
   const adminUrl = `${adminBaseUrl}/admin`;
+  const generateLabelUrl = `${adminBaseUrl}/admin?tab=orders&generateLabel=${encodeURIComponent(order.order_id)}`;
   const paymentLabel = order.payment_method || order.payment_status || '—';
   const carrierLabel = order.carrier || '—';
 
@@ -68,14 +69,17 @@ export function buildAdminNewOrderEmailHtml(
         Nuevo pedido <span style="color: #ff3366;">#${orderId}</span>
       </h1>
       <p style="text-align: center; font-size: 15px; color: #333;">
-        Hay un pedido pagado listo para preparar. <strong>Genera la etiqueta Nacex</strong> desde el panel de administración.
+        Hay un pedido pagado listo para preparar. Pulsa el botón para <strong>generar la etiqueta Nacex</strong> (iniciarás sesión en el admin si hace falta).
       </p>
 
       <div style="text-align: center; margin: 28px 0;">
-        <a href="${adminUrl}" style="background: #ff3366; color: #fff; padding: 16px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; text-transform: uppercase; letter-spacing: 1px; font-size: 12px;">
-          Ir al admin → Pedidos
+        <a href="${generateLabelUrl}" style="background: #ff3366; color: #fff; padding: 16px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; text-transform: uppercase; letter-spacing: 1px; font-size: 12px;">
+          Generar etiqueta Nacex
         </a>
       </div>
+      <p style="text-align: center; margin: 0 0 24px 0;">
+        <a href="${adminUrl}" style="color: #666; font-size: 12px; text-decoration: underline;">Abrir panel de pedidos</a>
+      </p>
 
       <div style="background: #fff5f7; border: 1px solid #ffd6e0; padding: 20px; border-radius: 8px; margin: 24px 0; font-size: 14px;">
         <h3 style="margin: 0 0 12px 0; text-transform: uppercase; font-size: 11px; color: #ff3366; letter-spacing: 0.1em;">Cliente</h3>
@@ -206,7 +210,8 @@ export async function sendAdminNewOrderEmail(
       `Nuevo pedido #${orderId}.`,
       `Cliente: ${contact.name || '—'} | ${contact.email || '—'} | ${contact.phone || '—'}`,
       `Total: ${Number(order.total_amount || 0).toFixed(2)}€`,
-      `Entra en ${adminBaseUrl}/admin para generar la etiqueta Nacex.`,
+      `Generar etiqueta: ${adminBaseUrl}/admin?tab=orders&generateLabel=${encodeURIComponent(order.order_id)}`,
+      `Panel admin: ${adminBaseUrl}/admin`,
     ].join('\n'),
   });
 }

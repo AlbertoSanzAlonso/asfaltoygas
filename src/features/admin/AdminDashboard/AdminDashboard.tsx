@@ -1,6 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { AdminLayout } from "@/features/admin/AdminLayout";
 import { ProductModal } from "@/features/admin/ProductModal/ProductModal";
 import { OverviewTab } from "@/features/admin/AdminDashboard/components/OverviewTab";
@@ -20,6 +21,8 @@ import type { ProductHighlightFlag } from "@/lib/api/products";
 import type { Product, Order } from "@/types";
 
 export const AdminDashboard: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const generateLabelStarted = useRef(false);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'orders' | 'customers' | 'newsletter' | 'discounts'>('dashboard');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -322,9 +325,29 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleGenerateLabel = async (orderId: string, options?: { isTest?: boolean }) => {
-    const order = orders?.find(o => o.order_id === orderId);
-    if (order && !canFulfillOrder(order)) {
+  const handleGenerateLabel = async (
+    orderId: string,
+    options?: { isTest?: boolean; order?: Order | null },
+  ) => {
+    let order = options?.order ?? orders?.find((o) => o.order_id === orderId) ?? null;
+    if (!order) {
+      try {
+        order = await api.orders.getById(orderId);
+      } catch (err) {
+        console.error('Error cargando pedido para etiqueta:', err);
+      }
+    }
+
+    if (!order) {
+      openModal({
+        title: 'Pedido no encontrado',
+        message: 'No se pudo cargar el pedido para generar la etiqueta.',
+        type: 'warning',
+      });
+      return;
+    }
+
+    if (!canFulfillOrder(order)) {
       openModal({
         title: 'Pago pendiente',
         message:
@@ -334,25 +357,38 @@ export const AdminDashboard: React.FC = () => {
       return;
     }
 
+    if (order.tracking_number?.trim()) {
+      const tracking = order.tracking_number.trim();
+      setSelectedOrder(order);
+      setTrackingInfo({ number: tracking, carrier: order.carrier || 'NACEX' });
+      openModal({
+        title: 'Etiqueta ya generada',
+        message: `Este pedido ya tiene tracking ${tracking}.`,
+        type: 'info',
+        actionLabel: 'Ver Etiqueta',
+        onAction: () => api.shipping.openNacexLabel(undefined, tracking),
+      });
+      return;
+    }
+
     const forceTest =
       options?.isTest === true ||
       import.meta.env.VITE_ENABLE_TEST_CHECKOUT === 'true' ||
-      order?.payment_method === 'TEST_MODE';
+      order.payment_method === 'TEST_MODE';
 
     try {
-      // Buscamos los detalles del pedido para pasarlos a la API de Nacex
-      const contact = order ? getOrderContact(order) : null;
-      const orderDetails = order ? {
-        nombre: contact?.name || 'Cliente',
+      const contact = getOrderContact(order);
+      const orderDetails = {
+        nombre: contact.name || 'Cliente',
         direccion: order.shipping_street,
         poblacion: order.shipping_city,
         cp: order.shipping_zip,
-        telefono: contact?.phone,
+        telefono: contact.phone,
         orderId: order.order_id,
         isTest: forceTest,
-        isNacexShop: order.carrier?.includes('Nacex Point'), // Detectar si es envío a punto
-        payment_method: order.payment_method
-      } : { isTest: forceTest };
+        isNacexShop: order.carrier?.includes('Nacex Point'),
+        payment_method: order.payment_method,
+      };
 
       const res = await api.shipping.createNacexExpedition(orderId, orderDetails);
 
@@ -370,7 +406,7 @@ export const AdminDashboard: React.FC = () => {
       }
 
       const orderWithTracking = {
-        ...(updatedOrder || order)!,
+        ...(updatedOrder || order),
         tracking_number: res.trackingNumber,
         carrier: 'NACEX',
         order_status: 'Shipped' as const,
@@ -380,12 +416,13 @@ export const AdminDashboard: React.FC = () => {
       setSelectedOrder(orderWithTracking);
       setTrackingInfo({ number: res.trackingNumber, carrier: 'NACEX' });
 
-      // Enviar notificación por email al cliente de forma automática
-      if (order?.customer?.email) {
+      // Enviar notificación por email al cliente (cuenta o invitado)
+      const shipEmail = getOrderContact(orderWithTracking).email || order.customer?.email;
+      if (shipEmail) {
         try {
           await api.mail.sendStatusUpdate(
             { ...orderWithTracking, customer: order.customer },
-            order.customer.email,
+            shipEmail,
             'Shipped'
           );
         } catch (emailErr) {
@@ -426,6 +463,26 @@ export const AdminDashboard: React.FC = () => {
       });
     }
   };
+
+  // Deep link desde email: /admin?tab=orders&generateLabel=<orderId>
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    const generateLabel = searchParams.get('generateLabel')?.trim();
+    if (tab === 'orders' || generateLabel) {
+      setActiveTab('orders');
+    }
+    if (!generateLabel || generateLabelStarted.current) return;
+    generateLabelStarted.current = true;
+    setSearchParams({}, { replace: true });
+    openModal({
+      title: 'Generando etiqueta Nacex',
+      message: 'Creando la expedición a partir del enlace del correo…',
+      type: 'info',
+    });
+    void handleGenerateLabel(generateLabel);
+    // Solo al montar / al llegar con query del email
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSaveTracking = async (orderId: string, number: string, carrier: string) => {
     try {
