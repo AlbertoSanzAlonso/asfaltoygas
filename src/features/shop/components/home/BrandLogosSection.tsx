@@ -48,7 +48,7 @@ export const BrandLogosSection: React.FC = () => {
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 md:w-24 bg-gradient-to-r from-accent to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 md:w-24 bg-gradient-to-l from-accent to-transparent" />
 
-        <div className="flex w-max animate-brand-marquee items-center gap-10 md:gap-14">
+        <div className="flex w-max animate-brand-marquee items-center gap-20 md:gap-28">
           {loop.map((brand, index) => (
             <BrandMark
               key={`${brand.slug}-${index}`}
