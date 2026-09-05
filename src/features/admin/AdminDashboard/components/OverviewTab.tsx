@@ -2,6 +2,11 @@
 import React from 'react';
 import type { Order, Product } from "@/types";
 import { Button } from "@/components/ui/Button";
+import { getOrderContact } from '@/lib/orderContact';
+import {
+  ADMIN_ORDER_LIST_STATUS_UI,
+  getAdminOrderListStatus,
+} from '@/lib/orderPayment';
 
 interface OverviewTabProps {
   orders?: Order[];
@@ -34,27 +39,38 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
             <button onClick={onViewAllOrders} className="text-primary text-[10px] font-black tracking-widest uppercase hover:underline">Ver todos</button>
           </div>
           <div className="divide-y divide-(--border-main)">
-            {orders?.slice(0, 5).map(order => (
+            {orders?.slice(0, 5).map(order => {
+              const contact = getOrderContact(order);
+              const statusUi = ADMIN_ORDER_LIST_STATUS_UI[getAdminOrderListStatus(order)];
+              return (
               <div key={order.order_id} 
                    onClick={() => onOrderClick(order)}
-                   className="p-6 hover:bg-primary/5 transition-colors flex justify-between items-center group cursor-pointer">
-                <div className="flex gap-4 items-center">
-                  <div className="px-4 h-10 bg-(--bg-main) border border-(--border-main) flex items-center justify-center font-mono text-[9px] text-primary font-black group-hover:border-primary/30 transition-all rounded-xl min-w-[90px]">
+                   className="p-6 hover:bg-primary/5 transition-colors flex justify-between items-center gap-4 group cursor-pointer">
+                <div className="flex gap-4 items-center min-w-0 flex-1">
+                  <div className="px-4 h-10 bg-(--bg-main) border border-(--border-main) flex items-center justify-center font-mono text-[9px] text-primary font-black group-hover:border-primary/30 transition-all rounded-xl min-w-[90px] shrink-0">
                     #{order.order_id.split('-')[0].toUpperCase()}
                   </div>
-                  <div>
-                    <p className="text-sm font-bold uppercase italic text-(--text-main)">{order.customer?.name} {order.customer?.surname}</p>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold uppercase italic text-(--text-main) truncate">
+                      {contact.name || 'Cliente'}
+                    </p>
                     <p className="text-[10px] text-gray-500 uppercase tracking-widest">
                       {new Date(order.order_date).toLocaleDateString()} • {order.items?.length || 0} artículos
                     </p>
+                    <span
+                      className={`mt-1.5 inline-flex text-[9px] font-black uppercase tracking-wide px-2.5 py-1 border rounded-lg ${statusUi.className}`}
+                    >
+                      {statusUi.label}
+                    </span>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right shrink-0">
                   <p className="font-black text-sm text-primary">{order.total_amount.toFixed(2)}€</p>
                   <p className="text-[8px] font-black uppercase tracking-widest text-gray-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Ver Detalle</p>
                 </div>
               </div>
-            ))}
+              );
+            })}
             {(!orders || orders.length === 0) && (
               <div className="p-12 text-center text-gray-500 text-xs font-bold uppercase italic">No hay pedidos registrados</div>
             )}
