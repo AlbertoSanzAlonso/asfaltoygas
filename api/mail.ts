@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import type { Order, OrderItem } from '../src/types/index.js';
 import {
+  getAdminOrderNotifyEmail,
   sendAdminNewOrderEmail,
   sendOrderPaidEmails,
 } from '../src/lib/emails/adminNewOrderNotification.js';
@@ -45,7 +46,7 @@ async function handleStatus(req: VercelRequest, res: VercelResponse) {
   const pass = Boolean((getEnv('SMTP_PASS') || getEnv('SMTP_PASSWORD') || '').trim());
   const port = getEnv('SMTP_PORT') || '587';
   const from = getMailFromAddress();
-  const admin = getEnv('ADMIN_ORDER_EMAIL')?.trim() || '';
+  const admin = getAdminOrderNotifyEmail();
   const transporter = createMailTransporter();
 
   let smtpVerify: 'ok' | 'fail' | 'skipped' = 'skipped';

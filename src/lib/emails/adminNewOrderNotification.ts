@@ -6,17 +6,29 @@ import {
   buildOrderTotalsEmailHtml,
 } from '../orderEmailHtml.js';
 
+import { BRAND } from '../brand.js';
 import { getEnv } from '../env.js';
 import { getCanonicalSiteUrl } from '../siteUrl.js';
 import { createMailTransporter, getMailFromHeader } from '../mailTransport.js';
 
 const LOGO_URL = `${getCanonicalSiteUrl()}/assets/logo/logo-asfaltoygas-main.png`;
 
-const DEFAULT_ADMIN_ORDER_EMAIL = 'asfaltoygasatcliente@gmail.com';
-
+/**
+ * Destino de avisos de pedido nuevo.
+ * No usar el buzón SMTP (`info@` / MAIL_FROM): ese es el remitente, no la bandeja del propietario.
+ */
 export function getAdminOrderNotifyEmail(): string {
-  const configured = getEnv('ADMIN_ORDER_EMAIL')?.trim();
-  return configured || DEFAULT_ADMIN_ORDER_EMAIL;
+  const configured = getEnv('ADMIN_ORDER_EMAIL')?.trim().toLowerCase();
+  const smtpMailbox = (
+    getEnv('MAIL_FROM')?.trim() ||
+    getEnv('SMTP_USER')?.trim() ||
+    ''
+  ).toLowerCase();
+
+  if (configured && configured !== smtpMailbox) {
+    return configured;
+  }
+  return BRAND.email;
 }
 
 export function getSiteUrl(): string {

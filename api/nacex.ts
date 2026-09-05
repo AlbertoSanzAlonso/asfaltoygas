@@ -6,7 +6,7 @@ import { BRAND } from '../src/lib/brand.js';
 import { getEnv } from './_env.js';
 
 /** Versión del handler (comprobar en Network → respuesta JSON tras redeploy). */
-const NACEX_API_VERSION = '2026-08-test-label-v5';
+const NACEX_API_VERSION = '2026-09-latin1-encode-v6';
 const NACEX_WS_URL = 'https://pda.nacex.com/nacex_ws/ws';
 
 /** Evita romper el formato pipe-separated de Nacex. */
@@ -33,7 +33,34 @@ function parsePutExpedicionResponse(raw: string): {
   return null;
 }
 
-/** Codifica cada valor como la librería PHP oficial (clave=urlencode(valor)). */
+/**
+ * Percent-encode en ISO-8859-1 (como PHP urlencode con Latin-1).
+ * encodeURIComponent usa UTF-8 y Nacex lo lee como Latin-1 → "Nicolás" sale "NicolÃ¡s".
+ */
+function encodeNacexValue(value: string): string {
+  let out = '';
+  for (let i = 0; i < value.length; i++) {
+    const code = value.charCodeAt(i);
+    const ch = value[i]!;
+    // Mismos caracteres “seguros” que encodeURIComponent
+    if (/[A-Za-z0-9\-_.!~*'()]/.test(ch)) {
+      out += ch;
+      continue;
+    }
+    if (code === 0x20) {
+      out += '%20';
+      continue;
+    }
+    if (code <= 0xff) {
+      out += `%${code.toString(16).toUpperCase().padStart(2, '0')}`;
+      continue;
+    }
+    // Fuera de Latin-1 (emoji, etc.): omitir
+  }
+  return out;
+}
+
+/** Codifica cada valor clave=valor como la librería PHP oficial (ISO-8859-1). */
 function encodeNacexData(pairs: string[]): string {
   return pairs
     .map((pair) => {
@@ -41,7 +68,7 @@ function encodeNacexData(pairs: string[]): string {
       if (eq === -1) return pair;
       const key = pair.slice(0, eq);
       const value = pair.slice(eq + 1);
-      return `${key}=${encodeURIComponent(value)}`;
+      return `${key}=${encodeNacexValue(value)}`;
     })
     .join('|');
 }
